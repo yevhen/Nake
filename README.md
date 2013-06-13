@@ -1,2 +1,3 @@
-Nake
-====
+### Nake is a C# script-based build tool for .NET inspired by Jake/Rake
+
+Documentation is on the way ...
