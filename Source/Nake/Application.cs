@@ -161,7 +161,7 @@ namespace Nake
 			}
 
 			var filter = options.ShowTasksFilter;
-			var maxTaskNameLength = project.Tasks.Values.Max(x => x.DisplayName.Length);
+			var maxTaskNameLength = project.Tasks.Values.Where(x => x.Description != "").Max(x => x.DisplayName.Length);
 
 			var tasks = project.Tasks.Values
 				.OrderBy(x => x.DisplayName)
