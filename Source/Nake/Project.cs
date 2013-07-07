@@ -9,7 +9,7 @@ namespace Nake
 	{
 		readonly Dictionary<string, Task> tasks = new Dictionary<string, Task>(new CaseInsensitiveEqualityComparer());
 
-		internal void Invoke(string name)
+		public void Invoke(string name)
 		{
 			var task = LookupTaskByName(name) ?? LookTaskInRootScope(name);
 
