@@ -39,9 +39,8 @@ task("package", ()=>
 		Path.Combine(OutDir, "Nake.bat"), 
 		string.Format(@"@ECHO OFF{0}{0}Packages\Nake.{1}\tools\net45\Nake.exe %*", Environment.NewLine, version)
 	);
-
-	Exec(string.Format(@"Tools\Nuget.exe pack {0} -Version {1} -OutputDirectory {2} -BasePath {3} -NoPackageAnalysis", "Nake.nuspec",
-		 version, PackageDir, Path.Combine(NakeProjectDirectory, OutDir)));
+	
+	Exec(string.Format(@"Tools\Nuget.exe pack {0} -Version {1} -OutputDirectory {2} -BasePath {3} -NoPackageAnalysis", 		@"Build\NuGet\Nake.nuspec", version, PackageDir, NakeProjectDirectory));
 });
 
 @default("build");
