@@ -22,12 +22,10 @@ task("clean", pre(OutputPath), () =>
 desc("Builds Nake sources");
 task("build", pre("clean"), ()=> 
 {
-	Projects("Nake.sln")
-			
+	Projects("Nake.sln")		
 		.Property("Configuration", Configuration) 
 		.Property("Platform", Platform)
 		.Property("OutputPath", OutputPath)
-
 	.BuildInParallel();
 });
 
@@ -35,7 +33,7 @@ desc("Builds official NuGet package for Nake");
 task("package", ()=> 
 {	
 	Configuration = "Release";
-	Tasks[":build"].Invoke();
+	Tasks["build"].Invoke();
 
 	string version = FileVersionInfo.GetVersionInfo("Output\\Nake.exe").FileVersion;
 

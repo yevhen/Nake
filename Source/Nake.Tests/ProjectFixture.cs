@@ -20,13 +20,14 @@ namespace Nake.Tests
 		[Test]
 		public void Should_not_allow_empty_description()
 		{
-			Assert.Throws<ArgumentException>(()=> Desc(""));
+			Assert.Throws<ArgumentException>(() => Desc(""));
 			Assert.Throws<ArgumentException>(() => Desc(null));
 		}
 
 		[Test]
 		public void Should_not_allow_colon_in_task_name()
 		{
+			Assert.Throws<ArgumentException>(() => Task(":"));
 			Assert.Throws<ArgumentException>(() => Task("some:task:with:colon"));
 		}
 
@@ -50,6 +51,7 @@ namespace Nake.Tests
 		{
 			Task("test");
 			Assert.Throws<DuplicateTaskException>(() => Task("test"));
+			Assert.Throws<DuplicateTaskException>(() => Task("Test"));
 		}
 
 		[Test]
@@ -59,11 +61,11 @@ namespace Nake.Tests
 		}
 
 		[Test]
-		public void Should_execute_queued_task_only_on_run()
+		public void Actions_are_not_executed_when_defined()
 		{
 			var executed = false;
-			
-			Task("test", () => {executed = true;});
+
+			Task("test", () => { executed = true; });
 			Assert.False(executed);
 
 			Invoke("test");
@@ -73,7 +75,7 @@ namespace Nake.Tests
 		[Test]
 		public void Should_fail_if_specified_dependency_cannot_be_found()
 		{
-			Task("test", new[]{"non-existent dependency"});
+			Task("test", new[] { "non-existent dependency" });
 			Assert.Throws<TaskPrerequisiteNotFoundException>(() => Invoke("test"));
 		}
 
@@ -81,8 +83,8 @@ namespace Nake.Tests
 		public void Should_chain_dependencies_as_specified()
 		{
 			var dependencyExecuted = false;
-			
-			Task("task", new[] {"dependency"}, () => { dependencyExecuted = true; });
+
+			Task("task", new[] { "dependency" }, () => { dependencyExecuted = true; });
 			Task("dependency");
 
 			Invoke("task");
@@ -109,7 +111,7 @@ namespace Nake.Tests
 			var customNamespaceScopeTaskExecuted = false;
 
 			Task("Test", () => { defaultNamespaceTaskExecuted = true; });
-			
+
 			Namespace("Custom", () =>
 			{
 				Task("Test", () => { customNamespaceTaskExecuted = true; });
@@ -147,7 +149,7 @@ namespace Nake.Tests
 			{
 				Task("Task1", () => { customNamespaceDependencyExecuted = true; });
 
-				Task("Task2", new[]{"Task1"});
+				Task("Task2", new[] { "Task1" });
 			});
 
 			Invoke("custom:task2");
@@ -180,15 +182,15 @@ namespace Nake.Tests
 		[Test]
 		public void Should_not_allow_any_other_colons_in_rooted_dependency_definitions()
 		{
-			Assert.Throws<ArgumentException>(()=> Task("Task", new[] { ":RootedDependency:WithAnotherColon" }));
+			Assert.Throws<ArgumentException>(() => Task("Task", new[] { ":RootedDependency:WithAnotherColon" }));
 		}
 
 		[Test]
 		public void Should_not_allow_null_or_whitespace_dependency_definitions()
 		{
-			Assert.Throws<ArgumentException>(() => Task("Task", new[] {""}));
-			Assert.Throws<ArgumentException>(() => Task("Task", new[] {"   "}));
-			Assert.Throws<ArgumentException>(() => Task("Task", new string[] {null}));
+			Assert.Throws<ArgumentException>(() => Task("Task", new[] { "" }));
+			Assert.Throws<ArgumentException>(() => Task("Task", new[] { "   " }));
+			Assert.Throws<ArgumentException>(() => Task("Task", new string[] { null }));
 		}
 
 		[Test]
@@ -209,12 +211,12 @@ namespace Nake.Tests
 
 			bool taskExecuted = false;
 			Task("test", new[] { "existent_file.txt" }, () => { taskExecuted = true; });
-			
+
 			Invoke("test");
 			Assert.True(taskExecuted);
 
 			var synthesizedFileTask = project.Tasks["existent_file.txt"];
-			
+
 			Assert.True(synthesizedFileTask is FileTask);
 			Assert.True(!synthesizedFileTask.Prerequisites.Any());
 		}
@@ -225,7 +227,7 @@ namespace Nake.Tests
 			var taskExecuted = false;
 			Task("test", new[] { "non_existent_file.txt" }, () => { taskExecuted = true; });
 
-			Assert.Throws<TaskPrerequisiteNotFoundException>(()=> Invoke("test"));
+			Assert.Throws<TaskPrerequisiteNotFoundException>(() => Invoke("test"));
 			Assert.False(taskExecuted);
 			Assert.False(project.Tasks.ContainsKey("non_existent_file.txt"));
 		}
@@ -248,12 +250,12 @@ namespace Nake.Tests
 
 		Task Task(string name, string[] dependencies, Action action = null)
 		{
-			return project.task(name, dependencies, action ?? (() => {}));
+			return project.task(name, dependencies, action ?? (() => { }));
 		}
 
 		Task Task(string name, Action action = null)
-		{ 
-			return project.task(name, action ?? (() => {}));
+		{
+			return project.task(name, action ?? (() => { }));
 		}
 
 		public void Namespace(string name, Action define)
