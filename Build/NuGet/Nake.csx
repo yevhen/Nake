@@ -7,13 +7,12 @@ public string Platform = "Any CPU";
 desc("This is a build task for your solution");
 task("build", ()=> 
 {
-	var solution = new MSBuildProject("Your.sln")
+	new MSBuildSubmission("Your.sln")
 	{
 		{"Configuration", Configuration}, 
 		{"Platform", Platform}
-	};
-
-	solution.Build();
+	}
+	.Build();
 });
 
 desc("This is a greeting task");

@@ -13,6 +13,17 @@ namespace Nake
 		readonly List<string> includes = new List<string>();
 		readonly List<Func<string, bool>> excludes = new List<Func<string, bool>>();
 
+		public FileList()
+		{}
+
+		public FileList(params string[] includes)
+		{
+			foreach (var pattern in includes)
+			{
+				Include(pattern);
+			}
+		}
+
 		public FileList Include(string pattern)
 		{
 			var include = pattern.Replace(@"\", "/");

@@ -15,13 +15,12 @@ task("clean", () => RemoveDirContents(OutDir));
 desc("This task will build Nake solution");
 task("build", ()=> 
 {
-	var solution = new MSBuildProject("Nake.sln")
+	new MSBuildSubmission("Nake.sln")
 	{
 		{"Configuration", Configuration}, 
 		{"Platform", Platform}
-	};
-
-	solution.Build();
+	}
+	.Build();
 });
 
 desc("This task will build official NuGet package for Nake");
