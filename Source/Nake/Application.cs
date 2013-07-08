@@ -162,11 +162,16 @@ namespace Nake
 			}
 
 			var filter = options.ShowTasksFilter;
-			var maxTaskNameLength = project.Tasks.Values.Where(x => x.Description != "").Max(x => x.DisplayName.Length);
 
-			var tasks = project.Tasks.Values
+			var tasks = project.Tasks.Values.Where(x => x.Description != "").ToArray();
+			if (tasks.Length == 0)
+				Exit.Ok();
+
+			var maxTaskNameLength = tasks.Max(x => x.DisplayName.Length);
+
+			tasks = tasks
 				.OrderBy(x => x.DisplayName)
-				.Where(x => filter == null || x.DisplayName.ToLower().Contains(filter.ToLower()));
+				.Where(x => filter == null || x.DisplayName.ToLower().Contains(filter.ToLower())).ToArray();
 
 			Console.WriteLine();
 
