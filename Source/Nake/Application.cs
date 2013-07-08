@@ -48,9 +48,10 @@ namespace Nake
 			RedefinePassedVariables();
 		}
 
-		static void SetCurrentDirectory()
+		void SetCurrentDirectory()
 		{
-			Location.CurrentDirectory = () => Environment.CurrentDirectory;
+			var directory = options.CurrentDirectory ?? Environment.CurrentDirectory;
+			Location.CurrentDirectory = () => directory;
 		}
 
 		void OverrideEnvironmentVariables()
@@ -161,7 +162,7 @@ namespace Nake
 			}
 
 			var filter = options.ShowTasksFilter;
-			var maxTaskNameLength = project.Tasks.Values.Max(x => x.DisplayName.Length);
+			var maxTaskNameLength = project.Tasks.Values.Where(x => x.Description != "").Max(x => x.DisplayName.Length);
 
 			var tasks = project.Tasks.Values
 				.OrderBy(x => x.DisplayName)

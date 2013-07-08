@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -10,15 +11,26 @@ namespace Nake
 {
 	public class FileList : IEnumerable<string>
 	{
-		readonly List<string> includes = new List<string>();
+		readonly HashSet<string> includes = new HashSet<string>();
 		readonly List<Func<string, bool>> excludes = new List<Func<string, bool>>();
+
+		public FileList()
+		{}
+
+		public FileList(params string[] patterns)
+		{
+			foreach (var pattern in patterns)
+			{
+				Include(pattern);
+			}
+		}
 
 		public FileList Include(string pattern)
 		{
-			var include = pattern.Replace(@"\", "/");
-
-			if (!includes.Contains(include))
-				includes.Add(include);
+			foreach (var inclusion in pattern.Split(new[] {";"}, StringSplitOptions.RemoveEmptyEntries))
+			{
+				includes.Add(inclusion.Replace(@"\", "/"));
+			}
 
 			return this;
 		}
@@ -58,7 +70,7 @@ namespace Nake
 				includes				
 					.SelectMany(pattern => 
 						Glob.GetMatches(AbsoluteGlob(pattern))
-							.Where(file => !excludes.Any(predicate => predicate(file))))
+							.Where(file => !excludes.Any(predicate => predicate(file.Replace("/", @"\")))))
 								.Select(file => file.Replace("/", @"\"))
 			);
 
@@ -67,7 +79,27 @@ namespace Nake
 
 		static string AbsoluteGlob(string pattern)
 		{
-			return string.Format("{0}" + pattern, Location.CurrentDirectory().Replace("\\", "/") + "/");
+			if (Path.IsPathRooted(pattern))
+				return pattern;
+
+			var absolutePath = Path.Combine(Location.CurrentDirectory(), pattern).Replace("\\", "/");
+
+			return absolutePath;
+		}
+
+		public static implicit operator FileList(string[] patterns)
+		{
+			return new FileList(patterns);
+		}
+
+		public static implicit operator FileList(string pattern)
+		{
+			return new FileList(pattern);
+		}
+
+		public static implicit operator string[](FileList files)
+		{
+			return files.ToArray();
 		}
 	}
 }

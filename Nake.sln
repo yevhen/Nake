@@ -1,5 +1,4 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nake", "Source\Nake\Nake.csproj", "{FF2BA5A8-F9DC-468E-B77F-698D9C141EBB}"
 EndProject
