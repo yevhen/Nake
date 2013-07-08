@@ -26,9 +26,9 @@ namespace Nake.Tests
 		{
 			Location.CurrentDirectory = () => Environment.CurrentDirectory;
 		}
-		
+
 		[Test]
-		public void Should_resolve_all_include_patterns_when_enumerated()
+		public void Should_resolve_all_include_patterns()
 		{
 			Include(@"**\*.txt");
 			Include(@"**\*.lg");
@@ -49,11 +49,11 @@ namespace Nake.Tests
 				File(@"B\C\CF6.lg"),
 			};
 
-			Assert.That(Enumerated(), Is.EquivalentTo(expected));
+			Assert.That(Result(), Is.EquivalentTo(expected));
 		}
 
 		[Test]
-		public void Should_respect_exclude_patterns_when_enumerated()
+		public void Should_respect_exclude_patterns()
 		{
 			Include(@"**\*.*");
 			Exclude(@"*.txt");
@@ -66,7 +66,7 @@ namespace Nake.Tests
 				File(@"B\BF3.lg"),
 			};
 
-			Assert.That(Enumerated(), Is.EquivalentTo(expected));
+			Assert.That(Result(), Is.EquivalentTo(expected));
 		}
 
 		[Test]
@@ -81,7 +81,7 @@ namespace Nake.Tests
 				File(@"A\AF1.txt")
 			};
 
-			Assert.That(Enumerated(), Is.EquivalentTo(expected));
+			Assert.That(Result(), Is.EquivalentTo(expected));
 		}
 
 		void Include(string pattern)
@@ -94,9 +94,9 @@ namespace Nake.Tests
 			files.Exclude(pattern);
 		}
 
-		List<string> Enumerated()
+		List<string> Result()
 		{
-			var actual = files.ToList(); return actual;
+			return files.ToList();
 		}
 
 		static string File(string fileName)
