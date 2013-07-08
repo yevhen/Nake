@@ -7,6 +7,7 @@ namespace Nake
 	class Options
 	{
 		public string ProjectFile;
+		public string CurrentDirectory;
 		
 		public bool QuietMode;
 		public bool SilentMode;
@@ -24,7 +25,7 @@ namespace Nake
 		static readonly List<Switch> switches = new List<Switch>
 		{
 			new Switch("help", "Display help message and exit")
-				.Shortcuts("H", "h", "?")
+				.Shortcuts("?")
 				.OnMatch(options => options.ShowHelp = true),
 
 			new Switch("version", "Display the program version and exit")
@@ -47,12 +48,16 @@ namespace Nake
 				.Shortcuts("f")
 				.OnMatch((options, file) => options.ProjectFile = file),
 
+			new Switch("directory DIR", "Use DIR as current directory")
+				.Shortcuts("d")
+				.OnMatch((options, dir) => options.CurrentDirectory = dir),
+
 			new Switch("trace", "Enables task execution tracing and full stack traces in exception messages")
 				.Shortcuts("t")
 				.OnMatch(options => options.TraceEnabled = true),
 			
 			new Switch("tasks [PATTERN]", "Display the tasks with descriptions matching optional PATTERN and exit")
-				.Shortcuts("T", "ls")
+				.Shortcuts("T")
 				.OnMatch((options, filter) => 
 				{ 
 					options.ShowTasks = true;

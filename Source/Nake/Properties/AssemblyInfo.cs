@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 
 [assembly: ComVisible(false)]
 
-[assembly: AssemblyVersion("0.5.3.0")]
-[assembly: AssemblyInformationalVersion("0.5.3.0-beta")]
+[assembly: AssemblyVersion("0.5.4.0")]
+[assembly: AssemblyInformationalVersion("0.5.4.0-beta")]
 
 [assembly: InternalsVisibleTo("Nake.Tests")]

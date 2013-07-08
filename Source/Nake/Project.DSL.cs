@@ -9,7 +9,7 @@ namespace Nake
 
 		public void desc(string description)
 		{
-			if (string.IsNullOrWhiteSpace(description))
+			if (String.IsNullOrWhiteSpace(description))
 				throw new ArgumentException("Empty description is disallowed");
 
 			if (currentDescription != null)
@@ -20,7 +20,7 @@ namespace Nake
 
 		public void @namespace(string name, Action define)
 		{
-			if (string.IsNullOrEmpty(name))
+			if (String.IsNullOrEmpty(name))
 				throw new ArgumentException("name cannot be null or empty string");
 
 			if (define == null)

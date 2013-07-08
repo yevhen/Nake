@@ -5,41 +5,50 @@ using System.Linq;
 using System.Reflection;
 using System.Diagnostics;
 
-public string OutDir = "Output";
+public string OutputPath = Path.Combine(NakeProjectDirectory, "Output");
 public string Configuration = "Debug";
 public string Platform = "Any CPU";
 
-desc("This task will wipeout all build output");
-task("clean", () => RemoveDirContents(OutDir));
+desc("Creates build output directory if needed");
+directory(OutputPath);
 
-desc("This task will build Nake solution");
-task("build", ()=> 
+desc("Wipeout all build output if present");
+task("clean", pre(OutputPath), () => 
 {
-	new MSBuildSubmission("Nake.sln")
-	{
-		{"Configuration", Configuration}, 
-		{"Platform", Platform}
-	}
-	.Build();
+	RemoveDirContents(OutputPath);
+	RemoveDir("**/bin;**/obj");
 });
 
-desc("This task will build official NuGet package for Nake");
+desc("Builds Nake sources");
+task("build", pre("clean"), ()=> 
+{
+	Projects("Nake.sln")
+			
+		.Property("Configuration", Configuration) 
+		.Property("Platform", Platform)
+		.Property("OutputPath", OutputPath)
+
+	.BuildInParallel();
+});
+
+desc("Builds official NuGet package for Nake");
 task("package", ()=> 
 {	
 	Configuration = "Release";
-	Invoke("build");
+	Tasks[":build"].Invoke();
 
 	string version = FileVersionInfo.GetVersionInfo("Output\\Nake.exe").FileVersion;
 
-	var PackageDir = "Output\\Package";
-	MakeDir(PackageDir);
+	var packageDir = "Output\\Package";
+	MakeDir(packageDir);
 	
 	File.WriteAllText(
-		Path.Combine(OutDir, "Nake.bat"), 
+		Path.Combine(OutputPath, "Nake.bat"), 
 		string.Format(@"@ECHO OFF{0}{0}Packages\Nake.{1}\tools\net45\Nake.exe %*", Environment.NewLine, version)
 	);
 	
-	Exec(string.Format(@"Tools\Nuget.exe pack {0} -Version {1} -OutputDirectory {2} -BasePath {3} -NoPackageAnalysis", 		@"Build\NuGet\Nake.nuspec", version, PackageDir, NakeProjectDirectory));
+	Exec(string.Format(@"Tools\Nuget.exe pack {0} -Version {1} -OutputDirectory {2} -BasePath {3} -NoPackageAnalysis", 
+		 @"Build\NuGet\Nake.nuspec", version, packageDir, NakeProjectDirectory));
 });
 
 @default("build");

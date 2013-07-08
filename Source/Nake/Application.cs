@@ -48,9 +48,10 @@ namespace Nake
 			RedefinePassedVariables();
 		}
 
-		static void SetCurrentDirectory()
+		void SetCurrentDirectory()
 		{
-			Location.CurrentDirectory = () => Environment.CurrentDirectory;
+			var directory = options.CurrentDirectory ?? Environment.CurrentDirectory;
+			Location.CurrentDirectory = () => directory;
 		}
 
 		void OverrideEnvironmentVariables()

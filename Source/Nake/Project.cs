@@ -9,7 +9,7 @@ namespace Nake
 	{
 		readonly Dictionary<string, Task> tasks = new Dictionary<string, Task>(new CaseInsensitiveEqualityComparer());
 
-		public void Invoke(string name)
+		internal void Invoke(string name)
 		{
 			var task = LookupTaskByName(name) ?? LookTaskInRootScope(name);
 
@@ -21,7 +21,7 @@ namespace Nake
 
 		Task DefineActionTask(string name, IEnumerable<string> prerequisites, Action<Task> action)
 		{
-			if (string.IsNullOrWhiteSpace(name))
+			if (String.IsNullOrWhiteSpace(name))
 				throw new ArgumentException("Task name cannot be null or empty string");
 
 			if (name.Contains(":"))
@@ -40,7 +40,7 @@ namespace Nake
 
 		Task DefineFileTask(string name, IEnumerable<string> prerequisites, Action<FileTask> action)
 		{
-			if (string.IsNullOrWhiteSpace(name))
+			if (String.IsNullOrWhiteSpace(name))
 				throw new ArgumentException("File name cannot be null or empty string");
 
 			if (action == null)
@@ -54,7 +54,7 @@ namespace Nake
 
 		Task DefineDirectoryTask(string name)
 		{
-			if (string.IsNullOrWhiteSpace(name))
+			if (String.IsNullOrWhiteSpace(name))
 				throw new ArgumentException("Directory name cannot be null or empty string");
 
 			if (tasks.ContainsKey(name))

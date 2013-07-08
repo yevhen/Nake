@@ -72,7 +72,7 @@
     <Compile Include="Exit.cs" />
     <Compile Include="FileTask.cs" />
     <Compile Include="MSBuildEngineStub.cs" />
-    <Compile Include="MSBuildSubmission.cs" />
+    <Compile Include="MSBuildProjects.cs" />
     <Compile Include="Env.cs" />
     <Compile Include="Exceptions.cs" />
     <Compile Include="Extensions.cs" />
