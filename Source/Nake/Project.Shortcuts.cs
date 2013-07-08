@@ -80,15 +80,10 @@ namespace Nake
 
 		public void MakeDir(params string[] directories)
 		{
-			MakeDir((FileList)directories);
+			MakeDir((IEnumerable<string>)directories);
 		}
 
 		public void MakeDir(IEnumerable<string> directories)
-		{
-			MakeDir((FileList)directories);
-		}
-
-		public void MakeDir(FileList directories)
 		{
 			Run(new MakeDir
 			{
