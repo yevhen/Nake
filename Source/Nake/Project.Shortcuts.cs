@@ -28,14 +28,6 @@ namespace Nake
 			Exit.Fail(message, args);
 		}
 
-		public void Run(MSBuildTask task)
-		{
-			task.BuildEngine = new MSBuildEngineStub();
-
-			if (!task.Execute() || task.Log.HasLoggedErrors)
-				Exit.Fail("{0} failed", task.GetType());
-		}
-
 		public void Exec(string command)
 		{
 			Run(new Exec
@@ -48,7 +40,7 @@ namespace Nake
 			});			
 		}
 
-		public void Copy(IEnumerable<string> sourceFiles, string destinationFolder, bool overwriteReadOnlyFiles = false)
+		public void Copy(FileList sourceFiles, string destinationFolder, bool overwriteReadOnlyFiles = false)
 		{
 			Run(new Copy
 			{
@@ -58,7 +50,7 @@ namespace Nake
 			});
 		}
 
-		public void Move(IEnumerable<string> sourceFiles, string destinationFolder, bool overwriteReadOnlyFiles = false)
+		public void Move(FileList sourceFiles, string destinationFolder, bool overwriteReadOnlyFiles = false)
 		{
 			Run(new Move
 			{
@@ -70,13 +62,28 @@ namespace Nake
 
 		public void Delete(params string[] files)
 		{
+			Delete((FileList)files);
+		}
+
+		public void Delete(IEnumerable<string> files)
+		{
+			Delete((FileList)files);
+		}
+
+		public void Delete(FileList files)
+		{
 			Run(new Delete
 			{
-				Files = files.AsTaskItems()				
+				Files = files.AsTaskItems()
 			});
 		}
 
 		public void MakeDir(params string[] directories)
+		{
+			MakeDir((IEnumerable<string>)directories);
+		}
+
+		public void MakeDir(IEnumerable<string> directories)
 		{
 			Run(new MakeDir
 			{
@@ -86,19 +93,64 @@ namespace Nake
 
 		public void RemoveDir(params string[] directories)
 		{
+			RemoveDir((FileList)directories);
+		}
+
+		public void RemoveDir(IEnumerable<string> directories)
+		{
+			RemoveDir((FileList)directories);		
+		}
+
+		public void RemoveDir(FileList directories)
+		{
 			Run(new RemoveDir
 			{
 				Directories = directories.AsTaskItems()
-			});
+			});			
 		}
 
 		public void RemoveDirContents(params string[] directories)
 		{
+			RemoveDirContents((FileList)directories);
+		}
+
+		public void RemoveDirContents(IEnumerable<string> directories)
+		{
+			RemoveDirContents((FileList)directories);
+		}
+
+		public void RemoveDirContents(FileList directories)
+		{
 			foreach (var directory in directories)
 			{
-				Exec(string.Format(@"DEL /S /Q /F {0}", Path.Combine(Location.GetFullPath(directory), "*.*")));
-				Exec(string.Format(@"FOR /D %%p IN (""{0}"") DO RMDIR /S /Q ""%%p""", Path.Combine(Location.GetFullPath(directory), "*.*")));
+				Exec(String.Format(@"DEL /S /Q /F {0}", Path.Combine(Location.GetFullPath(directory), "*.*")));
+				Exec(String.Format(@"FOR /D %%p IN (""{0}"") DO RMDIR /S /Q ""%%p""", Path.Combine(Location.GetFullPath(directory), "*.*")));
 			}
+		}
+
+		public static MSBuildTask Run(MSBuildTask task)
+		{
+			task.BuildEngine = new MSBuildEngineStub();
+
+			if (!task.Execute() || task.Log.HasLoggedErrors)
+				Exit.Fail("{0} failed", task.GetType());
+
+			return task;
+		}
+
+		public MSBuildProjects Projects(params string[] projects)
+		{
+			return Projects((FileList)projects);
+		}
+
+		public MSBuildProjects Projects(IEnumerable<string> projects)
+		{
+			return Projects((FileList)projects);
+		}
+
+		public MSBuildProjects Projects(FileList projects)
+		{
+			return new MSBuildProjects(projects);
 		}
 	}
 }

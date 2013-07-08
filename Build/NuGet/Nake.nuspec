@@ -1,0 +1,25 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Nake</id>
+    <version>$version$</version>
+    <authors>Yevhen Bobrov</authors>
+    <owners>Yevhen Bobrov</owners>
+    <licenseUrl>http://github.com/yevhen/Nake/blob/dev/LICENSE.md</licenseUrl>
+    <projectUrl>http://github.com/yevhen/Nake</projectUrl>
+    <description>Write you build automation scripts in C# without paying the angle bracket tax</description>
+    <tags>roslyn csx script scriptcs nake build automation</tags>
+  </metadata>
+  <files>
+    <file src="Tools\NuGet.exe" target="tools" />
+    <file src="Build\NuGet\Init.ps1" target="tools" />
+
+    <file src="Output\Nake.exe" target="tools/net45" />
+    <file src="Output\Nake.exe.config" target="tools/net45" />
+    <file src="Output\NuGet.Core.dll" target="tools/net45" />
+    <file src="Output\GlobDir.dll" target="tools/net45" />
+    
+    <file src="Build\NuGet\Nake.csx" target="sample" />
+    <file src="Output\Nake.bat" target="sample" />	
+  </files>
+</package>
