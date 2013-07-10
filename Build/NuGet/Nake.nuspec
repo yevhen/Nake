@@ -14,12 +14,14 @@
     <file src="Tools\NuGet.exe" target="tools" />
     <file src="Build\NuGet\Init.ps1" target="tools" />
 
-    <file src="Output\Nake.exe" target="tools/net45" />
-    <file src="Output\Nake.exe.config" target="tools/net45" />
-    <file src="Output\NuGet.Core.dll" target="tools/net45" />
-    <file src="Output\GlobDir.dll" target="tools/net45" />
+    <file src="Output\Package\Release\Nake.exe" target="tools/net45" />
+    <file src="Output\Package\Release\Nake.exe.config" target="tools/net45" />
+    <file src="Output\Package\Release\Meta.dll" target="tools/net45" />
+    <file src="Output\Package\Release\Utility.dll" target="tools/net45" />
+    <file src="Output\Package\Release\NuGet.Core.dll" target="tools/net45" />
+    <file src="Output\Package\Release\GlobDir.dll" target="tools/net45" />
     
     <file src="Build\NuGet\Nake.csx" target="sample" />
-    <file src="Output\Nake.bat" target="sample" />	
+    <file src="Output\Package\Release\Nake.bat" target="sample" />	
   </files>
 </package>

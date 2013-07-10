@@ -1,22 +1,44 @@
-using Nake;
+public const string RootPath = "$NakeScriptDirectory$";
+public const string OutputPath = RootPath + @"\Output";
 
-public string OutDir = "Output";
-public string Configuration = "Debug";
-public string Platform = "Any CPU";
-
-desc("This is a build task for your solution");
-task("build", ()=> 
+[Task] public static void Default()
 {
-	Projects("Your.sln")
-	
-		.Property("Configuration", Configuration) 
-		.Property("Platform", Platform)
-		.Property("OutputPath", OutDir)
-	
-	.BuildInParallel();
-});
+	Greeting();
+}
 
-desc("This is a greeting task");
-task("greeting", () => Console.WriteLine("Hello from Nake!"));
+/// <summary> 
+/// Very simple demo task. See other demo tasks for more useful stuff ;)
+/// </summary>
+[Task] public static void Greeting()
+{
+	Log.Info("Hello from Nake!");
+}
 
-@default("greeting");
+/// <summary> 
+/// Wipeout all build output and temporary build files
+/// </summary>
+[Task] public static void Clean(string path = OutputPath)
+{
+	FS.RemoveDir(@"**\bin|**\obj");
+
+	FS.Delete(@"{path}\*.*|-:*.vshost.exe");
+	FS.RemoveDir(@"{path}\*");
+}
+
+/// <summary>
+/// Builds you solution's sources  
+/// </summary>
+[Task] public static void Build(string configuration = "Debug", string platform = "Any CPU", string outputPath = OutputPath)
+{
+	Clean(outputPath);
+
+	MSBuild
+		
+		.Projects("Your.sln")
+			.Property("Configuration", configuration) 
+			.Property("Platform", platform)
+			.Property("OutDir", outputPath)
+			.Property("ReferencePath", outputPath)
+
+	.Build();
+}

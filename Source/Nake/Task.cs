@@ -1,144 +1,161 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+
+using Roslyn.Compilers;
+using Roslyn.Compilers.CSharp;
 
 namespace Nake
 {
-	public abstract class Task
-	{
-		readonly List<string> prerequisites = new List<string>();
+    class Task
+    {
+        const string ScriptClass = "Submission#0";
 
-		readonly Project project;
-		readonly string name;
-		readonly Scope scope;
-		
-		bool invoked;
+        readonly List<Task> dependencies = new List<Task>();
+        readonly HashSet<TaskInvocation> invocations = new HashSet<TaskInvocation>();
 
-		internal Task(Project project, Scope scope, string name)
-		{
-			this.project = project;
-			this.scope = scope;
-			this.name = name;
+        readonly MethodSymbol symbol;
+        MethodInfo reflected;
 
-			Description = "";
-		}
+        public Task(MethodSymbol symbol)
+        {
+            CheckSignature(symbol);
+            CheckPlacement(symbol);
+            CheckSummary(symbol);
 
-		public virtual string Key
-		{
-			get { return name; }
-		}
+            this.symbol = symbol;
+        }
 
-		protected string ScopedTaskKey()
-		{
-			return scope.TaskKey(name);
-		}
+        static void CheckSignature(MethodSymbol symbol)
+        {
+            if (!symbol.IsStatic ||
+                !symbol.ReturnsVoid ||
+                 symbol.DeclaredAccessibility != Accessibility.Public ||
+                 symbol.IsGenericMethod ||
+                 symbol.Parameters.Any(p => p.RefKind != RefKind.None || !TypeConverter.IsSupported(p.Type)))
+                throw new TaskSignatureViolationException(symbol.ToString());
+        }
 
-		public virtual string DisplayName
-		{
-			get { return name; }
-		}
+        static void CheckPlacement(MethodSymbol symbol)
+        {
+            var parentType = symbol.ContainingType;
+            
+            while (parentType.Name != ScriptClass)
+            {
+                var isNamespace =
+                    parentType.IsStatic &&
+                    parentType.DeclaredAccessibility == Accessibility.Public;
 
-		protected string ScopedTaskDisplayName()
-		{
-			return scope.TaskDisplayName(name);
-		}
+                if (!isNamespace)
+                    throw new TaskPlacementViolationException(symbol.ToString());
 
-		public string Description
-		{
-			get; set;
-		}
+                parentType = parentType.ContainingType;
+            }
+        }
 
-		public IEnumerable<string> Prerequisites
-		{
-			get { return prerequisites; }
-		}
+        static void CheckSummary(MethodSymbol symbol)
+        {
+            if (symbol.GetDocumentationComment().HadXmlParseError)
+                throw new InvalidXmlDocumentationException(symbol.ToString());
+        }
 
-		public IEnumerable<Task> PrerequisiteTasks()
-		{
-			return Prerequisites.Select(LookupPrerequisite);
-		}
+        public static bool IsAnnotated(MethodSymbol symbol)
+        {
+            return symbol.GetAttributes().SingleOrDefault(x => x.AttributeClass.Name == "TaskAttribute") != null;
+        }
 
-		Task LookupPrerequisite(string prerequisite)
-		{
-			var task = project.Lookup(prerequisite, scope);
+        public string Summary
+        {
+            get { return symbol.GetDocumentationComment().SummaryTextOpt ?? ""; }
+        }
 
-			if (task == null)
-				throw new TaskPrerequisiteNotFoundException(this, prerequisite);
+        public bool IsGlobal()
+        {
+            return !FullName.Contains(".");
+        }
 
-			return task;
-		}
+        public string Name
+        {
+            get
+            {
+                return IsGlobal()
+                        ? FullName
+                        : FullName.Substring(FullName.LastIndexOf(".", StringComparison.Ordinal) + 1);
+            }
+        }
 
-		public void Invoke()
-		{
-			Invoke(InvocationChain.Start);
-		}
+        public string FullName
+        {
+            get
+            {
+                return DisplayName.Substring(0, DisplayName.IndexOf("(", StringComparison.Ordinal));
+            }
+        }
 
-		void Invoke(InvocationChain chain)
-		{
-			chain = chain.Append(this);
+        public string DeclaringType
+        {
+            get
+            {                
+                if (IsGlobal())
+                    return ScriptClass;
 
-			Out.TraceFormat("** Invoke '{0}' {1}", DisplayName, InvocationStatus());
+                return ScriptClass + "+" + FullName.Substring(0,
+                    FullName.LastIndexOf(".", StringComparison.Ordinal)).Replace(".", "+");
+            }
+        }
 
-			if (invoked)
-				return;
+        public string DisplayName
+        {
+            get { return symbol.ToString(); }
+        }
 
-			invoked = true;
-			InvokePrerequisites(chain);
+        public bool HasRequiredParameters()
+        {
+            return symbol.Parameters.Any(x => !x.HasDefaultValue);
+        }
 
-			if (IsNeeded())
-				Execute();
-		}
+        public void AddDependency(Task dependency)
+        {
+            if (dependency == this)
+                throw new RecursiveTaskCallException(this);
 
-		string InvocationStatus()
-		{
-			var state = new List<string>();
+            var via = new List<string>();
 
-			if (!invoked)
-				state.Add("first time");
+            if (dependency.IsDependantUpon(this, via))
+                throw new CyclicDependencyException(this, dependency, string.Join(" -> ", via) + " -> " + FullName);
 
-			if (!IsNeeded())
-				state.Add("not needed");
+            dependencies.Add(dependency);
+        }
 
-			return state.Any() ? string.Join(", ",  state) : "";
-		}
+        bool IsDependantUpon(Task other, ICollection<string> chain)
+        {
+            chain.Add(FullName);
 
-		void InvokePrerequisites(InvocationChain chain)
-		{
-			foreach (var prerequisite in PrerequisiteTasks())
-			{
-				prerequisite.Invoke(chain);
-			}
-		}
+            return dependencies.Contains(other) ||
+                   dependencies.Any(dependency => dependency.IsDependantUpon(other, chain));
+        }
+        
+        public void Reflect(Assembly assembly)
+        {
+            reflected = assembly.GetType(DeclaringType)
+                .GetMethod(Name, BindingFlags.Static | BindingFlags.Public);
+        }
 
-		public void Execute()
-		{
-			Out.TraceFormat("** Execute '{0}'", name);
+        public void Invoke(TaskArgument[] arguments)
+        {
+            var invocation = new TaskInvocation(this, reflected, arguments);
 
-			DoExecute();
-		}
+            var alreadyInvoked = !invocations.Add(invocation);
+            if (alreadyInvoked)
+                return;
 
-		public void Reenable()
-		{
-			invoked = false;
-		}
+            invocation.Invoke();
+        }       
 
-		public void AddPrerequisite(string prerequisite)
-		{
-			if (string.IsNullOrWhiteSpace(prerequisite))
-				throw new ArgumentException("Prerequisite resolves to null or whitespace");
-
-			if (prerequisite.StartsWith(":") && prerequisite.LastIndexOf(":", StringComparison.Ordinal) != 0)
-				throw new ArgumentException("Prerequisite definition is invalid");
-		
-			if (prerequisites.Contains(prerequisite))
-				throw new DuplicatePrerequisiteException(this, prerequisite);
-
-			prerequisites.Add(prerequisite);
-		}
-
-		public abstract bool IsNeeded();
-		public abstract DateTime Timestamp();
-		
-		protected abstract void DoExecute();
-	}
+        public override string ToString()
+        {
+            return DisplayName;
+        }
+    }
 }
