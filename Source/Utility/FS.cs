@@ -41,6 +41,16 @@ namespace Nake
             });
         }
 
+        public static void Copy
+        (
+            string sourceFiles, 
+            string destinationFolder, 
+            bool overwriteReadOnlyFiles = false, 
+            bool skipUnchangedFiles = true)
+        {
+            Copy(new FileSet(sourceFiles).ToArray(), destinationFolder, overwriteReadOnlyFiles, skipUnchangedFiles);
+        }
+
         public static void Move(
             string[] sourceFiles, 
             string[] destinationFiles, 
@@ -65,6 +75,14 @@ namespace Nake
                 OverwriteReadOnlyFiles = overwriteReadOnlyFiles,
                 DestinationFolder = destinationFolder.AsTaskItem(),                
             });
+        }        
+        
+        public static void Move(
+            string sourceFiles, 
+            string destinationFolder, 
+            bool overwriteReadOnlyFiles = false)
+        {
+            Move(new FileSet(sourceFiles).ToArray(), destinationFolder, overwriteReadOnlyFiles);
         }
 
         public static string[] Delete(params string[] files)
