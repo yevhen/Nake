@@ -52,9 +52,10 @@ public const string OutputPath = RootPath + @"\Output";
 {
 	Build(configuration, outputPath);
 
-	string tests = new FileSet(
+	string tests = new FileSet
+	{
 		@"{outputPath}\*.Tests.dll"
-	);
+	};
 
 	Cmd.Exec(@"Packages\NUnit.Runners.2.6.2\tools\nunit-console.exe /framework:net-4.0 /noshadow /nologo {tests}");
 }

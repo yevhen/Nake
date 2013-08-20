@@ -22,10 +22,15 @@ namespace Nake
 
         public FileSet(params string[] patterns)
         {
-            var parts = patterns.SelectMany(pattern => 
-                pattern.Split(patternSeparator, StringSplitOptions.RemoveEmptyEntries));
+            foreach (var pattern in patterns)
+            {
+                Add(pattern);
+            }
+        }
 
-            foreach (var part in parts)
+        public FileSet Add(string pattern)
+        {
+            foreach (var part in pattern.Split(patternSeparator, StringSplitOptions.RemoveEmptyEntries))
             {
                 if (part.StartsWith("-:"))
                 {
@@ -35,6 +40,8 @@ namespace Nake
 
                 Include(part);
             }
+
+            return this;
         }
 
         public FileSet Include(string pattern)
