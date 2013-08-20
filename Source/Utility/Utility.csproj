@@ -71,7 +71,6 @@
     <Compile Include="Cmd.cs" />
     <Compile Include="FileSet.Extensions.cs" />
     <Compile Include="FileSet.cs" />
-    <Compile Include="Interactive.cs" />
     <Compile Include="Exit.cs" />
     <Compile Include="Env.cs" />
     <Compile Include="FS.cs" />

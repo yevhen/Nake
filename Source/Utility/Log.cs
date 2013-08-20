@@ -63,7 +63,7 @@ namespace Nake
         }
     }
 
-    static class With
+    public static class With
     {
         public static void Color(ConsoleColor color, Action action)
         {
