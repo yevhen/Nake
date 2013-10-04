@@ -18,12 +18,12 @@ namespace Nake.Magic
         static readonly Regex expressionPattern = new Regex(
             @"(?<!{){(?<expression>[^}{\r\n]+)}(?!})",
             RegexOptions.Compiled | RegexOptions.Singleline
-            );
+        );
 
         static readonly Regex environmentVariablePattern = new Regex(
             @"(?<!\$)\$(?<variable>[^\${\r\n]+)\$(?!\$)",
             RegexOptions.Compiled | RegexOptions.Singleline
-            );
+        );
 
         readonly SemanticModel model;
         readonly LiteralExpressionSyntax node;
@@ -86,17 +86,14 @@ namespace Nake.Magic
                 span.StartLinePosition.Character + 1 + matchPosition);
         }
 
-        string InlineEnvironmentVariables(string token)
+        static string InlineEnvironmentVariables(string token)
         {
             return environmentVariablePattern.Replace(token, match =>
             {
                 var variable = match.Groups["variable"].Value;
+                var value = Env.Var[variable] ?? "$" + variable + "$";
 
-                if (!Env.Defined(variable))
-                    throw new InlineEnvironmentVariableUndefinedException(
-                        variable, LocationDiagnostics(match.Index));
-
-                return Verbatimize(Env.Var[variable]);
+                return Verbatimize(value);
             });
         }
 

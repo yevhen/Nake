@@ -227,16 +227,20 @@ namespace Nake
         } 
 
         [Test]
-        public void Should_throw_if_inlined_environment_variable_is_undefined()
+        public void Should_return_original_environment_variable_token_if_inlined_environment_variable_is_undefined()
         {
-            Assert.Throws<InlineEnvironmentVariableUndefinedException>(()=> Build(@"
+            Build(@"
                 
                 [Task] public static void Expand()
                 {
-                    Console.WriteLine(@""$undefined$"");
+                    Env.Var[""Result""] = @""$undefined$"";
                 }                    
                     
-            "));
+            ");
+            
+            Invoke("Expand");
+            
+            Assert.That(Env.Var["Result"], Is.EqualTo(@"$undefined$"));
         } 
     }
 }
