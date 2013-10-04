@@ -6,21 +6,21 @@ namespace Nake
 {
     public static class FileSetExtensions
     {
-        public static FileSet Mirror(this FileSet source, string destination)
+        public static string[] Mirror(this FileSet source, string destination)
         {
             destination = Location.GetFullPath(destination);
 
             return source.Transform(item => Path.Combine(destination, item.RecursivePath, item.FullName));
         }
 
-        public static FileSet Flatten(this FileSet source, string destination)
+        public static string[] Flatten(this FileSet source, string destination)
         {
             destination = Location.GetFullPath(destination);
 
             return source.Transform(item => Path.Combine(destination, item.FullName));
         }
         
-        public static FileSet Transform(this FileSet source, Func<FileSet.Item, string> transform)
+        public static string[] Transform(this FileSet source, Func<FileSet.Item, string> transform)
         {
             if (transform == null)
                 throw new ArgumentNullException("transform");
