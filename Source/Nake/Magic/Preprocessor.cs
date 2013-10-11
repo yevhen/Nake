@@ -14,6 +14,7 @@ ADD: Absolute references handling (Copyright 2013 Yevhen Bobrov :)
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -174,17 +175,22 @@ namespace Nake.Magic
 
         internal struct AbsoluteReference : IEquatable<AbsoluteReference>
         {
-            readonly string path;
+            public readonly string AssemblyPath;
+            public string ScriptFile;
 
             public AbsoluteReference(string scriptFile, string assemblyReference)
             {
+                this.ScriptFile = scriptFile;
+                
                 var currentScriptDirectory = Path.GetDirectoryName(scriptFile);
-                path = Path.GetFullPath(Path.Combine(currentScriptDirectory, assemblyReference));
+                Debug.Assert(currentScriptDirectory != null);
+
+                AssemblyPath = Path.GetFullPath(Path.Combine(currentScriptDirectory, assemblyReference));
             }
 
             public bool Equals(AbsoluteReference other)
             {
-                return String.Equals(path, (string) other.path);
+                return String.Equals(AssemblyPath, (string) other.AssemblyPath);
             }
 
             public override bool Equals(object obj)
@@ -197,12 +203,12 @@ namespace Nake.Magic
 
             public override int GetHashCode()
             {
-                return path.GetHashCode();
+                return AssemblyPath.GetHashCode();
             }
 
             public override string ToString()
             {
-                return path;
+                return AssemblyPath;
             }
 
             public static bool operator ==(AbsoluteReference left, AbsoluteReference right)
@@ -217,7 +223,7 @@ namespace Nake.Magic
 
             public static implicit operator string(AbsoluteReference obj)
             {
-                return obj.path;
+                return obj.AssemblyPath;
             }
         }
     }

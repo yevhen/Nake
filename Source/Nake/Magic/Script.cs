@@ -105,7 +105,8 @@ namespace Nake.Magic
                 foreach (var absoluteReference in result.AbsoluteReferences)
                 {
                     if (!File.Exists(absoluteReference))
-                        throw new NakeException("Reference {0} defined in script {1} cannot be found");
+                        throw new NakeException("Reference {0} defined in script {1} cannot be found", 
+                            absoluteReference.AssemblyPath, absoluteReference.ScriptFile);
 
                     if (NakeReferences.Contains(absoluteReference))
                         continue;
