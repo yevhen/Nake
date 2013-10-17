@@ -39,6 +39,7 @@ public const string OutputPath = RootPath + @"\Output";
 		
 		.Projects("Nake.sln")
 			.Property("Platform", "Any CPU")
+			.Property("Configuration", configuration)
 			.Property("OutDir", outputPath)
 			.Property("ReferencePath", outputPath)
 

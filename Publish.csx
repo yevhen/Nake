@@ -33,8 +33,7 @@ static Func<string> ArchiveFile = () => OutputPath + @"\{Version()}.zip";
 /// <summary> 
 /// Zips all binaries for standalone installation
 /// </summary>
-[Task]
-public static void Zip()
+[Task] public static void Zip()
 {
 	var files = new FileSet
 	{
