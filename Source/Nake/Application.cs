@@ -1,223 +1,210 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 
-using Roslyn.Compilers;
+using Nake.Magic;
 
 namespace Nake
 {
-	class Application
-	{
-		readonly Options options;
-		readonly Project project;
-		readonly ScriptingSession session;
-		
-		public Application(Options options)
-		{
-			this.options = options;
+    class Application
+    {
+        readonly Options options;
+        
+        public Application(Options options)
+        {
+            this.options = options;
+        }
 
-			project = new Project();
-			session = new ScriptingSession(project);			
-		}
+        public void Start()
+        {
+            if (options.ShowHelp)
+                ShowHelp();
 
-		public void Start()
-		{
-			ShowHelp();
-			ShowVersion();
+            if (options.ShowVersion)
+                ShowVersion();
+            
+            if (options.QuietMode)
+                SetQuiet();
 
-			SetQuiet();
-			SetSilent();
-			SetTrace();
+            if (options.SilentMode)
+                SetSilent();
 
-			Initialize();
+            if (options.TraceEnabled)
+                SetTrace();
 
-			ShowTasks();
-			InvokeTasks();
-		}
+            Initialize();
 
-		void Initialize()
-		{
-			SetCurrentDirectory();
-			OverrideEnvironmentVariables();
-			
-			var projectFile = FindProjectFile();
-			DefineNakeVariables(projectFile);
-			
-			LoadProject(projectFile);
-			RedefinePassedVariables();
-		}
+            if (options.ShowTasks)
+                ShowTasks();
 
-		void SetCurrentDirectory()
-		{
-			var directory = options.CurrentDirectory ?? Environment.CurrentDirectory;
-			Location.CurrentDirectory = () => directory;
-		}
+            InvokeTasks();
+        }
 
-		void OverrideEnvironmentVariables()
-		{
-			var env = new Env();
-			
-			foreach (var property in options.Variables)
-			{
-				env[property.Key] = property.Value;
-			}
-		}
+        void Initialize()
+        {
+            SetCurrentDirectory();
+            OverrideEnvironmentVariables();
+            
+            var scriptFile = FindScriptFile();
+            DefineNakeEnvironmentVariables(scriptFile);
 
-		void DefineNakeVariables(string projectFile)
-		{
-			DefineVariable("NakeProjectDirectory", Path.GetDirectoryName(projectFile));
-			DefineVariable("NakeStartupDirectory", Location.CurrentDirectory());
-		}
+            var compilation = BuildScript(scriptFile);
+            RegisterTasks(compilation);
+        }
 
-		void DefineVariable(string name, string value)
-		{
-			session.Execute(string.Format("public static string {0} = @\"{1}\";", name, value));
-		}
+        void SetCurrentDirectory()
+        {
+            var directory = options.CurrentDirectory ?? Environment.CurrentDirectory;
+            Location.CurrentDirectory = () => directory;
+        }
 
-		string FindProjectFile()
-		{
-			if (options.ProjectFile != null)
-			{
-				var absoluteFilePath = !Path.IsPathRooted(options.ProjectFile) 
-					? Path.GetFullPath(Path.Combine(Location.CurrentDirectory(), options.ProjectFile))
-					: options.ProjectFile;
+        void OverrideEnvironmentVariables()
+        {
+            foreach (var variable in options.Variables)
+            {
+                Env.Var[variable.Name] = variable.Value;
+            }
+        }
 
-				if (!File.Exists(absoluteFilePath))
-					throw new NakeException("Specified project file '{0}' doesn't exists", options.ProjectFile);
+        static void DefineNakeEnvironmentVariables(FileInfo scriptFile)
+        {
+            Env.Var["NakeScriptDirectory"] = scriptFile.DirectoryName;
+            Env.Var["NakeStartupDirectory"] = Location.CurrentDirectory();
+        }
 
-				return absoluteFilePath;
-			}
+        FileInfo FindScriptFile()
+        {
+            if (options.ScriptFile != null)
+            {
+                var absoluteFilePath = !Path.IsPathRooted(options.ScriptFile) 
+                    ? Path.GetFullPath(Path.Combine(Location.CurrentDirectory(), options.ScriptFile))
+                    : options.ScriptFile;
 
-			var defaultProjectFile = Path.Combine(Location.CurrentDirectory(), "Nake.csx");
+                if (!File.Exists(absoluteFilePath))
+                    throw new NakeException("Specified script file '{0}' doesn't exists", options.ScriptFile);
 
-			if (!File.Exists(defaultProjectFile))
-				throw new NakeException("Nake.csx file was not found in current directory [{0}]", Location.CurrentDirectory());
+                return new FileInfo(absoluteFilePath);
+            }
 
-			return defaultProjectFile;
-		}
+            var defaultScriptFile = Path.Combine(Location.CurrentDirectory(), "Nake.csx");
 
-		void LoadProject(string file)
-		{
-			session.Load(file);
-		}
+            if (!File.Exists(defaultScriptFile))
+                throw new NakeException("Nake.csx file was not found in current directory [{0}]", Location.CurrentDirectory());
 
-		void RedefinePassedVariables()
-		{
-			foreach (var property in options.Variables)
-			{
-				try
-				{
-					session.Execute(string.Format("{0} = \"{1}\";", property.Key, property.Value));
-				}
-				catch (CompilationErrorException e)
-				{
-					if (e.Message.Contains("CS0029"))
-					{
-						session.Execute(string.Format("{0} = {1};", property.Key, property.Value.ToLower()));
-						return;
-					}
+            return new FileInfo(defaultScriptFile);
+        }
 
-					if (e.Message.Contains("CS0103"))
-					{
-						Out.TraceFormat("The project doesn't define variable {0}", property.Key);
-						return;
-					}
+        Script BuildScript(FileInfo scriptFile)
+        {
+            return Script.Build(scriptFile, VariableSubstitutions(), options.DebugScript);
+        }
 
-					throw;
-				}
-			}
-		}
+        Dictionary<string, string> VariableSubstitutions()
+        {
+            return options.Variables.ToDictionary(x => x.Name, x => x.Value);
+        }
 
-		public void ShowHelp()
-		{
-			if (!options.ShowHelp)
-				return;
-			
-			Options.PrintUsage();
+        static void RegisterTasks(Script script)
+        {
+            var registry = TaskRegistry.Global;
 
-			Exit.Ok();
-		}
-		
-		public void ShowVersion()
-		{
-			if (!options.ShowVersion)
-				return;
+            foreach (var task in script.Tasks)
+            {
+                registry.Register(task);
+            }
+        }
 
-			Out.Info(Assembly.GetExecutingAssembly().GetName().Version.ToString());
+        public void ShowHelp()
+        {
+            Options.PrintUsage();
 
-			Exit.Ok();
-		}
+            Exit.Ok();
+        }
+        
+        public void ShowVersion()
+        {
+            Log.Info(Assembly.GetExecutingAssembly().GetName().Version.ToString());
 
-		public void ShowTasks()
-		{
-			if (!options.ShowTasks)
-				return;		
+            Exit.Ok();
+        }
 
-			if (!project.Tasks.Any())
-			{
-				Out.Info("Project defines 0 tasks");
+        public void ShowTasks()
+        {
+            if (!TaskRegistry.Global.Tasks.Any())
+            {
+                Log.Info("Project defines 0 tasks");
+                Exit.Ok();
+            }
 
-				Exit.Ok();
-			}
+            var filter = options.ShowTasksFilter;
 
-			var filter = options.ShowTasksFilter;
-			var maxTaskNameLength = project.Tasks.Values.Where(x => x.Description != "").Max(x => x.DisplayName.Length);
+            var tasks = TaskRegistry.Global.Tasks.Where(x => x.Summary != "").ToArray();
+            if (tasks.Length == 0)
+                Exit.Ok();
 
-			var tasks = project.Tasks.Values
-				.OrderBy(x => x.DisplayName)
-				.Where(x => filter == null || x.DisplayName.ToLower().Contains(filter.ToLower()));
+            var maxTaskNameLength = tasks.Max(x => x.FullName.Length);
 
-			Console.WriteLine();
+            tasks = tasks
+                .OrderBy(x => x.FullName)
+                .Where(x => filter == null || x.FullName.ToLower().Contains(filter.ToLower())).ToArray();
 
-			foreach (var task in tasks)
-			{
-				if (string.IsNullOrEmpty(task.Description))
-					continue;
+            Console.WriteLine();
 
-				Console.Write("nake ");
+            foreach (var task in tasks)
+            {
+                if (string.IsNullOrEmpty(task.Summary))
+                    continue;
 
-				Console.ForegroundColor = ConsoleColor.DarkGreen;
-				Console.Write(task.DisplayName.PadRight(maxTaskNameLength + 2));
-				
-				Console.ForegroundColor = ConsoleColor.DarkGray;
-				Console.Write("# " + task.Description);
+                Console.Write(Runner.Label + " ");
 
-				Console.ResetColor();
-				Console.WriteLine();
-			}
+                Console.ForegroundColor = ConsoleColor.DarkGreen;
+                Console.Write(task.FullName.ToLower().PadRight(maxTaskNameLength + 2));
+                
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.Write("# " + task.Summary);
 
-			Console.WriteLine();
+                Console.ResetColor();
+                Console.WriteLine();
+            }
 
-			Exit.Ok();
-		}
+            Console.WriteLine();
+            
+            Exit.Ok();
+        }
 
-		public void InvokeTasks()
-		{
-			var tasks = options.Tasks.ToList();
+        public void InvokeTasks()
+        {
+            var tasks = options.Tasks;
 
-			if (tasks.Count == 0)
-				tasks.Add("default");
+            if (tasks.Count == 0)
+                tasks.Add(Options.Task.Default);
 
-			foreach (var task in tasks)
-			{
-				project.Invoke(task);
-			}
-		}
+            foreach (var task in tasks)
+            {
+                var found = TaskRegistry.Global.Find(task.Name);
 
-		void SetQuiet()
-		{
-			Out.QuietMode = options.QuietMode;
-		}
+                if (found == null)
+                    throw new TaskNotFoundException(task.Name);
 
-		void SetSilent()
-		{
-			Out.SilentMode = options.SilentMode;
-		}
+                found.Invoke(task.Arguments);
+            }
+        }
 
-		void SetTrace()
-		{
-			Out.TraceEnabled = options.TraceEnabled;
-		}
-	}
+        static void SetQuiet()
+        {
+            Env.Var["NakeQuietMode"] = "true";
+        }
+
+        static void SetSilent()
+        {
+            Env.Var["NakeSilentMode"] = "true";
+        }
+
+        static void SetTrace()
+        {
+            Env.Var["NakeTraceEnabled"] = "true";
+        }
+    }
 }

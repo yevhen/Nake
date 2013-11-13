@@ -2,62 +2,85 @@
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Threading;
 
 using NuGet;
 
 namespace Nake
 {
-	class Program
-	{
-		[STAThread]
-		public static void Main(string[] args)
-		{
-			DownloadDependencies();
+    public class Program
+    {
+        public static ManualResetEvent Downloading = new ManualResetEvent(false);
 
-			try
-			{
-				var application = new Application(Options.Parse(args));
-				application.Start();
-			}
-			catch (OptionParseException e)
-			{
-				Out.Fail(e.Message);
-				Options.PrintUsage();
-				Exit.Fail(e);
-			}
-			catch (Exception e)
-			{
-				Out.Fail(e);	
-				Exit.Fail(e);
-			}
-		}
+        public static void Main(string[] args)
+        {
+           RegisterResolver();
 
-		[Conditional("RELEASE")]
-		static void DownloadDependencies()
-		{
-			var currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+           DownloadRoslyn();
 
-			try
-			{
-				Assembly.Load(new AssemblyName("Roslyn.Compilers.CSharp, Version=1.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35"));
-				return;
-			}
-			catch (FileNotFoundException)
-			{}
+           StartApplication(args);
+        }
 
-			if (File.Exists(Path.Combine(currentDir, @"Dependencies\Roslyn.Compilers.CSharp.1.2.20906.2\lib\net45\Roslyn.Compilers.CSharp.dll")))
-				return;
+        static void RegisterResolver()
+        {
+            AssemblyResolver.Register();
+        }
 
-			Console.WriteLine("Roslyn CTP was not found");
-			Console.WriteLine("Installing Roslyn CTP ...");
+        static void DownloadRoslyn()
+        {
+            const string roslynCompilerAssembly = "Roslyn.Compilers.CSharp";
+            const string roslynVersion = "1.2.20906.2";
 
-			var officialRepository = new AggregateRepository(
-				PackageRepositoryFactory.Default, new[] { "https://nuget.org/api/v2/" }, true);
+            try
+            {
+                Assembly.Load(new AssemblyName(roslynCompilerAssembly));
+                AssemblyResolver.Unregister();
 
-			var packageManager = new PackageManager(officialRepository, Path.Combine(currentDir, "Dependencies"));
-			packageManager.InstallPackage("Roslyn.Compilers.CSharp", new SemanticVersion("1.2.20906.2"), false, true);
+                return;
+            }
+            catch (FileNotFoundException)
+            {}
 
-			Console.WriteLine("Roslyn CTP was installed successfully");
-		}
-	}
+            Console.WriteLine("Roslyn CTP was not found");
+            Console.WriteLine("Installing Roslyn CTP ...");
+
+            var officialRepository = new AggregateRepository(
+                PackageRepositoryFactory.Default, new[] { "https://nuget.org/api/v2/" }, true);
+
+            var currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            Debug.Assert(currentDir != null, "currentDir != null");
+
+            var packageManager = new PackageManager(officialRepository, Path.Combine(currentDir, "Roslyn"));
+            packageManager.InstallPackage(roslynCompilerAssembly, new SemanticVersion(roslynVersion), false, true);
+
+            Console.WriteLine("Roslyn CTP was installed successfully");
+        }
+
+        static void StartApplication(string[] args)
+        {
+            AssemblyResolver.Resolve = true;
+
+            try
+            {
+                var application = new Application(Options.Parse(args));
+                application.Start();
+            }
+            catch (OptionParseException e)
+            {
+                Log.Error(e.Message);
+                Options.PrintUsage();
+                Exit.Fail(e);
+            }
+            catch (TaskInvocationException e)
+            {
+                Log.Error(e.SourceException);
+                Exit.Fail(e);
+            }
+            catch (Exception e)
+            {
+                Log.Error(e);
+                Exit.Fail(e);
+            }
+        }
+    }
 }

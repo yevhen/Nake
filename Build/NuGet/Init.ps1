@@ -1,6 +1,6 @@
 ﻿$scriptDir = split-path $script:MyInvocation.MyCommand.Path
 $nuget = "$scriptDir\NuGet.exe"
-$roslynPath = "$scriptDir\net45\Dependencies"
+$roslynPath = "$scriptDir\net45\Roslyn"
 
 if (Test-Path $roslynPath) {
 	Exit

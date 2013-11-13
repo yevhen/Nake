@@ -1,299 +1,469 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Nake
 {
-	class Options
-	{
-		public string ProjectFile;
-		public string CurrentDirectory;
-		
-		public bool QuietMode;
-		public bool SilentMode;
-		public bool TraceEnabled;
+    class Options
+    {
+        public string ScriptFile;
+        public string CurrentDirectory;
+        public bool DebugScript;
+        
+        public bool QuietMode;
+        public bool SilentMode;
+        public bool TraceEnabled;
 
-		public bool ShowHelp;
-		public bool ShowVersion;
-		
-		public bool ShowTasks;
-		public string ShowTasksFilter;
+        public bool ShowHelp;
+        public bool ShowVersion;
+        
+        public bool ShowTasks;
+        public string ShowTasksFilter;
 
-		public readonly IDictionary<string, string> Variables = new Dictionary<string, string>();
-		public readonly HashSet<string> Tasks = new HashSet<string>();
+        public readonly List<Variable> Variables = new List<Variable>();
+        public readonly List<Task> Tasks = new List<Task>();
 
-		static readonly List<Switch> switches = new List<Switch>
-		{
-			new Switch("help", "Display help message and exit")
-				.Shortcuts("?")
-				.OnMatch(options => options.ShowHelp = true),
+        static readonly List<Switch> switches = new List<Switch>
+        {
+            new Switch("help", "Display help message and exit")
+                .Shortcuts("?")
+                .OnMatch(options => options.ShowHelp = true),
 
-			new Switch("version", "Display the program version and exit")
-				.Shortcuts("v")
-				.OnMatch(options => options.ShowVersion = true),			
-				
-			new Switch("quiet", "Do not echo informational messages to standard output")
-				.Shortcuts("q")
-				.OnMatch(options => options.QuietMode = true),
+            new Switch("version", "Display the program version and exit")
+                .Shortcuts("v")
+                .OnMatch(options => options.ShowVersion = true),			
+                
+            new Switch("quiet", "Do not echo informational messages to standard output")
+                .Shortcuts("q")
+                .OnMatch(options => options.QuietMode = true),
 
-			new Switch("silent", "Same as --quiet but also suppresses user generated log messages")
-				.Shortcuts("s")
-				.OnMatch(options =>
-				{
-					options.QuietMode = true; 
-					options.SilentMode = true;
-				}),
+            new Switch("silent", "Same as --quiet but also suppresses user generated log messages")
+                .Shortcuts("s")
+                .OnMatch(options =>
+                {
+                    options.QuietMode = true; 
+                    options.SilentMode = true;
+                }),
 
-			new Switch("nakefile FILE", "Use FILE as the Nake project file")
-				.Shortcuts("f")
-				.OnMatch((options, file) => options.ProjectFile = file),
+            new Switch("nakefile FILE", "Use FILE as the Nake project file")
+                .Shortcuts("f")
+                .OnMatch((options, file) => options.ScriptFile = file),
 
-			new Switch("directory DIR", "Use DIR as current directory")
-				.Shortcuts("d")
-				.OnMatch((options, dir) => options.CurrentDirectory = dir),
+            new Switch("directory DIR", "Use DIR as current directory")
+                .Shortcuts("d")
+                .OnMatch((options, dir) => options.CurrentDirectory = dir),
 
-			new Switch("trace", "Enables task execution tracing and full stack traces in exception messages")
-				.Shortcuts("t")
-				.OnMatch(options => options.TraceEnabled = true),
-			
-			new Switch("tasks [PATTERN]", "Display the tasks with descriptions matching optional PATTERN and exit")
-				.Shortcuts("T")
-				.OnMatch((options, filter) => 
-				{ 
-					options.ShowTasks = true;
-					options.ShowTasksFilter = filter;
-				}),										
-		};
+            new Switch("trace", "Enables task execution tracing and full stack traces in exception messages")
+                .Shortcuts("t")
+                .OnMatch(options => options.TraceEnabled = options.DebugScript = true),
 
-		public static void PrintUsage()
-		{
-			const string banner = "Usage: nake [options ...]  [VAR=VALUE ...]  [targets ...]";
+            new Switch("debug", "Enables full script debugging in Visual Studio")
+                .OnMatch(options => options.DebugScript = true),
 
-			Console.WriteLine(Environment.NewLine + banner);
-			Console.WriteLine(Environment.NewLine + "Options:");
+            new Switch("tasks [PATTERN]", "Display the tasks with descriptions matching optional PATTERN and exit")
+                .Shortcuts("T")
+                .OnMatch((options, filter) => 
+                { 
+                    options.ShowTasks = true;
+                    options.ShowTasksFilter = filter;
+                }),										
+        };
 
-			var maxSwitchKeywordLength = switches.Max(x => x.KeywordLength);
-			var maxSwitchShortcutsLength = switches.Max(x => x.ShortcutsLength);
+        public static void PrintUsage()
+        {
+            var banner = string.Format(
+                "Usage: {0} [options ...]  [VAR=VALUE ...]  [task ...]", Runner.Label);
 
-			foreach (var @switch in switches)
-			{
-				Console.Write("   ");
+            Console.WriteLine(Environment.NewLine + banner);
+            Console.WriteLine(Environment.NewLine + "Options:");
 
-				@switch.PrintShortcuts(maxSwitchShortcutsLength + 2);
-				@switch.PrintKeyword(maxSwitchKeywordLength + 2);
-				@switch.PrintDescription();
+            var maxSwitchKeywordLength = switches.Max(x => x.KeywordLength);
+            var maxSwitchShortcutsLength = switches.Max(x => x.ShortcutsLength);
+         
+            foreach (var @switch in switches)
+            {
+                Console.Write("   ");
 
-				Console.WriteLine();
-			}
+                @switch.PrintShortcuts(maxSwitchShortcutsLength + 2);
+                @switch.PrintKeyword(maxSwitchKeywordLength + 2);
+                @switch.PrintDescription();
 
-			Console.WriteLine();
-		}
-			
-		public static Options Parse(string[] args)
-		{
-			var result = new Options();
+                Console.WriteLine();
+            }
 
-			var remaining = ParseSwitches(args, result);
-			if (remaining.Length == 0)
-				return result;
+            Console.WriteLine();
+        }
 
-			remaining = ParseVariables(remaining, result);
-			if (remaining.Length == 0)
-				return result;
+        public static Options Parse(string[] args)
+        {
+            var result = new Options();
 
-			ParseTasks(remaining, result);
-			return result;
-		}
+            var remaining = ParseSwitches(args, result);
+            if (remaining.Length == 0)
+                return result;
 
-		static string[] ParseSwitches(string[] args, Options options)
-		{
-			var position = 0;
+            remaining = ParseVariables(remaining, result);
+            if (remaining.Length == 0)
+                return result;
 
-			while (position < args.Length)
-			{
-				Switch.Match match = null;
+            if (remaining.Length != 0)
+                ParseTasks(remaining, result);
 
-				foreach (var option in switches)
-				{
-					match = option.TryMatch(args, position);
-					
-					if (match == null)
-						continue;
+            return result;
+        }
 
-					match.Apply(options);
-					position += match.ArgumentsConsumed();
+        static string[] ParseSwitches(string[] args, Options options)
+        {
+            var position = 0;
 
-					break;
-				}
+            while (position < args.Length)
+            {
+                Switch.Match match = null;
 
-				if (match == null)
-					break;
-			}
+                foreach (var option in switches)
+                {
+                    match = option.TryMatch(args, position);
+                    
+                    if (match == null)
+                        continue;
 
-			return args.Slice(position);
-		}
+                    match.Apply(options);
+                    position += match.ArgumentsConsumed();
 
-		static string[] ParseVariables(string[] args, Options options)
-		{
-			var position = 0;
+                    break;
+                }
 
-			while (position < args.Length)
-			{
-				if (!args[position].Contains("="))
-					break;
+                if (match == null)
+                    break;
+            }
 
-				var keyValue = args[position].Split('=');
-				options.Variables.Add(keyValue[0], keyValue[1]);
+            return Slice(args, position);
+        }
 
-				position++;
-			}
+        static string[] ParseVariables(string[] args, Options options)
+        {
+            foreach (var arg in args.TakeWhile(Variable.Matches))
+            {
+                options.Variables.Add(new Variable(arg));
+            }
 
-			return args.Slice(position);
-		}
+            return Slice(args, options.Variables.Count);
+        }
 
-		static void ParseTasks(IEnumerable<string> args, Options options)
-		{
-			foreach (var arg in args)
-			{
-				options.Tasks.Add(arg);
-			}
-		}
+        static void ParseTasks(string[] args, Options options)
+        {            
+            var match = new Task.Match(args);
 
-		class Switch
-		{
-			const string KeywordIndicator = "--";
-			const string ShortcutIndicator = "-";
+            while (match != null)
+            {
+                options.Tasks.Add(match.Build());
 
-			readonly string keyword;
-			readonly string pattern;
-			readonly string description;
-			
-			readonly bool expectsValue;
-			readonly bool requiresValue;
+                match = match.Next();
+            }
+        }
 
-			string[] shortcuts = new string[0];
-			Action<Options, string> handler;
+        class Switch
+        {
+            const string KeywordIndicator = "--";
+            const string ShortcutIndicator = "-";
 
-			public Switch(string pattern, string description)
-			{
-				this.pattern = pattern;
-				this.description = description;
+            readonly string keyword;
+            readonly string pattern;
+            readonly string description;
+            
+            readonly bool expectsValue;
+            readonly bool requiresValue;
 
-				var specification = pattern.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
-				keyword = specification[0];
+            HashSet<string> shortcuts = new HashSet<string>();
+            Action<Options, string> handler;
 
-				var hasValueSpecified = specification.Length == 2;
-				if (!hasValueSpecified)
-					return;
-				
-				expectsValue = true;
-				requiresValue = !specification[1].Contains("[");
-			}
+            public Switch(string pattern, string description)
+            {
+                this.pattern = pattern;
+                this.description = description;
 
-			public int KeywordLength
-			{
-				get { return pattern.Length + KeywordIndicator.Length; }
-			}
+                var specification = pattern.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
+                keyword = specification[0];
 
-			public int ShortcutsLength
-			{
-				get { return string.Join("/", shortcuts).Length + ShortcutIndicator.Length; }
-			}
+                var hasValueSpecified = specification.Length == 2;
+                if (!hasValueSpecified)
+                    return;
+                
+                expectsValue = true;
+                requiresValue = !specification[1].Contains("[");
+            }
 
-			public void PrintKeyword(int padding)
-			{
-				Console.Write((KeywordIndicator + pattern).PadRight(padding));
-			}
+            public int KeywordLength
+            {
+                get { return pattern.Length + KeywordIndicator.Length; }
+            }
 
-			public void PrintShortcuts(int padding)
-			{
-				Console.Write((ShortcutIndicator + string.Join("/", shortcuts)).PadRight(padding));
-			}
+            public int ShortcutsLength
+            {
+                get { return String.Join("/", shortcuts).Length + ShortcutIndicator.Length; }
+            }
 
-			public void PrintDescription()
-			{
-				Console.Write(description);
-			}
+            public void PrintKeyword(int padding)
+            {
+                Console.Write((KeywordIndicator + pattern).PadRight(padding));
+            }
 
-			public Switch Shortcuts(params string[] aliases)
-			{
-				shortcuts = aliases;
-				return this;
-			}
+            public void PrintShortcuts(int padding)
+            {
+                Console.Write((ShortcutIndicator + String.Join("/", shortcuts)).PadRight(padding));
+            }
 
-			public Switch OnMatch(Action<Options> action)
-			{
-				handler = (options, value) => action(options);
-				return this;
-			}
+            public void PrintDescription()
+            {
+                Console.Write(description);
+            }
 
-			public Switch OnMatch(Action<Options, string> action)
-			{
-				handler = action;
-				return this;
-			}
+            public Switch Shortcuts(params string[] aliases)
+            {
+                foreach (var alias in aliases)
+                {
+                    shortcuts.Add(alias);
+                }
 
-			public Match TryMatch(string[] args, int position)
-			{
-				return Matches(args[position])
-						? new Match(this, GetValue(args, position))
-						: null;
-			}
+                return this;
+            }
 
-			bool Matches(string arg)
-			{
-				var matchKeyword = keyword == arg.Remove(0, KeywordIndicator.Length);
-				var matchAnyShortcut = shortcuts.Contains(arg.Remove(0, ShortcutIndicator.Length));
+            public Switch OnMatch(Action<Options> action)
+            {
+                handler = (options, value) => action(options);
+                return this;
+            }
 
-				return matchKeyword || matchAnyShortcut;
-			}
+            public Switch OnMatch(Action<Options, string> action)
+            {
+                handler = action;
+                return this;
+            }
 
-			string GetValue(string[] args, int position)
-			{
-				if (!expectsValue)
-					return null;
+            public Match TryMatch(string[] args, int position)
+            {
+                return Matches(args[position])
+                        ? new Match(this, GetValue(args, position))
+                        : null;
+            }
 
-				var hasValue = position + 1 != args.Length;
+            bool Matches(string arg)
+            {
+                if (arg.StartsWith(KeywordIndicator))
+                    return keyword == arg.Remove(0, KeywordIndicator.Length);
 
-				if (requiresValue && !hasValue)
-					throw OptionParseException.MissingValue(keyword);
+                if (arg.StartsWith(ShortcutIndicator))
+                    return shortcuts.Contains(arg.Remove(0, ShortcutIndicator.Length));
+            
+                return false;
+            }
 
-				return hasValue ? args[position + 1] : null;
-			}
+            string GetValue(string[] args, int position)
+            {
+                if (!expectsValue)
+                    return null;
 
-			public class Match
-			{
-				readonly Switch option;
-				readonly string value;
+                var hasValue = position + 1 != args.Length;
 
-				public Match(Switch option, string value)
-				{
-					this.option = option;
-					this.value = value;
-				}
+                if (requiresValue && !hasValue)
+                    throw OptionParseException.MissingValue(keyword);
 
-				public void Apply(Options options)
-				{
-					option.handler(options, value);
-				}
+                return hasValue ? args[position + 1] : null;
+            }
 
-				public int ArgumentsConsumed()
-				{
-					return value != null ? 2 : 1;
-				}
-			}
-		}
-	}
+            public class Match
+            {
+                readonly Switch option;
+                readonly string value;
 
-	class OptionParseException : Exception
-	{
-		OptionParseException(string message, params object[] args)
-			: base(string.Format(message, args))
-		{}
+                public Match(Switch option, string value)
+                {
+                    this.option = option;
+                    this.value = value;
+                }
 
-		public static OptionParseException MissingValue(string keyword)
-		{
-			return new OptionParseException("Switch -{0} is missing required value");
-		}
-	}
+                public void Apply(Options options)
+                {
+                    option.handler(options, value);
+                }
+
+                public int ArgumentsConsumed()
+                {
+                    return value != null ? 2 : 1;
+                }
+            }
+        }
+
+        static T[] Slice<T>(T[] source, int start)
+        {
+            var length = source.Length - start;
+
+            if (length == 0)
+                return new T[0];
+
+            var slice = new T[length];
+            Array.Copy(source, start, slice, 0, length);
+
+            return slice;
+        }
+
+        public class Variable
+        {
+            public static bool Matches(string arg)
+            {
+                return arg.Contains("=");
+            }
+
+            public readonly string Name;
+            public readonly string Value;
+
+            public Variable(string arg)
+            {
+                var parts = arg.Split('=');
+
+                Name = parts[0];
+                Value = parts[1];
+            }
+        }
+
+        public class Task
+        {
+            public static Task Default = new Task("default", new TaskArgument[0]);
+
+            public readonly string Name;
+            public readonly TaskArgument[] Arguments;
+
+            public Task(string name, TaskArgument[] arguments)
+            {
+                Name = name;
+                Arguments = arguments;
+
+                Check();
+            }
+
+            void Check()
+            {
+                var isNamedStarted = false;
+
+                foreach (var arg in Arguments)
+                {
+                    if (isNamedStarted && arg.IsPositional())
+                        throw new TaskArgumentOrderException(Name);
+
+                    isNamedStarted = arg.IsNamed();
+                }
+            }
+
+            public class Match
+            {
+                readonly string name;
+                readonly string[] remaining;
+                readonly IList<Argument> arguments = new List<Argument>();
+
+                public Match(string[] args)
+                {
+                    name = args[0];
+                
+                    var current = new Argument();
+                    arguments.Add(current);
+                    
+                    var position = 0;
+                    while (++position < args.Length)
+                    {
+                        var arg = args[position];
+                    
+                        if (arg == ";")
+                        {
+                            current.Terminate();
+                            position++;
+                            break;
+                        }
+
+                        if (current.IsComplete())
+                        {
+                            current.Terminate();
+                            arguments.Add(current = new Argument());
+                        }
+
+                        if (arg.EndsWith(":"))
+                        {
+                            current.SetName(arg.Remove(arg.Length - 1));
+                            continue;
+                        }
+
+                        current.SetValue(arg);
+                    }
+                    
+                    current.Terminate();
+                    remaining = Slice(args, position);
+                }
+
+                public Task Build()
+                {
+                    return new Task(name, arguments.Where(x => !x.IsEmpty())
+                                                   .Select(x => x.Build())
+                                                   .ToArray());
+                }
+
+                public Match Next()
+                {
+                    return remaining.Length != 0 ? new Match(remaining) : null;
+                }
+
+                class Argument
+                {
+                    string name;
+                    string value;
+
+                    public void SetValue(string arg)
+                    {
+                        value = arg;
+                    }
+
+                    public void SetName(string arg)
+                    {
+                        name = arg;
+                    }
+
+                    public void Terminate()
+                    {
+                        if (!IsEmpty() && !IsComplete())
+                            throw OptionParseException.IncompleteArgument(name);
+                    }
+
+                    public bool IsEmpty()
+                    {
+                        return name == null && value == null;
+                    }
+
+                    public bool IsComplete()
+                    {
+                        return (name == null && value != null) || (name != null && value != null);
+                    }
+
+                    public TaskArgument Build()
+                    {
+                        return new TaskArgument(name ?? "", value);
+                    }
+                }
+            }
+        }
+    }
+
+    class OptionParseException : Exception
+    {
+        OptionParseException(string message, params object[] args)
+            : base(string.Format(message, args))
+        {}
+
+        public static OptionParseException MissingValue(string keyword)
+        {
+            return new OptionParseException("Switch -{0} is missing required value");
+        }
+
+        public static Exception IncompleteArgument(string name)
+        {
+            return new OptionParseException("Incomplete argument {{{0}}}", name);
+        }
+    }
 }

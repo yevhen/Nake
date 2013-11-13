@@ -7,7 +7,7 @@
     <ProjectGuid>{2444EB4E-C1B8-47E0-9D2E-E4C59C30FFFE}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Nake.Tests</RootNamespace>
+    <RootNamespace>Nake</RootNamespace>
     <AssemblyName>Nake.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -41,6 +41,8 @@
     <Reference Include="nunit.framework">
       <HintPath>..\..\packages\NUnit.2.6.2\lib\nunit.framework.dll</HintPath>
     </Reference>
+    <Reference Include="Roslyn.Compilers, Version=1.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="Roslyn.Compilers.CSharp, Version=1.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -50,74 +52,37 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FileListFixture.cs" />
-    <Compile Include="IntegrationFixture.cs" />
-    <Compile Include="ProjectFixture.cs" />
-    <Compile Include="TaskFixture.cs" />
+    <Compile Include="Feature_intersections.cs" />
+    <Compile Include="Cyclic_dependencies.cs" />
+    <Compile Include="Describing_tasks.cs" />
+    <Compile Include="Duplicate_tasks.cs" />
+    <Compile Include="CodeFixture.cs" />
+    <Compile Include="Options_parsing.cs" />
+    <Compile Include="Redefining_public_fields.cs" />
+    <Compile Include="String_literal_expansion.cs" />
+    <Compile Include="What_considered_being_a_task.cs" />
+    <Compile Include="Invoking_tasks.cs" />
+    <Compile Include="Global_task_registry.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Testing\MockTask.cs" />
-    <Compile Include="Testing\SubstituteEnvironmentTerminationAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Meta\Meta.csproj">
+      <Project>{b12eb89e-0c86-4d2e-866d-bbf1e6890806}</Project>
+      <Name>Meta</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Nake\Nake.csproj">
       <Project>{ff2ba5a8-f9dc-468e-b77f-698d9c141ebb}</Project>
       <Name>Nake</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Utility\Utility.csproj">
+      <Project>{e6106638-a952-4ca6-8c3d-438046ad4eac}</Project>
+      <Name>Utility</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="Packages.config" />
-    <Content Include="Testing\Integration\Nake.csx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Testing\Integration\Below\Deep.csx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Testing\Integration\Secondary.csx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Testing\FileList\A\AF3.lg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Testing\FileList\A\C\CF3.lg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Testing\FileList\B\C\CF6.lg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="Testing\FileList\A\C\CF1.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Testing\FileList\A\AF1.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Testing\FileList\A\AF2.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Testing\FileList\B\BF1.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Testing\FileList\B\BF2.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <Content Include="Testing\FileList\B\BF3.lg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <None Include="Testing\FileList\B\C\CF4.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Testing\FileList\B\C\CF5.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Testing\FileList\A\C\CF2.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
