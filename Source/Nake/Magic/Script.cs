@@ -112,6 +112,7 @@ namespace Nake.Magic
                         continue;
 
                     session.AddReference(new MetadataFileReference(absoluteReference));
+
                 }
 
                 return result.Code();

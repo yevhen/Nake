@@ -44,4 +44,5 @@ TestResults/
 #ignore certain folders
 /Output/
 /Packages/
+/Tools/Nake/Roslyn
 /Packages/!Repositories.config
