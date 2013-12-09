@@ -178,7 +178,7 @@ Nake welcome  # This is a demo task
 </code></pre>
 
 <blockquote>
-<p>NOTE: At the moment the supported parameter types are: bool, string, int. The support for <code>params</code> arrays and other types is planned. Thus you can do pretty much anything with already supported types. </p>
+<p>NOTE: At the moment Nake supports the following parameter types: bool, string and int. Support for <code>params</code> arrays and some other types is on a road-map.  Nevertheless, it's possible to code pretty much anything with just the types already supported by Nake.</p>
 </blockquote>
 
 <h3>
@@ -214,7 +214,7 @@ Nake welcome  # This is a demo task
 <span class="p">}</span>
 </pre></div>
 
-<p>Yes, it's just a normal method call. There is no any special syntax in Nake for specifying prerequisites - you simply invoke one task from within another task using native C# language constructs. Everything is 100% statically bound. No strings whatsoever, and you can put task invocations in any place you want (so that you can easily replicate advanced MSBuild features like <a href="http://freetodev.wordpress.com/2009/06/24/msbuild-4-0-beforetargets-and-aftertargets/">Before/After targets</a> <img class="emoji" title=":grin:" alt=":grin:" src="https://github.global.ssl.fastly.net/images/icons/emoji/grin.png" height="20" width="20" align="absmiddle">). </p>
+<p>Yes, it's just a regular method call. There is no any special syntax in Nake for specifying prerequisites - you simply invoke one task from within another task using native C# language constructs. Everything is 100% statically bound. No strings whatsoever, and you can put task invocations in any place you want (so that you can easily replicate advanced MSBuild features like <a href="http://freetodev.wordpress.com/2009/06/24/msbuild-4-0-beforetargets-and-aftertargets/">Before/After targets</a> <img class="emoji" title=":grin:" alt=":grin:" src="https://github.global.ssl.fastly.net/images/icons/emoji/grin.png" height="20" width="20" align="absmiddle">). </p>
 
 <h5>
 <a name="how-does-it-work" class="anchor" href="#how-does-it-work"><span class="octicon octicon-link"></span></a>How does it work?</h5>
@@ -283,8 +283,9 @@ Calling multiple tasks (note about PowerShell escaping of ';')</p>
 </ul><h2>
 <a name="contributing" class="anchor" href="#contributing"><span class="octicon octicon-link"></span></a>Contributing</h2>
 
-<p><strong>Bugs</strong> - no need to ask anything, just fix it and do a pull request
-<strong>Features</strong> - ideally should be discussed via GitHub issues or Nake's discussion group to avoid duplicate work and to make sure that new stuff is still inline with original vision.</p>
+<p><strong>Bugs</strong> - no need to ask anything, just fix it and do a pull request</p>
+
+<p><strong>Features</strong> - ideally should be discussed via GitHub issues or Nake's discussion group to avoid duplicate work and to make sure that new stuff is still inline with original vision.</p>
 
 <h2>
 <a name="samples-and-documentation" class="anchor" href="#samples-and-documentation"><span class="octicon octicon-link"></span></a>Samples and Documentation</h2>
@@ -294,7 +295,7 @@ Calling multiple tasks (note about PowerShell escaping of ';')</p>
 <h2>
 <a name="community" class="anchor" href="#community"><span class="octicon octicon-link"></span></a>Community</h2>
 
-<p>For commercial propositions you can write directly to me - yevhen dot bobrov at gmail com. General discussion group could be found <a href="https://groups.google.com/forum/#!forum/naketool">here</a>. Also, for news you can follow Nake's <a href="https://twitter.com/NakeTool">official</a> twitter account (or <a href="https://twitter.com/yevhen">my</a> account for that matter). The twitter's hashtag is <code>#naketool</code>.</p>
+<p>General discussion group could be found <a href="https://groups.google.com/forum/#!forum/naketool">here</a>. Also, for news you can follow Nake's <a href="https://twitter.com/NakeTool">official</a> twitter account (or <a href="https://twitter.com/yevhen">my</a> account for that matter). The twitter's hashtag is <code>#naketool</code>.</p>
 
 <h2>
 <a name="credits" class="anchor" href="#credits"><span class="octicon octicon-link"></span></a>Credits</h2>
