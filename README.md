@@ -119,7 +119,7 @@ Will produce the following output:
 
 	Hasta la vista, baby!
 
-> NOTE: At the moment the supported parameter types are: bool, string, int. The support for `params` arrays and other types is planned. Thus you can do pretty much anything with already supported types. 
+> NOTE: At the moment Nake supports the following parameter types: bool, string and int. Support for `params` arrays and some other types is on a road-map.  Nevertheless, it's possible to code pretty much anything with just the types already supported by Nake.
 
 ### Specifying prerequisite tasks (dependencies)
 
@@ -154,7 +154,7 @@ Now, how can we specify that relationship in Nake script? That `Build()` task is
 	// here goes code, which builds sources using given configuration
 }
 ```
-Yes, it's just a normal method call. There is no any special syntax in Nake for specifying prerequisites - you simply invoke one task from within another task using native C# language constructs. Everything is 100% statically bound. No strings whatsoever, and you can put task invocations in any place you want (so that you can easily replicate advanced MSBuild features like [Before/After targets](http://freetodev.wordpress.com/2009/06/24/msbuild-4-0-beforetargets-and-aftertargets/) :grin:). 
+Yes, it's just a regular method call. There is no any special syntax in Nake for specifying prerequisites - you simply invoke one task from within another task using native C# language constructs. Everything is 100% statically bound. No strings whatsoever, and you can put task invocations in any place you want (so that you can easily replicate advanced MSBuild features like [Before/After targets](http://freetodev.wordpress.com/2009/06/24/msbuild-4-0-beforetargets-and-aftertargets/) :grin:). 
 
 ##### How does it work?
 
@@ -203,6 +203,7 @@ Calling multiple tasks (note about PowerShell escaping of ';')
 ## Contributing
 
 **Bugs** - no need to ask anything, just fix it and do a pull request
+
 **Features** - ideally should be discussed via GitHub issues or Nake's discussion group to avoid duplicate work and to make sure that new stuff is still inline with original vision.
 
 ## Samples and Documentation
@@ -211,7 +212,7 @@ Have a look at [Nake.csx](https://github.com/yevhen/Nake/blob/master/Nake.csx) o
 
 ## Community
 
-For commercial propositions you can write directly to me - yevhen dot bobrov at gmail com. General discussion group could be found [here](https://groups.google.com/forum/#!forum/naketool). Also, for news you can follow Nake's [official](https://twitter.com/NakeTool) twitter account (or [my](https://twitter.com/yevhen) account for that matter). The twitter's hashtag is `#naketool`.
+General discussion group could be found [here](https://groups.google.com/forum/#!forum/naketool). Also, for news you can follow Nake's [official](https://twitter.com/NakeTool) twitter account (or [my](https://twitter.com/yevhen) account for that matter). The twitter's hashtag is `#naketool`.
 
 ## Credits
 - To all contributors (check out GitHub statistics)!
