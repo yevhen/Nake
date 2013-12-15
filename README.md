@@ -158,47 +158,112 @@ Yes, it's just a regular method call. There is no any special syntax in Nake for
 
 ##### How does it work?
 
-TODO: Describe how Nake is unique in its approach to specifying tasks and their prerequisites, and how it extends C# language semantics in order to implement dependency based style of computation ([link](http://martinfowler.com/articles/rake.html#DependencyBasedProgramming)), while still keeping its DSL (pure C#) rather imperative. Describe how Nake uses Roslyn's syntax re-writing features to rewrite task invocations.
+DOC: Describe how Nake is unique in its approach to specifying tasks and their prerequisites, and how it extends C# language semantics in order to implement dependency based style of computation ([link](http://martinfowler.com/articles/rake.html#DependencyBasedProgramming)), while still keeping its DSL (pure C#) rather imperative. Describe how Nake uses Roslyn's syntax re-writing features to rewrite task invocations.
 
 ### Namespaces
-TODO
+DOC
 
 ## Other mind-blowing features (at a glance)
 
-#### String expression expansions
-TODO
+#### String literal expansions
+DOC
 
-#### Command line property overrides
-TODO 
+#### Command line overrides
+DOC 
 
 #### MSBuild interoperability
-TODO
+DOC
 
 #### Powerful utility library
-TODO
+DOC
 
-## Other less mind-blowing but useful features
+## Other useful features
 
-#### Cycle dependencies detection
-TODO
-
-#### Roslyn bootstrapping
-TODO
+- **Cycle dependencies detection** - DOC
+- **Roslyn bootstrapping** - DOC
 
 ## General scripting
 
-Point to relevant topics in scriptcs documentation
+DOC: Point to relevant topics in scriptcs documentation
 
 ## Working with command line
 
-Cmd line reference
-Calling multiple tasks (note about PowerShell escaping of ';')
+General syntax is: `Nake [options ...]  [VAR=VALUE ...]  [task ...]`
+
+Options:
+
+	   -?  --help             Display help message and exit
+	   -v  --version          Display the program version and exit
+	   -q  --quiet            Do not echo informational messages to standard output
+	   -s  --silent           Same as --quiet but also suppresses user generated log messages
+	   -f  --nakefile FILE    Use FILE as the Nake project file
+	   -d  --directory DIR    Use DIR as current directory
+	   -t  --trace            Enables task execution tracing and full stack traces in exception messages
+	       --debug            Enables full script debugging in Visual Studio
+	   -T  --tasks [PATTERN]  Display the tasks with descriptions matching optional PATTERN and exit
+
+>NOTE: You can always get help for command line usage by running Nake with `-?` or `--help` switches.
+
+#### Setting environment variables
+
+You can set process-level environment variables by defining key/value pairs before task name:
+
+```
+Nake CpuCount=2 OutDir=C:\Temp scan 
+```
+
+#### Overriding constants
+
+An interesting feature of Nake, is that it allows you to override value of any public constant or public static property, by simply passing a corresponding key/value pair from a command line, like in previous example:
+
+```
+Nake CpuCount=2 OutDir=C:\Temp scan 
+```
+You can get these values using built-in utility class:
+
+```cs
+var cpuCount = Env.Var["CpuCount"] ?? 1;
+var outDir = Env.Var["OutDir"] ?? "Output";
+```
+This is similar to MSBuild way of having overridable variables with fallback values. But in Nake, it is enough to just declare public constants or public static properties, and Nake will try to match property names with those coming from a command line, overriding those which match: 
+
+```cs
+public const int CpuCount = 1;
+public static string OutDir = "Output";
+```
+Declaring constants could be more handy, as you can use them as default parameter values: 
+
+```cs
+[Task] public static void Clean(string dir = OutDir) { ... }
+```
+
+#### Passing arguments to tasks 
+
+Use space to separate arguments. Both positional and named arguments are supported. The command line syntax is the same as regular C# method calling syntax, except space is used as separator (instead of `,`):
+
+```
+Nake db.migrate MainDb version:10002 
+```
+> NOTE: Use double quotes, if the value you're passing contains colon `:` (ie `Nake clean dir:"C:\Temp"`). Also, don't forget to properly escape symbols, which have special meaning in your shell.  
+
+#### Calling multiple tasks 
+
+You can call multiple tasks, within one session, by simply separating them with semicolon `;`:
+
+```
+Nake clean;build;test 
+```
+> NOTE: In some shells, like PowerShell, semicolon (`;`) need to be escaped. For PowerShell it should be escaped with a backtick `;.
 
 ## Backlog
 
+- Running on Mono
+- Support for additional parameter types, such as `params`
 - Ask for required arguments, ala PowerShell
 - Interactive mode, task name tab completion
-- Once Roslyn finally start respecting #load directive, move both Meta and Utility to `.csx` files, so global install is possible 
+- PowerShell hosting
+- On-demand script loader
+- Once Roslyn finally start respecting #load directive, move both Meta and Utility to `.csx` files, so global install is possible
 
 ## Contributing
 

@@ -26,19 +26,19 @@ namespace Nake
         static readonly List<Switch> switches = new List<Switch>
         {
             new Switch("help", "Display help message and exit")
-                .Shortcuts("?")
+                .Shortcut("?")
                 .OnMatch(options => options.ShowHelp = true),
 
             new Switch("version", "Display the program version and exit")
-                .Shortcuts("v")
+                .Shortcut("v")
                 .OnMatch(options => options.ShowVersion = true),			
                 
             new Switch("quiet", "Do not echo informational messages to standard output")
-                .Shortcuts("q")
+                .Shortcut("q")
                 .OnMatch(options => options.QuietMode = true),
 
             new Switch("silent", "Same as --quiet but also suppresses user generated log messages")
-                .Shortcuts("s")
+                .Shortcut("s")
                 .OnMatch(options =>
                 {
                     options.QuietMode = true; 
@@ -46,22 +46,22 @@ namespace Nake
                 }),
 
             new Switch("nakefile FILE", "Use FILE as the Nake project file")
-                .Shortcuts("f")
+                .Shortcut("f")
                 .OnMatch((options, file) => options.ScriptFile = file),
 
             new Switch("directory DIR", "Use DIR as current directory")
-                .Shortcuts("d")
+                .Shortcut("d")
                 .OnMatch((options, dir) => options.CurrentDirectory = dir),
 
             new Switch("trace", "Enables task execution tracing and full stack traces in exception messages")
-                .Shortcuts("t")
+                .Shortcut("t")
                 .OnMatch(options => options.TraceEnabled = options.DebugScript = true),
 
             new Switch("debug", "Enables full script debugging in Visual Studio")
                 .OnMatch(options => options.DebugScript = true),
 
             new Switch("tasks [PATTERN]", "Display the tasks with descriptions matching optional PATTERN and exit")
-                .Shortcuts("T")
+                .Shortcut("T")
                 .OnMatch((options, filter) => 
                 { 
                     options.ShowTasks = true;
@@ -78,13 +78,13 @@ namespace Nake
             Console.WriteLine(Environment.NewLine + "Options:");
 
             var maxSwitchKeywordLength = switches.Max(x => x.KeywordLength);
-            var maxSwitchShortcutsLength = switches.Max(x => x.ShortcutsLength);
+            var maxSwitchShortcutsLength = switches.Max(x => x.ShortcutLength);
          
             foreach (var @switch in switches)
             {
                 Console.Write("   ");
 
-                @switch.PrintShortcuts(maxSwitchShortcutsLength + 2);
+                @switch.PrintShortcut(maxSwitchShortcutsLength + 2);
                 @switch.PrintKeyword(maxSwitchKeywordLength + 2);
                 @switch.PrintDescription();
 
@@ -174,7 +174,7 @@ namespace Nake
             readonly bool expectsValue;
             readonly bool requiresValue;
 
-            HashSet<string> shortcuts = new HashSet<string>();
+            string shortcut = "";
             Action<Options, string> handler;
 
             public Switch(string pattern, string description)
@@ -198,19 +198,9 @@ namespace Nake
                 get { return pattern.Length + KeywordIndicator.Length; }
             }
 
-            public int ShortcutsLength
+            public int ShortcutLength
             {
-                get { return String.Join("/", shortcuts).Length + ShortcutIndicator.Length; }
-            }
-
-            public void PrintKeyword(int padding)
-            {
-                Console.Write((KeywordIndicator + pattern).PadRight(padding));
-            }
-
-            public void PrintShortcuts(int padding)
-            {
-                Console.Write((ShortcutIndicator + String.Join("/", shortcuts)).PadRight(padding));
+                get { return shortcut.Length + ShortcutIndicator.Length; }
             }
 
             public void PrintDescription()
@@ -218,13 +208,24 @@ namespace Nake
                 Console.Write(description);
             }
 
-            public Switch Shortcuts(params string[] aliases)
+            public void PrintKeyword(int padding)
             {
-                foreach (var alias in aliases)
-                {
-                    shortcuts.Add(alias);
-                }
+                Print(KeywordIndicator + pattern, padding);
+            }
 
+            public void PrintShortcut(int padding)
+            {
+                Print(shortcut != "" ? ShortcutIndicator + shortcut : "", padding);
+            }
+
+            static void Print(string s, int padding)
+            {
+                Console.Write(s.PadRight(padding));
+            }
+
+            public Switch Shortcut(string alias)
+            {
+                shortcut = alias;
                 return this;
             }
 
@@ -253,7 +254,7 @@ namespace Nake
                     return keyword == arg.Remove(0, KeywordIndicator.Length);
 
                 if (arg.StartsWith(ShortcutIndicator))
-                    return shortcuts.Contains(arg.Remove(0, ShortcutIndicator.Length));
+                    return shortcut.Contains(arg.Remove(0, ShortcutIndicator.Length));
             
                 return false;
             }
