@@ -219,67 +219,140 @@ Nake welcome  # This is a demo task
 <h5>
 <a name="how-does-it-work" class="anchor" href="#how-does-it-work"><span class="octicon octicon-link"></span></a>How does it work?</h5>
 
-<p>TODO: Describe how Nake is unique in its approach to specifying tasks and their prerequisites, and how it extends C# language semantics in order to implement dependency based style of computation (<a href="http://martinfowler.com/articles/rake.html#DependencyBasedProgramming">link</a>), while still keeping its DSL (pure C#) rather imperative. Describe how Nake uses Roslyn's syntax re-writing features to rewrite task invocations.</p>
+<p>DOC: Describe how Nake is unique in its approach to specifying tasks and their prerequisites, and how it extends C# language semantics in order to implement dependency based style of computation (<a href="http://martinfowler.com/articles/rake.html#DependencyBasedProgramming">link</a>), while still keeping its DSL (pure C#) rather imperative. Describe how Nake uses Roslyn's syntax re-writing features to rewrite task invocations.</p>
 
 <h3>
 <a name="namespaces" class="anchor" href="#namespaces"><span class="octicon octicon-link"></span></a>Namespaces</h3>
 
-<p>TODO</p>
+<p>DOC</p>
 
 <h2>
 <a name="other-mind-blowing-features-at-a-glance" class="anchor" href="#other-mind-blowing-features-at-a-glance"><span class="octicon octicon-link"></span></a>Other mind-blowing features (at a glance)</h2>
 
 <h4>
-<a name="string-expression-expansions" class="anchor" href="#string-expression-expansions"><span class="octicon octicon-link"></span></a>String expression expansions</h4>
+<a name="string-literal-expansions" class="anchor" href="#string-literal-expansions"><span class="octicon octicon-link"></span></a>String literal expansions</h4>
 
-<p>TODO</p>
+<p>DOC</p>
 
 <h4>
-<a name="command-line-property-overrides" class="anchor" href="#command-line-property-overrides"><span class="octicon octicon-link"></span></a>Command line property overrides</h4>
+<a name="command-line-overrides" class="anchor" href="#command-line-overrides"><span class="octicon octicon-link"></span></a>Command line overrides</h4>
 
-<p>TODO </p>
+<p>DOC </p>
 
 <h4>
 <a name="msbuild-interoperability" class="anchor" href="#msbuild-interoperability"><span class="octicon octicon-link"></span></a>MSBuild interoperability</h4>
 
-<p>TODO</p>
+<p>DOC</p>
 
 <h4>
 <a name="powerful-utility-library" class="anchor" href="#powerful-utility-library"><span class="octicon octicon-link"></span></a>Powerful utility library</h4>
 
-<p>TODO</p>
+<p>DOC</p>
 
 <h2>
-<a name="other-less-mind-blowing-but-useful-features" class="anchor" href="#other-less-mind-blowing-but-useful-features"><span class="octicon octicon-link"></span></a>Other less mind-blowing but useful features</h2>
+<a name="other-useful-features" class="anchor" href="#other-useful-features"><span class="octicon octicon-link"></span></a>Other useful features</h2>
 
-<h4>
-<a name="cycle-dependencies-detection" class="anchor" href="#cycle-dependencies-detection"><span class="octicon octicon-link"></span></a>Cycle dependencies detection</h4>
-
-<p>TODO</p>
-
-<h4>
-<a name="roslyn-bootstrapping" class="anchor" href="#roslyn-bootstrapping"><span class="octicon octicon-link"></span></a>Roslyn bootstrapping</h4>
-
-<p>TODO</p>
-
-<h2>
+<ul>
+<li>
+<strong>Cycle dependencies detection</strong> - DOC</li>
+<li>
+<strong>Roslyn bootstrapping</strong> - DOC</li>
+</ul><h2>
 <a name="general-scripting" class="anchor" href="#general-scripting"><span class="octicon octicon-link"></span></a>General scripting</h2>
 
-<p>Point to relevant topics in scriptcs documentation</p>
+<p>DOC: Point to relevant topics in scriptcs documentation</p>
 
 <h2>
 <a name="working-with-command-line" class="anchor" href="#working-with-command-line"><span class="octicon octicon-link"></span></a>Working with command line</h2>
 
-<p>Cmd line reference
-Calling multiple tasks (note about PowerShell escaping of ';')</p>
+<p>General syntax is: <code>Nake [options ...]  [VAR=VALUE ...]  [task ...]</code></p>
+
+<p>Options:</p>
+
+<pre><code>   -?  --help             Display help message and exit
+   -v  --version          Display the program version and exit
+   -q  --quiet            Do not echo informational messages to standard output
+   -s  --silent           Same as --quiet but also suppresses user generated log messages
+   -f  --nakefile FILE    Use FILE as the Nake project file
+   -d  --directory DIR    Use DIR as current directory
+   -t  --trace            Enables task execution tracing and full stack traces in exception messages
+       --debug            Enables full script debugging in Visual Studio
+   -T  --tasks [PATTERN]  Display the tasks with descriptions matching optional PATTERN and exit
+</code></pre>
+
+<blockquote>
+<p>NOTE: You can always get help for command line usage by running Nake with <code>-?</code> or <code>--help</code> switches.</p>
+</blockquote>
+
+<h4>
+<a name="setting-environment-variables" class="anchor" href="#setting-environment-variables"><span class="octicon octicon-link"></span></a>Setting environment variables</h4>
+
+<p>You can set process-level environment variables by defining key/value pairs before task name:</p>
+
+<pre><code>Nake CpuCount=2 OutDir=C:\Temp scan 
+</code></pre>
+
+<h4>
+<a name="overriding-constants" class="anchor" href="#overriding-constants"><span class="octicon octicon-link"></span></a>Overriding constants</h4>
+
+<p>An interesting feature of Nake, is that it allows you to override value of any public constant or public static property, by simply passing a corresponding key/value pair from a command line, like in previous example:</p>
+
+<pre><code>Nake CpuCount=2 OutDir=C:\Temp scan 
+</code></pre>
+
+<p>You can get these values using built-in utility class:</p>
+
+<div class="highlight highlight-cs"><pre><span class="kt">var</span> <span class="n">cpuCount</span> <span class="p">=</span> <span class="n">Env</span><span class="p">.</span><span class="n">Var</span><span class="p">[</span><span class="s">"CpuCount"</span><span class="p">]</span> <span class="p">??</span> <span class="m">1</span><span class="p">;</span>
+<span class="kt">var</span> <span class="n">outDir</span> <span class="p">=</span> <span class="n">Env</span><span class="p">.</span><span class="n">Var</span><span class="p">[</span><span class="s">"OutDir"</span><span class="p">]</span> <span class="p">??</span> <span class="s">"Output"</span><span class="p">;</span>
+</pre></div>
+
+<p>This is similar to MSBuild way of having overridable variables with fallback values. But in Nake, it is enough to just declare public constants or public static properties, and Nake will try to match property names with those coming from a command line, overriding those which match: </p>
+
+<div class="highlight highlight-cs"><pre><span class="k">public</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">CpuCount</span> <span class="p">=</span> <span class="m">1</span><span class="p">;</span>
+<span class="k">public</span> <span class="k">static</span> <span class="kt">string</span> <span class="n">OutDir</span> <span class="p">=</span> <span class="s">"Output"</span><span class="p">;</span>
+</pre></div>
+
+<p>Declaring constants could be more handy, as you can use them as default parameter values: </p>
+
+<div class="highlight highlight-cs"><pre><span class="na">[Task]</span> <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="n">Clean</span><span class="p">(</span><span class="kt">string</span> <span class="n">dir</span> <span class="p">=</span> <span class="n">OutDir</span><span class="p">)</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span>
+</pre></div>
+
+<h4>
+<a name="passing-arguments-to-tasks" class="anchor" href="#passing-arguments-to-tasks"><span class="octicon octicon-link"></span></a>Passing arguments to tasks</h4>
+
+<p>Use space to separate arguments. Both positional and named arguments are supported. The command line syntax is the same as regular C# method calling syntax, except space is used as separator (instead of <code>,</code>):</p>
+
+<pre><code>Nake db.migrate MainDb version:10002 
+</code></pre>
+
+<blockquote>
+<p>NOTE: Use double quotes, if the value you're passing contains colon <code>:</code> (ie <code>Nake clean dir:"C:\Temp"</code>). Also, don't forget to properly escape symbols, which have special meaning in your shell.  </p>
+</blockquote>
+
+<h4>
+<a name="calling-multiple-tasks" class="anchor" href="#calling-multiple-tasks"><span class="octicon octicon-link"></span></a>Calling multiple tasks</h4>
+
+<p>You can call multiple tasks, within one session, by simply separating them with semicolon <code>;</code>:</p>
+
+<pre><code>Nake clean;build;test 
+</code></pre>
+
+<blockquote>
+<p>NOTE: In some shells, like PowerShell, semicolon (<code>;</code>) need to be escaped. For PowerShell it should be escaped with a backtick `;.</p>
+</blockquote>
 
 <h2>
 <a name="backlog" class="anchor" href="#backlog"><span class="octicon octicon-link"></span></a>Backlog</h2>
 
 <ul>
+<li>Running on Mono</li>
+<li>Support for additional parameter types, such as <code>params</code>
+</li>
 <li>Ask for required arguments, ala PowerShell</li>
 <li>Interactive mode, task name tab completion</li>
-<li>Once Roslyn finally start respecting #load directive, move both Meta and Utility to <code>.csx</code> files, so global install is possible </li>
+<li>PowerShell hosting</li>
+<li>On-demand script loader</li>
+<li>Once Roslyn finally start respecting #load directive, move both Meta and Utility to <code>.csx</code> files, so global install is possible</li>
 </ul><h2>
 <a name="contributing" class="anchor" href="#contributing"><span class="octicon octicon-link"></span></a>Contributing</h2>
 
