@@ -1,14 +1,12 @@
 ## Nake
 
-Nake is a magic build automation tool for .NET. It was built by unicorns flying in a rainbows and it's well seasoned by lots of fairy dust. Nake is simply that build\deployment\ops automation tool you were dreaming of.
+Nake is a magic task runner tool for .NET. It was built by unicorns flying in a rainbows and it's well seasoned by lots of fairy dust. Nake is simply that build/deployment/ops automation tool you were dreaming of.
 
-Jokes aside, it's the only tool which can give you the imperative\functional convenience of Rake\MSBuild, but without forcing you (and your team) to learn yet another language and without pricking you eyes by hordes of angle brackets. 
+Jokes aside, it's the only tool which can give you an imperative/functional convenience of Rake/MSBuild, but without forcing you (and your team) to learn yet another language and without pricking you eyes by hordes of angle brackets. 
 
 At last! Now you can automate your tasks by writing a 100% idiomatic C# code without any limitations (and with all the power of .NET framework) using a lightweight scripting approach. No projects, no pre-compilation, using any text editor. 
 
-Nake's DSL for defining tasks is uniquely minimal and it was carefully crafted to be a 100% IntelliSense compatible. If you're happy to edit your `.csx` scripts by using Visual Studio (2012), you can get all of that editing goodness by simply installing [Roslyn CTP](http://www.microsoft.com/en-us/download/details.aspx?id=34685) extension. 
-
-And no worries, Nake has great MSBuild interoperability story, so you can easily import and execute any built-in or third-party MSBuild tasks.
+Nake's DSL for defining tasks is uniquely minimal and it was carefully crafted to be a 100% IntelliSense compatible. And no worries, Nake has great MSBuild interoperability story, so you can easily import and execute any built-in or third-party MSBuild tasks.
 
 ## Getting Started
 
@@ -19,6 +17,12 @@ There multiple ways in which Nake could be installed. You can install it by usin
 To install Nake via NuGet, run this command in NuGet package manager console:
 
 	PM> Install-Package Nake 
+
+#### IntelliSense and syntax highlighting
+
+You can install [Roslyn CTP](http://www.microsoft.com/en-us/download/details.aspx?id=34685) extension to get IntelliSense support in Visual Studio 2012. IntelliSense for other versions of Visual Studio is not available at the moment. 
+
+Syntax highlighting for `.csx` files is easy to get - it is just standard C# code, so just map `.csx` file extension in you favorite text editor to be recognized as C#.
 
 ### Writing your first task
 
