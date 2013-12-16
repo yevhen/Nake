@@ -42,15 +42,13 @@
         <h2>
 <a name="nake" class="anchor" href="#nake"><span class="octicon octicon-link"></span></a>Nake</h2>
 
-<p>Nake is a magic build automation tool for .NET. It was built by unicorns flying in a rainbows and it's well seasoned by lots of fairy dust. Nake is simply that build\deployment\ops automation tool you were dreaming of.</p>
+<p>Nake is a magic task runner tool for .NET. It was built by unicorns flying in a rainbows and it's well seasoned by lots of fairy dust. Nake is simply that build/deployment/ops automation tool you were dreaming of.</p>
 
-<p>Jokes aside, it's the only tool which can give you the imperative\functional convenience of Rake\MSBuild, but without forcing you (and your team) to learn yet another language and without pricking you eyes by hordes of angle brackets. </p>
+<p>Jokes aside, it's the only tool which can give you an imperative/functional convenience of Rake/MSBuild, but without forcing you (and your team) to learn yet another language and without pricking you eyes by hordes of angle brackets. </p>
 
 <p>At last! Now you can automate your tasks by writing a 100% idiomatic C# code without any limitations (and with all the power of .NET framework) using a lightweight scripting approach. No projects, no pre-compilation, using any text editor. </p>
 
-<p>Nake's DSL for defining tasks is uniquely minimal and it was carefully crafted to be a 100% IntelliSense compatible. If you're happy to edit your <code>.csx</code> scripts by using Visual Studio (2012), you can get all of that editing goodness by simply installing <a href="http://www.microsoft.com/en-us/download/details.aspx?id=34685">Roslyn CTP</a> extension. </p>
-
-<p>And no worries, Nake has great MSBuild interoperability story, so you can easily import and execute any built-in or third-party MSBuild tasks.</p>
+<p>Nake's DSL for defining tasks is uniquely minimal and it was carefully crafted to be a 100% IntelliSense compatible. And no worries, Nake has great MSBuild interoperability story, so you can easily import and execute any built-in or third-party MSBuild tasks.</p>
 
 <h2>
 <a name="getting-started" class="anchor" href="#getting-started"><span class="octicon octicon-link"></span></a>Getting Started</h2>
@@ -64,6 +62,17 @@
 
 <pre><code>PM&gt; Install-Package Nake 
 </code></pre>
+
+<h4>
+<a name="intellisense-and-syntax-highlighting" class="anchor" href="#intellisense-and-syntax-highlighting"><span class="octicon octicon-link"></span></a>IntelliSense and syntax highlighting</h4>
+
+<p>You can install <a href="http://www.microsoft.com/en-us/download/details.aspx?id=34685">Roslyn CTP</a> extension to get IntelliSense support in Visual Studio 2012. IntelliSense for other versions of Visual Studio is not available at the moment. </p>
+
+<p>Syntax highlighting for <code>.csx</code> files is easy to get - it is just standard C# code, so just map <code>.csx</code> file extension in you favorite text editor to be recognized as C#.</p>
+
+<blockquote>
+<p>NOTE: You might first need to install <a href="http://www.microsoft.com/en-us/download/details.aspx?id=30668">VS 2012 SDK</a> for Roslyn CTP extension to be installed successfully</p>
+</blockquote>
 
 <h3>
 <a name="writing-your-first-task" class="anchor" href="#writing-your-first-task"><span class="octicon octicon-link"></span></a>Writing your first task</h3>
