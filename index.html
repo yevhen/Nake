@@ -68,7 +68,7 @@
 
 <p>You can install <a href="http://www.microsoft.com/en-us/download/details.aspx?id=34685">Roslyn CTP</a> extension to get IntelliSense support in Visual Studio 2012. IntelliSense for other versions of Visual Studio is not available at the moment. </p>
 
-<p>Syntax highlighting for <code>.csx</code> files is easy to get - it is just standard C# code, so just map <code>.csx</code> file extension in you favorite text editor to be recognized as C#.</p>
+<p>Syntax highlighting for <em>.csx</em> files is easy to get - it is just standard C# code, so just map <em>.csx</em> file extension in you favorite text editor to be recognized as C#.</p>
 
 <blockquote>
 <p>NOTE: You might first need to install <a href="http://www.microsoft.com/en-us/download/details.aspx?id=30668">VS 2012 SDK</a> for Roslyn CTP extension to be installed successfully</p>
@@ -88,7 +88,7 @@
 <p>Save it to the root folder of your solution and give file <code>Nake.csx</code> name. Now you can invoke your task from command line by using Nake console application.</p>
 
 <blockquote>
-<p>NOTE: If you installed Nake via NuGet package manager console in Visual Studio, during an installation a sample script (<code>Nake.csx</code>) was created in the root directory of your solution. You can use it as the starting point.</p>
+<p>NOTE: If you installed Nake via NuGet package manager console in Visual Studio, during an installation a sample script (<em>Nake.csx</em>) was created in the root directory of your solution. You can use it as the starting point.</p>
 </blockquote>
 
 <h3>
@@ -120,7 +120,7 @@ Packages\Nake.1.0.0.7\tools\net45\Nake.exe %*
 <p>Now you have an easy (and recommended) way to launch Nake.</p>
 
 <blockquote>
-<p>NOTE: If you installed Nake via NuGet package manager console in Visual Studio, during an installation a sample batch runner file (<code>Nake.bat</code>) was created in the root directory of your solution. if that didn't happen - check Nake <code>samples</code> directory inside respective package folder. </p>
+<p>NOTE: If you installed Nake via NuGet package manager console in Visual Studio, during an installation a sample batch runner file (<em>Nake.bat</em>) was created in the root directory of your solution. if that didn't happen - check Nake <em>samples</em> directory inside respective package folder. </p>
 </blockquote>
 
 <h3>
@@ -139,7 +139,7 @@ Packages\Nake.1.0.0.7\tools\net45\Nake.exe %*
 <span class="p">}</span>
 </pre></div>
 
-<p>Now if you run Nake with <code>-T</code> switch you should see the following output: </p>
+<p>Now if you again run Nake with the <em>-T</em> switch you should see the following output: </p>
 
 <pre><code>C:\Demo&gt;Nake -T
 
@@ -206,9 +206,9 @@ Nake welcome  # This is a demo task
 <span class="p">}</span>
 </pre></div>
 
-<p>We want to specify that the <code>Clean()</code> task should always be executed before the <code>Build()</code> task is executed. Regarding to this, we can say that the <code>Clean()</code> task is the <em>prerequisite</em> of the <code>Build()</code> task or that the <code>Build()</code> task is <em>dependent</em> on the <code>Clean()</code> task. </p>
+<p>We want to specify that the Clean() task should always be executed before the Build() task is executed. Regarding to this, we can say that the Clean() task is the <em>prerequisite</em> of the Build() task or that the Build() task is <em>dependent</em> on the Clean() task. </p>
 
-<p>Now, how can we specify that relationship in Nake script? That <code>Build()</code> task is dependent on the <code>Clean()</code> task? Check out the following example:</p>
+<p>Now, how can we specify that relationship in Nake script? That Build() task is dependent on the Clean() task? Check out the following example:</p>
 
 <div class="highlight highlight-cs"><pre><span class="na">[Task]</span> <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="n">Clean</span><span class="p">()</span>
 <span class="p">{</span>
@@ -290,7 +290,7 @@ Nake welcome  # This is a demo task
 </code></pre>
 
 <blockquote>
-<p>NOTE: You can always get help for command line usage by running Nake with <code>-?</code> or <code>--help</code> switches.</p>
+<p>NOTE: You can always get help for command line usage by running Nake with <em>-?</em> or <em>--help</em> switches.</p>
 </blockquote>
 
 <h4>
@@ -347,7 +347,7 @@ Nake welcome  # This is a demo task
 </code></pre>
 
 <blockquote>
-<p>NOTE: In some shells, like PowerShell, semicolon (<code>;</code>) need to be escaped. For PowerShell it should be escaped with a backtick `;.</p>
+<p>NOTE: In some shells, like PowerShell, semicolon (<em>;</em>) need to be escaped. For PowerShell it should be escaped with a backtick <em>`;</em>.</p>
 </blockquote>
 
 <h2>
@@ -355,13 +355,13 @@ Nake welcome  # This is a demo task
 
 <ul>
 <li>Running on Mono</li>
-<li>Support for additional parameter types, such as <code>params</code>
+<li>Support for additional parameter types, such as <em>params</em>
 </li>
 <li>Ask for required arguments, ala PowerShell</li>
 <li>Interactive mode, task name tab completion</li>
 <li>PowerShell hosting</li>
 <li>On-demand script loader</li>
-<li>Once Roslyn finally start respecting #load directive, move both Meta and Utility to <code>.csx</code> files, so global install is possible</li>
+<li>Once Roslyn finally start respecting <em>#load</em> directive, move both Meta and Utility to <em>.csx</em> files, so global install is possible</li>
 </ul><h2>
 <a name="contributing" class="anchor" href="#contributing"><span class="octicon octicon-link"></span></a>Contributing</h2>
 
