@@ -24,6 +24,8 @@ You can install [Roslyn CTP](http://www.microsoft.com/en-us/download/details.asp
 
 Syntax highlighting for `.csx` files is easy to get - it is just standard C# code, so just map `.csx` file extension in you favorite text editor to be recognized as C#.
 
+> NOTE: You might first need to install [VS 2012 SDK](http://www.microsoft.com/en-us/download/details.aspx?id=30668) for Roslyn CTP extension to be installed successfully
+
 ### Writing your first task
 
 Open up you favorite text editor and enter the following code:
