@@ -22,7 +22,7 @@ To install Nake via NuGet, run this command in NuGet package manager console:
 
 You can install [Roslyn CTP](http://www.microsoft.com/en-us/download/details.aspx?id=34685) extension to get IntelliSense support in Visual Studio 2012. IntelliSense for other versions of Visual Studio is not available at the moment. 
 
-Syntax highlighting for `.csx` files is easy to get - it is just standard C# code, so just map `.csx` file extension in you favorite text editor to be recognized as C#.
+Syntax highlighting for *.csx* files is easy to get - it is just standard C# code, so just map *.csx* file extension in you favorite text editor to be recognized as C#.
 
 > NOTE: You might first need to install [VS 2012 SDK](http://www.microsoft.com/en-us/download/details.aspx?id=30668) for Roslyn CTP extension to be installed successfully
 
@@ -38,7 +38,7 @@ Open up you favorite text editor and enter the following code:
 ```
 Save it to the root folder of your solution and give file `Nake.csx` name. Now you can invoke your task from command line by using Nake console application.
 
-> NOTE: If you installed Nake via NuGet package manager console in Visual Studio, during an installation a sample script (`Nake.csx`) was created in the root directory of your solution. You can use it as the starting point.
+> NOTE: If you installed Nake via NuGet package manager console in Visual Studio, during an installation a sample script (*Nake.csx*) was created in the root directory of your solution. You can use it as the starting point.
 
 ### Invoking task via command line
 
@@ -63,7 +63,7 @@ That, without doubt, is tedious to enter every time you want to invoke a task, b
 
 Now you have an easy (and recommended) way to launch Nake.
 
-> NOTE: If you installed Nake via NuGet package manager console in Visual Studio, during an installation a sample batch runner file (`Nake.bat`) was created in the root directory of your solution. if that didn't happen - check Nake `samples` directory inside respective package folder. 
+> NOTE: If you installed Nake via NuGet package manager console in Visual Studio, during an installation a sample batch runner file (*Nake.bat*) was created in the root directory of your solution. if that didn't happen - check Nake *samples* directory inside respective package folder. 
 
 ### Describing tasks
 
@@ -81,7 +81,7 @@ Now guess how can we give a meaningful descriptions to our tasks, which are simp
 }
 ```
 
-Now if you run Nake with `-T` switch you should see the following output: 
+Now if you again run Nake with the *-T* switch you should see the following output: 
 
 	C:\Demo>Nake -T
 	
@@ -143,9 +143,9 @@ Suppose we have the following build related tasks defined in a script:
 }
 ```
 
-We want to specify that the `Clean()` task should always be executed before the `Build()` task is executed. Regarding to this, we can say that the `Clean()` task is the *prerequisite* of the `Build()` task or that the `Build()` task is *dependent* on the `Clean()` task. 
+We want to specify that the Clean() task should always be executed before the Build() task is executed. Regarding to this, we can say that the Clean() task is the *prerequisite* of the Build() task or that the Build() task is *dependent* on the Clean() task. 
 
-Now, how can we specify that relationship in Nake script? That `Build()` task is dependent on the `Clean()` task? Check out the following example:
+Now, how can we specify that relationship in Nake script? That Build() task is dependent on the Clean() task? Check out the following example:
 
 ```cs
 [Task] public static void Clean()
@@ -208,7 +208,7 @@ Options:
 	       --debug            Enables full script debugging in Visual Studio
 	   -T  --tasks [PATTERN]  Display the tasks with descriptions matching optional PATTERN and exit
 
->NOTE: You can always get help for command line usage by running Nake with `-?` or `--help` switches.
+>NOTE: You can always get help for command line usage by running Nake with *-?* or *--help* switches.
 
 #### Setting environment variables
 
@@ -259,17 +259,17 @@ You can call multiple tasks, within one session, by simply separating them with 
 ```
 Nake clean;build;test 
 ```
-> NOTE: In some shells, like PowerShell, semicolon (`;`) need to be escaped. For PowerShell it should be escaped with a backtick `;.
+> NOTE: In some shells, like PowerShell, semicolon (*;*) need to be escaped. For PowerShell it should be escaped with a backtick *`;*.
 
 ## Backlog
 
 - Running on Mono
-- Support for additional parameter types, such as `params`
+- Support for additional parameter types, such as *params*
 - Ask for required arguments, ala PowerShell
 - Interactive mode, task name tab completion
 - PowerShell hosting
 - On-demand script loader
-- Once Roslyn finally start respecting #load directive, move both Meta and Utility to `.csx` files, so global install is possible
+- Once Roslyn finally start respecting *#load* directive, move both Meta and Utility to *.csx* files, so global install is possible
 
 ## Contributing
 
