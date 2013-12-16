@@ -85,7 +85,7 @@
 <span class="p">}</span>
 </pre></div>
 
-<p>Save it to the root folder of your solution and give file <code>Nake.csx</code> name. Now you can invoke your task from command line by using Nake console application.</p>
+<p>Save it to the root folder of your solution and give file <em>Nake.csx</em> name. Now you can invoke your task from command line by using Nake console application.</p>
 
 <blockquote>
 <p>NOTE: If you installed Nake via NuGet package manager console in Visual Studio, during an installation a sample script (<em>Nake.csx</em>) was created in the root directory of your solution. You can use it as the starting point.</p>
@@ -106,12 +106,12 @@
 
 <p>Cool, ya? <img class="emoji" title=":grimacing:" alt=":grimacing:" src="https://github.global.ssl.fastly.net/images/icons/emoji/grimacing.png" height="20" width="20" align="absmiddle"></p>
 
-<p>That for sure will only work if you have <code>Nake.exe</code> somewhere in your path. That's not good as Nake should be used as local dependency. Assuming that you have installed it via NuGet, your actual path might look like the one below:</p>
+<p>That for sure will only work if you have <em>Nake.exe</em> somewhere in your path. That's not good as Nake should be used as local dependency. Assuming that you have installed it via NuGet, your actual path might look like the one below:</p>
 
 <pre><code>Packages\Nake.1.0.0.7\tools\net45\Nake.exe welcome
 </code></pre>
 
-<p>That, without doubt, is tedious to enter every time you want to invoke a task, but there is nothing in the world that cannot be fixed with a duct tape and bit of cleverness. Let's create a simple batch file which will act as the proxy for running Nake. Create <code>Nake.bat</code> file in the root directory of your solution and put there the text below:</p>
+<p>That, without doubt, is tedious to enter every time you want to invoke a task, but there is nothing in the world that cannot be fixed with a duct tape and bit of cleverness. Let's create a simple batch file which will act as the proxy for running Nake. Create <em>Nake.bat</em> file in the root directory of your solution and put there the text below:</p>
 
 <pre><code>@ECHO OFF 
 Packages\Nake.1.0.0.7\tools\net45\Nake.exe %*
@@ -126,7 +126,7 @@ Packages\Nake.1.0.0.7\tools\net45\Nake.exe %*
 <h3>
 <a name="describing-tasks" class="anchor" href="#describing-tasks"><span class="octicon octicon-link"></span></a>Describing tasks</h3>
 
-<p>Now if you invoke Nake with <code>-T</code> switch it should show you all tasks defined in the script. Nevertheless, running it for the script which we've just created will produce no output. Why is that? Well, that's because by default Nake won't list tasks that don't have descriptions.</p>
+<p>Now if you invoke Nake with <em>-T</em> switch it should show you all tasks defined in the script. Nevertheless, running it for the script which we've just created will produce no output. Why is that? Well, that's because by default Nake won't list tasks that don't have descriptions.</p>
 
 <p>Now guess how can we give a meaningful descriptions to our tasks, which are simply methods? Right, you will just use standard XML documentation comments:  </p>
 
@@ -187,7 +187,7 @@ Nake welcome  # This is a demo task
 </code></pre>
 
 <blockquote>
-<p>NOTE: At the moment Nake supports the following parameter types: bool, string and int. Support for <code>params</code> arrays and some other types is on a road-map.  Nevertheless, it's possible to code pretty much anything with just the types already supported by Nake.</p>
+<p>NOTE: At the moment Nake supports the following parameter types: bool, string and int. Support for <em>params</em> arrays and some other types is on a road-map.  Nevertheless, it's possible to code pretty much anything with just the types already supported by Nake.</p>
 </blockquote>
 
 <h3>
@@ -329,19 +329,19 @@ Nake welcome  # This is a demo task
 <h4>
 <a name="passing-arguments-to-tasks" class="anchor" href="#passing-arguments-to-tasks"><span class="octicon octicon-link"></span></a>Passing arguments to tasks</h4>
 
-<p>Use space to separate arguments. Both positional and named arguments are supported. The command line syntax is the same as regular C# method calling syntax, except space is used as separator (instead of <code>,</code>):</p>
+<p>Use space to separate arguments. Both positional and named arguments are supported. The command line syntax is the same as regular C# method calling syntax, except space is used as separator (instead of <em>,</em>):</p>
 
 <pre><code>Nake db.migrate MainDb version:10002 
 </code></pre>
 
 <blockquote>
-<p>NOTE: Use double quotes, if the value you're passing contains colon <code>:</code> (ie <code>Nake clean dir:"C:\Temp"</code>). Also, don't forget to properly escape symbols, which have special meaning in your shell.  </p>
+<p>NOTE: Use double quotes, if the value you're passing contains colon <em>:</em> (ie <em>Nake clean dir:"C:\Temp"</em>). Also, don't forget to properly escape symbols, which have special meaning in your shell.  </p>
 </blockquote>
 
 <h4>
 <a name="calling-multiple-tasks" class="anchor" href="#calling-multiple-tasks"><span class="octicon octicon-link"></span></a>Calling multiple tasks</h4>
 
-<p>You can call multiple tasks, within one session, by simply separating them with semicolon <code>;</code>:</p>
+<p>You can call multiple tasks, within one session, by simply separating them with semicolon <em>;</em>:</p>
 
 <pre><code>Nake clean;build;test 
 </code></pre>
