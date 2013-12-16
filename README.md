@@ -36,7 +36,7 @@ Open up you favorite text editor and enter the following code:
 	Console.WriteLine("Hello, world!");
 }
 ```
-Save it to the root folder of your solution and give file `Nake.csx` name. Now you can invoke your task from command line by using Nake console application.
+Save it to the root folder of your solution and give file *Nake.csx* name. Now you can invoke your task from command line by using Nake console application.
 
 > NOTE: If you installed Nake via NuGet package manager console in Visual Studio, during an installation a sample script (*Nake.csx*) was created in the root directory of your solution. You can use it as the starting point.
 
@@ -52,11 +52,11 @@ You should see the following output:
 
 Cool, ya? :grimacing: 
 
-That for sure will only work if you have `Nake.exe` somewhere in your path. That's not good as Nake should be used as local dependency. Assuming that you have installed it via NuGet, your actual path might look like the one below:
+That for sure will only work if you have *Nake.exe* somewhere in your path. That's not good as Nake should be used as local dependency. Assuming that you have installed it via NuGet, your actual path might look like the one below:
 
 	Packages\Nake.1.0.0.7\tools\net45\Nake.exe welcome
 
-That, without doubt, is tedious to enter every time you want to invoke a task, but there is nothing in the world that cannot be fixed with a duct tape and bit of cleverness. Let's create a simple batch file which will act as the proxy for running Nake. Create `Nake.bat` file in the root directory of your solution and put there the text below:
+That, without doubt, is tedious to enter every time you want to invoke a task, but there is nothing in the world that cannot be fixed with a duct tape and bit of cleverness. Let's create a simple batch file which will act as the proxy for running Nake. Create *Nake.bat* file in the root directory of your solution and put there the text below:
 
 	@ECHO OFF 
 	Packages\Nake.1.0.0.7\tools\net45\Nake.exe %*
@@ -67,7 +67,7 @@ Now you have an easy (and recommended) way to launch Nake.
 
 ### Describing tasks
 
-Now if you invoke Nake with `-T` switch it should show you all tasks defined in the script. Nevertheless, running it for the script which we've just created will produce no output. Why is that? Well, that's because by default Nake won't list tasks that don't have descriptions.
+Now if you invoke Nake with *-T* switch it should show you all tasks defined in the script. Nevertheless, running it for the script which we've just created will produce no output. Why is that? Well, that's because by default Nake won't list tasks that don't have descriptions.
 
 Now guess how can we give a meaningful descriptions to our tasks, which are simply methods? Right, you will just use standard XML documentation comments:  
 
@@ -125,7 +125,7 @@ Will produce the following output:
 
 	Hasta la vista, baby!
 
-> NOTE: At the moment Nake supports the following parameter types: bool, string and int. Support for `params` arrays and some other types is on a road-map.  Nevertheless, it's possible to code pretty much anything with just the types already supported by Nake.
+> NOTE: At the moment Nake supports the following parameter types: bool, string and int. Support for *params* arrays and some other types is on a road-map.  Nevertheless, it's possible to code pretty much anything with just the types already supported by Nake.
 
 ### Specifying prerequisite tasks (dependencies)
 
@@ -245,16 +245,16 @@ Declaring constants could be more handy, as you can use them as default paramete
 
 #### Passing arguments to tasks 
 
-Use space to separate arguments. Both positional and named arguments are supported. The command line syntax is the same as regular C# method calling syntax, except space is used as separator (instead of `,`):
+Use space to separate arguments. Both positional and named arguments are supported. The command line syntax is the same as regular C# method calling syntax, except space is used as separator (instead of *,*):
 
 ```
 Nake db.migrate MainDb version:10002 
 ```
-> NOTE: Use double quotes, if the value you're passing contains colon `:` (ie `Nake clean dir:"C:\Temp"`). Also, don't forget to properly escape symbols, which have special meaning in your shell.  
+> NOTE: Use double quotes, if the value you're passing contains colon *:* (ie *Nake clean dir:"C:\Temp"*). Also, don't forget to properly escape symbols, which have special meaning in your shell.  
 
 #### Calling multiple tasks 
 
-You can call multiple tasks, within one session, by simply separating them with semicolon `;`:
+You can call multiple tasks, within one session, by simply separating them with semicolon *;*:
 
 ```
 Nake clean;build;test 
