@@ -21,7 +21,12 @@ namespace Nake
 
         public static void Ok()
         {
-            Terminator(0, "", null);
+            Terminator(0, null, null);
+        }
+
+        public static void Fail()
+        {
+            Terminator(-1, null, null);
         }
 
         public static void Fail(string message)

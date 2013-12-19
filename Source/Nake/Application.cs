@@ -157,7 +157,7 @@ namespace Nake
                 if (string.IsNullOrEmpty(task.Summary))
                     continue;
 
-                Console.Write(Runner.Label + " ");
+                Console.Write(Runner.Label(options.RunnerName) + " ");
 
                 Console.ForegroundColor = ConsoleColor.DarkGreen;
                 Console.Write(task.FullName.ToLower().PadRight(maxTaskNameLength + 2));
@@ -170,7 +170,6 @@ namespace Nake
             }
 
             Console.WriteLine();
-            
             Exit.Ok();
         }
 

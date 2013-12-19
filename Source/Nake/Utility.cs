@@ -20,7 +20,12 @@ namespace Nake
 
     static class Runner
     {
-        public static string Label = ParentProcess.IsPowerShell ? @".\nake" : "nake";
+        public static string Prefix = ParentProcess.IsPowerShell ? @".\" : "";
+
+        public static string Label(string runner = null)
+        {
+            return Prefix + (runner ?? "nake");
+        }
     }
 
     static class ParentProcess

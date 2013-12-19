@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Security.Permissions;
 using System.Threading.Tasks;
 
@@ -9,14 +10,19 @@ namespace Nake
         [SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.ControlAppDomain)]
         public static void Main(string[] args)
         {
-            CatchUnhandledExceptions();
-            
-            BootstrapRoslyn();
-            
+            BreakInDebuggerIfRequested();
+            ObserveUnhandledExceptions();
+            BootstrapRoslynIfNeccessary();
             StartApplication(args);
         }
 
-        static void CatchUnhandledExceptions()
+        static void BreakInDebuggerIfRequested()
+        {
+            if (Env.Var["NakeDebugger"] == "1")
+                Debugger.Break();
+        }
+
+        static void ObserveUnhandledExceptions()
         {
             AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
             {
@@ -38,7 +44,7 @@ namespace Nake
             };
         }
 
-        static void BootstrapRoslyn()
+        static void BootstrapRoslynIfNeccessary()
         {
             Roslyn.Bootstrap();
         }

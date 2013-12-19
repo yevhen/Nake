@@ -1,3 +1,3 @@
 @ECHO OFF
-
-Tools\Nake\Nake.exe -f Publish.csx %*
+SET DIR=%~dp0%
+%DIR%\Tools\Nake\Nake.exe -f %DIR%\Publish.csx -d %DIR% -r publish %*

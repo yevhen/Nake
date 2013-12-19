@@ -8,6 +8,8 @@ namespace Nake
     {
         public string ScriptFile;
         public string CurrentDirectory;
+
+        public string RunnerName;
         public bool DebugScript;
         
         public bool QuietMode;
@@ -53,6 +55,10 @@ namespace Nake
                 .Shortcut("d")
                 .OnMatch((options, dir) => options.CurrentDirectory = dir),
 
+            new Switch("runner NAME", "Use NAME as runner file name in task listing")
+                .Shortcut("r")
+                .OnMatch((options, name) => options.RunnerName = name),
+
             new Switch("trace", "Enables task execution tracing and full stack traces in exception messages")
                 .Shortcut("t")
                 .OnMatch(options => options.TraceEnabled = options.DebugScript = true),
@@ -72,7 +78,7 @@ namespace Nake
         public static void PrintUsage()
         {
             var banner = string.Format(
-                "Usage: {0} [options ...]  [VAR=VALUE ...]  [task ...]", Runner.Label);
+                "Usage: {0} [options ...]  [VAR=VALUE ...]  [task ...]", Runner.Label());
 
             Console.WriteLine(Environment.NewLine + banner);
             Console.WriteLine(Environment.NewLine + "Options:");
