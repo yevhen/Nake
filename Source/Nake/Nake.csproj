@@ -57,7 +57,7 @@
     <Compile Include="..\ProductAssemblyInfo.cs">
       <Link>Properties\ProductAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="AssemblyResolver.cs" />
+    <Compile Include="RoslynAssemblyResolver.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Application.cs" />
     <Compile Include="Magic\AnalysisResult.cs" />

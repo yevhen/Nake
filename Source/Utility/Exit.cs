@@ -1,10 +1,23 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace Nake
 {
     public static class Exit
     {
-        internal static Action<int, string, Exception> Terminator = (code, msg, ex) => Environment.Exit(code);
+        internal static Action<int, string, Exception> Terminator = (code, msg, ex) =>
+        {
+            if (Debugger.IsAttached)
+                WaitTermination();
+
+            Environment.Exit(code);
+        };
+
+        static void WaitTermination()
+        {
+            Console.Write("Press any key to terminate ...");
+            Console.ReadKey();
+        }
 
         public static void Ok()
         {
@@ -13,7 +26,7 @@ namespace Nake
 
         public static void Fail(string message)
         {
-            Environment.Exit(-1);
+            Terminator(-1, message, null);
         }
 
         public static void Fail(Exception exception)

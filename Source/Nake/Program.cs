@@ -2,7 +2,8 @@
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using System.Threading;
+using System.Security.Permissions;
+using System.Threading.Tasks;
 
 using NuGet;
 
@@ -10,36 +11,55 @@ namespace Nake
 {
     public class Program
     {
-        public static ManualResetEvent Downloading = new ManualResetEvent(false);
-
+        [SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.ControlAppDomain)]
         public static void Main(string[] args)
         {
-           RegisterResolver();
+            CatchUnhandledExceptions();
 
-           DownloadRoslyn();
+            RegisterRoslynResolver();
+            DownloadRoslynPackage();
 
-           StartApplication(args);
+            StartApplication(args);
         }
 
-        static void RegisterResolver()
+        static void CatchUnhandledExceptions()
         {
-            AssemblyResolver.Register();
+            AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
+            {
+                var e = (Exception) args.ExceptionObject;
+
+                Log.Error(e);
+                Exit.Fail(e);
+            };
+
+            TaskScheduler.UnobservedTaskException += (sender, args) =>
+            {
+                var e = args.Exception;
+                args.SetObserved();
+
+                foreach (var inner in e.Flatten().InnerExceptions)
+                    Log.Error(inner);
+
+                Exit.Fail(e);
+            };
         }
 
-        static void DownloadRoslyn()
+        static void RegisterRoslynResolver()
+        {
+            RoslynAssemblyResolver.Register();
+        }
+
+        static void DownloadRoslynPackage()
         {
             const string roslynCompilerAssembly = "Roslyn.Compilers.CSharp";
             const string roslynVersion = "1.2.20906.2";
-
-            try
-            {
-                Assembly.Load(new AssemblyName(roslynCompilerAssembly));
-                AssemblyResolver.Unregister();
-
+            
+            if (GacUtil.IsAssemblyInGAC(roslynCompilerAssembly))
                 return;
-            }
-            catch (FileNotFoundException)
-            {}
+
+            const string roslynLocalPath = @"Roslyn\Roslyn.Compilers.Common.1.2.20906.2\lib\net45\Roslyn.Compilers.dll";
+            if (File.Exists(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, roslynLocalPath)))
+                return;
 
             Console.WriteLine("Roslyn CTP was not found");
             Console.WriteLine("Installing Roslyn CTP ...");
@@ -58,12 +78,12 @@ namespace Nake
 
         static void StartApplication(string[] args)
         {
-            AssemblyResolver.Resolve = true;
+            RoslynAssemblyResolver.Resolve = true;
 
             try
             {
-                var application = new Application(Options.Parse(args));
-                application.Start();
+                var options = Options.Parse(args);
+                new Application(options).Start();
             }
             catch (OptionParseException e)
             {
@@ -74,11 +94,6 @@ namespace Nake
             catch (TaskInvocationException e)
             {
                 Log.Error(e.SourceException);
-                Exit.Fail(e);
-            }
-            catch (Exception e)
-            {
-                Log.Error(e);
                 Exit.Fail(e);
             }
         }
