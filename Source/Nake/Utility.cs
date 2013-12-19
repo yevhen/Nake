@@ -162,7 +162,7 @@ namespace Nake
             public int cchBuf;
         }
 
-        public static bool IsAssemblyInGAC(string assemblyName)
+        public static bool IsAssemblyInGac(string assemblyName)
         {
             var assembyInfo = new AssemblyInfo { cchBuf = 512 };
             assembyInfo.currentAssemblyPath = new string('\0', assembyInfo.cchBuf);
