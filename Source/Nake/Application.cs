@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 
 using Nake.Magic;
+using Nake.Scripting;
 
 namespace Nake
 {

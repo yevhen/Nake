@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
-using Roslyn.Compilers.CSharp;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Nake.Magic
 {
-    class Analyzer : SyntaxWalker
+    class Analyzer : CSharpSyntaxWalker
     {
         public readonly AnalysisResult Result = new AnalysisResult();
 
@@ -47,7 +48,7 @@ namespace Nake.Magic
 
         public override void VisitInvocationExpression(InvocationExpressionSyntax node)
         {
-            var symbol = model.GetSymbolInfo(node).Symbol as MethodSymbol;
+            var symbol = ModelExtensions.GetSymbolInfo(model, node).Symbol as IMethodSymbol;
             
             if (symbol == null)
                 return;
@@ -80,7 +81,7 @@ namespace Nake.Magic
 
             foreach (var variable in node.Declaration.Variables)
             {
-                var symbol = (FieldSymbol) model.GetDeclaredSymbol(variable);
+                var symbol = (IFieldSymbol) ModelExtensions.GetDeclaredSymbol(model, variable);
 
                 var fullName = symbol.ToString();
                 if (!substitutions.ContainsKey(fullName))

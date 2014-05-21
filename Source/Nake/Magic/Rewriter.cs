@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using Roslyn.Compilers.Common;
-using Roslyn.Compilers.CSharp;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Nake.Magic
 {
-    class Rewriter : SyntaxRewriter
+    class Rewriter : CSharpSyntaxRewriter
     {
         readonly SemanticModel model;
         readonly AnalysisResult result;
@@ -60,10 +61,12 @@ namespace Nake.Magic
             return skip.Contains(node);
         }
 
-        void SkipLiteralsWithinStringFormat(ExpressionSyntax node)
+        void SkipLiteralsWithinStringFormat(SyntaxNode node)
         {
-            var symbol = model.GetSpeculativeSymbolInfo(node.Span.Start, node,
-                SpeculativeBindingOption.BindAsExpression).Symbol as MethodSymbol;
+            const SpeculativeBindingOption options = SpeculativeBindingOption.BindAsExpression;
+
+            var symbol = model.GetSpeculativeSymbolInfo(node.Span.Start, node, options)
+                .Symbol as IMethodSymbol;
 
             if (symbol == null || (!symbol.ToString().StartsWith("string.Format(")))
                 return;

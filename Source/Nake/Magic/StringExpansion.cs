@@ -2,9 +2,9 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 
-using Roslyn.Compilers;
-using Roslyn.Compilers.Common;
-using Roslyn.Compilers.CSharp;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Nake.Magic
 {
@@ -12,7 +12,7 @@ namespace Nake.Magic
     {
         public static bool Qualifies(LiteralExpressionSyntax node)
         {
-            return node.Kind == SyntaxKind.StringLiteralExpression;
+            return node.CSharpKind() == SyntaxKind.StringLiteralExpression;
         }
 
         static readonly Regex expressionPattern = new Regex(
@@ -44,8 +44,8 @@ namespace Nake.Magic
             var expanded   = ExpandExpressions(literal);
             var inlined    = InlineEnvironmentVariables(expanded);
             var final      = Quote(Unescape(inlined));
-                    
-            return Syntax.ParseExpression(final);
+
+            return SyntaxFactory.ParseExpression(final);
         }
 
         string ExpandExpressions(string token)
@@ -57,7 +57,7 @@ namespace Nake.Magic
             {
                 var expression = match.Groups["expression"].Value;
 
-                var syntax = Syntax.ParseExpression(expression);
+                var syntax = SyntaxFactory.ParseExpression(expression);
                 if (syntax.Span.Length != expression.Length)
                     throw new ExpressionSyntaxException(expression, LocationDiagnostics(match.Index));
 
@@ -77,7 +77,7 @@ namespace Nake.Magic
 
         string LocationDiagnostics(int matchPosition)
         {
-            var span = node.GetLocation().GetLineSpan(true);
+            var span = node.GetLocation().GetLineSpan();
 
             return string.Format(
                 "{0} ({1},{2})", 
@@ -99,7 +99,21 @@ namespace Nake.Magic
 
         static string Quote(string token)
         {
-            return string.Format(@"@""{0}""", token);
+            var quotation = IsQuoted(token) && !IsExpanded(token) 
+                            ? @"@{0}" 
+                            : @"@""{0}""";
+
+            return string.Format(quotation, token);
+        }
+
+        static bool IsQuoted(string token)
+        {
+            return token.StartsWith("\"") && token.EndsWith("\"");
+        }
+
+        static bool IsExpanded(string token)
+        {
+            return token.EndsWith("@\"");
         }
 
         static string Verbatimize(string token)

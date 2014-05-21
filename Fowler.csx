@@ -1,6 +1,4 @@
-﻿#r "Tools\Nake\Meta.dll" 
-
-using Nake;
+﻿using Nake;
 using System;
 
 [Task] public static void Default()

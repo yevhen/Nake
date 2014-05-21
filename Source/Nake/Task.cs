@@ -3,22 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-using Roslyn.Compilers;
-using Roslyn.Compilers.CSharp;
+using Microsoft.CodeAnalysis;
 
 namespace Nake
 {
     class Task
     {
-        const string ScriptClass = "Submission#0";
+        const string ScriptClass = "Script";
 
         readonly List<Task> dependencies = new List<Task>();
         readonly HashSet<TaskInvocation> invocations = new HashSet<TaskInvocation>();
 
-        readonly MethodSymbol symbol;
+        readonly IMethodSymbol symbol;
         MethodInfo reflected;
 
-        public Task(MethodSymbol symbol)
+        public Task(IMethodSymbol symbol)
         {
             CheckSignature(symbol);
             CheckPlacement(symbol);
@@ -27,7 +26,7 @@ namespace Nake
             this.symbol = symbol;
         }
 
-        static void CheckSignature(MethodSymbol symbol)
+        static void CheckSignature(IMethodSymbol symbol)
         {
             if (!symbol.IsStatic ||
                 !symbol.ReturnsVoid ||
@@ -37,11 +36,11 @@ namespace Nake
                 throw new TaskSignatureViolationException(symbol.ToString());
         }
 
-        static void CheckPlacement(MethodSymbol symbol)
+        static void CheckPlacement(IMethodSymbol symbol)
         {
             var parentType = symbol.ContainingType;
             
-            while (parentType.Name != ScriptClass)
+            while (!parentType.IsScriptClass)
             {
                 var isNamespace =
                     parentType.IsStatic &&
@@ -54,20 +53,26 @@ namespace Nake
             }
         }
 
-        static void CheckSummary(MethodSymbol symbol)
+        static void CheckSummary(IMethodSymbol symbol)
         {
-            if (symbol.GetDocumentationComment().HadXmlParseError)
+            var comments = Comments(symbol);
+            if (comments.HadXmlParseError || comments.FullXmlFragment.Contains("Badly formed XML"))
                 throw new InvalidXmlDocumentationException(symbol.ToString());
         }
 
-        public static bool IsAnnotated(MethodSymbol symbol)
+        public static bool IsAnnotated(ISymbol symbol)
         {
             return symbol.GetAttributes().SingleOrDefault(x => x.AttributeClass.Name == "TaskAttribute") != null;
         }
 
         public string Summary
         {
-            get { return symbol.GetDocumentationComment().SummaryTextOpt ?? ""; }
+            get { return Comments(symbol).SummaryText ?? ""; }
+        }
+
+        static DocumentationComment Comments(IMethodSymbol symbol)
+        {
+            return DocumentationComment.FromXmlFragment(symbol.GetDocumentationCommentXml());
         }
 
         public bool IsGlobal()
@@ -112,7 +117,7 @@ namespace Nake
 
         public bool HasRequiredParameters()
         {
-            return symbol.Parameters.Any(x => !x.HasDefaultValue);
+            return symbol.Parameters.Any(x => !x.HasExplicitDefaultValue);
         }
 
         public void AddDependency(Task dependency)

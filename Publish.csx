@@ -41,7 +41,10 @@ static Func<string> ArchiveFile = () => OutputPath + @"\{Version()}.zip";
 		@"{ReleaseOutputPath}\Meta.*",
 		@"{ReleaseOutputPath}\Utility.*",
 		@"{ReleaseOutputPath}\GlobDir.dll",
-		@"{ReleaseOutputPath}\NuGet.Core.dll",
+		@"{ReleaseOutputPath}\Microsoft.CodeAnalysis.dll",
+		@"{ReleaseOutputPath}\Microsoft.CodeAnalysis.CSharp.dll",
+        @"{ReleaseOutputPath}\System.Collections.Immutable.dll",
+        @"{ReleaseOutputPath}\System.Reflection.Metadata.dll",
 		"-:*.Tests.*"
 	};
 
@@ -66,23 +69,23 @@ static Func<string> ArchiveFile = () => OutputPath + @"\{Version()}.zip";
 /// <summary> 
 /// Publishes standalone version to GitHub releases
 /// </summary>
-[Task] public static void Standalone(string description = null)
+[Task] public static void Standalone(bool beta, string branch, string description = null)
 {
-	string release = CreateRelease(description);
+	string release = CreateRelease(beta, branch, description);
 
 	Upload(release, ArchiveFile(), "application/zip");
 }
 
-static string CreateRelease(string description)
+static string CreateRelease(bool beta, string branch, string description)
 {
-	IDictionary<string, object> data = new ExpandoObject();
+	dynamic data = new ExpandoObject();
 
-	data["tag_name"] = data["name"] = Version();
-	data["target_commitish"] = "dev";
-	data["prerelease"] = true;
-
-	if (!string.IsNullOrEmpty(description))
-		data["body"] = description;
+	data.tag_name = data.name = Version();
+	data.target_commitish = branch;
+	data.prerelease = beta;
+    data.body = !string.IsNullOrEmpty(description) 
+                ? description 
+                : "Standalone release {Version()}";
 
 	return GitHub().Post("https://api.github.com/repos/yevhen/nake/releases",
 						  data, HttpContentTypes.ApplicationJson).Location;
@@ -102,8 +105,8 @@ static void Upload(string release, string filePath, string contentType)
 
 static string GetUploadUri(string release)
 {
-	var body = (IDictionary<string, object>)GitHub().Get(release).DynamicBody;
-	return ((string)body["upload_url"]).Replace("{{?name}}", "");
+	var body = GitHub().Get(release).DynamicBody;
+	return ((string)body.upload_url).Replace("{{?name}}", "");
 }
 
 static HttpClient GitHub()

@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using Roslyn.Compilers.CSharp;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Nake.Magic
 {
     class AnalysisResult : SyntaxWalker
     {
-        readonly IDictionary<MethodSymbol, Task> tasksBySymbol = new Dictionary<MethodSymbol, Task>();
+        readonly IDictionary<IMethodSymbol, Task> tasksBySymbol = new Dictionary<IMethodSymbol, Task>();
         readonly IDictionary<string, Task> tasksByName = new Dictionary<string, Task>(new CaseInsensitiveEqualityComparer());
         
         readonly IDictionary<InvocationExpressionSyntax, ProxyInvocation> invocations = new Dictionary<InvocationExpressionSyntax, ProxyInvocation>();
@@ -20,12 +21,12 @@ namespace Nake.Magic
             get { return tasksBySymbol.Values; }
         }
 
-        public Task Find(MethodSymbol symbol)
+        public Task Find(IMethodSymbol symbol)
         {
             return tasksBySymbol.Find(symbol);
         }
 
-        public void Add(MethodSymbol symbol, Task task)
+        public void Add(IMethodSymbol symbol, Task task)
         {
             var existent = tasksByName.Find(task.FullName);
             if (existent != null)

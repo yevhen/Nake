@@ -4,27 +4,29 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-using Roslyn.Compilers;
-using Roslyn.Compilers.CSharp;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Emit;
 
 namespace Nake.Magic
 {
     class FairyDust
     {
-        readonly Compilation compilation;
+        readonly CSharpCompilation compilation;
         readonly IDictionary<string, string> substitutions;
         readonly bool debug;
 
-        readonly SyntaxTree originalTree;
+        readonly CSharpSyntaxTree originalTree;
         readonly SemanticModel semanticModel;
 
-        public FairyDust(Compilation compilation, IDictionary<string, string> substitutions, bool debug)
+        public FairyDust(CSharpCompilation compilation, IDictionary<string, string> substitutions, bool debug)
         {
             this.compilation = compilation;
             this.substitutions = substitutions;
             this.debug = debug;
 
-            originalTree = this.compilation.SyntaxTrees.Single();
+            originalTree = (CSharpSyntaxTree) this.compilation.SyntaxTrees.Single();
             semanticModel = this.compilation.GetSemanticModel(originalTree);
         }
 
@@ -51,7 +53,7 @@ namespace Nake.Magic
             var rewriter = new Rewriter(semanticModel, result);
             var newRoot = rewriter.Visit(originalTree.GetRoot());
             
-            var rewrittenTree = SyntaxTree.Create((CompilationUnitSyntax) newRoot,
+            var rewrittenTree = CSharpSyntaxTree.Create((CompilationUnitSyntax) newRoot,
                 originalTree.FilePath, originalTree.Options);
 
             return compilation.ReplaceSyntaxTree(originalTree, rewrittenTree);
@@ -91,8 +93,7 @@ namespace Nake.Magic
                 return;
 
             var errors = result.Diagnostics
-                .Where(d => d.Info.Severity == DiagnosticSeverity.Error)
-                .ToArray();
+                .WhereAsArray(x => x.Severity == DiagnosticSeverity.Error);
 
             if (errors.Any())
                 throw new NakeException("Compilation failed!\r\n\r\n" +

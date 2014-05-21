@@ -18,8 +18,11 @@
     <file src="Output\Package\Release\Nake.exe.config" target="tools/net45" />
     <file src="Output\Package\Release\Meta.dll" target="tools/net45" />
     <file src="Output\Package\Release\Utility.dll" target="tools/net45" />
-    <file src="Output\Package\Release\NuGet.Core.dll" target="tools/net45" />
     <file src="Output\Package\Release\GlobDir.dll" target="tools/net45" />
+    <file src="Output\Package\Release\Microsoft.CodeAnalysis.dll" target="tools/net45" />
+    <file src="Output\Package\Release\Microsoft.CodeAnalysis.CSharp.dll" target="tools/net45" />
+    <file src="Output\Package\Release\System.Collections.Immutable.dll" target="tools/net45" />
+    <file src="Output\Package\Release\System.Reflection.Metadata.dll" target="tools/net45" />
     
     <file src="Build\NuGet\Nake.csx" target="sample" />
     <file src="Output\Package\Release\Nake.bat" target="sample" />	

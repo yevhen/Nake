@@ -12,7 +12,6 @@ namespace Nake
         {
             BreakInDebuggerIfRequested();
             ObserveUnhandledExceptions();
-            BootstrapRoslynIfNeccessary();
             StartApplication(args);
         }
 
@@ -43,12 +42,7 @@ namespace Nake
                 Exit.Fail(e);
             };
         }
-
-        static void BootstrapRoslynIfNeccessary()
-        {
-            Roslyn.Bootstrap();
-        }
-
+    
         static void StartApplication(string[] args)
         {
             try

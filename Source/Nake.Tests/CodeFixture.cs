@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 
 using Nake.Magic;
+using Nake.Scripting;
 
 using NUnit.Framework;
 
