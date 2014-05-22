@@ -7,6 +7,8 @@
 #r "Packages\JsonFx.2.0.1209.2802\lib\net40\JsonFx.dll"
 
 using Nake;
+using Nake.FS;
+using Nake.Cmd;
 
 using System;
 using System.IO;
@@ -32,26 +34,26 @@ static Func<string> ArchiveFile = () => OutputPath + @"\{Version()}.zip";
 /// </summary>
 [Task] public static void Zip()
 {
-	var files = new FileSet
-	{
-		@"{ReleaseOutputPath}\Nake.*",
-		@"{ReleaseOutputPath}\Meta.*",
-		@"{ReleaseOutputPath}\Utility.*",
-		@"{ReleaseOutputPath}\GlobDir.dll",
-		@"{ReleaseOutputPath}\Microsoft.CodeAnalysis.dll",
-		@"{ReleaseOutputPath}\Microsoft.CodeAnalysis.CSharp.dll",
+    var files = new FileSet
+    {
+        @"{ReleaseOutputPath}\Nake.*",
+        @"{ReleaseOutputPath}\Meta.*",
+        @"{ReleaseOutputPath}\Utility.*",
+        @"{ReleaseOutputPath}\GlobDir.dll",
+        @"{ReleaseOutputPath}\Microsoft.CodeAnalysis.dll",
+        @"{ReleaseOutputPath}\Microsoft.CodeAnalysis.CSharp.dll",
         @"{ReleaseOutputPath}\System.Collections.Immutable.dll",
         @"{ReleaseOutputPath}\System.Reflection.Metadata.dll",
-		"-:*.Tests.*"
-	};
+        "-:*.Tests.*"
+    };
 
-	FS.Delete(ArchiveFile());
+    Delete(ArchiveFile());
 
-	using (ZipArchive archive = ZipFile.Open(ArchiveFile(), ZipArchiveMode.Create))
-	{
-		foreach (var file in files)
-			archive.CreateEntryFromFile(file, Path.GetFileName(file));
-	}
+    using (ZipArchive archive = ZipFile.Open(ArchiveFile(), ZipArchiveMode.Create))
+    {
+        foreach (var file in files)
+            archive.CreateEntryFromFile(file, Path.GetFileName(file));
+    }
 }
 
 /// <summary>
@@ -59,7 +61,7 @@ static Func<string> ArchiveFile = () => OutputPath + @"\{Version()}.zip";
 /// </summary>
 [Task] public static void NuGet()
 {
-	Cmd.Exec(@"Tools\Nuget.exe push {PackageFile()} $NuGetApiKey$");
+    Exec(@"Tools\Nuget.exe push {PackageFile()} $NuGetApiKey$");
 }
 
 
@@ -70,57 +72,57 @@ static Func<string> ArchiveFile = () => OutputPath + @"\{Version()}.zip";
 {
     Zip();
 
-	string release = CreateRelease(beta, branch, description);
-	Upload(release, ArchiveFile(), "application/zip");
+    string release = CreateRelease(beta, branch, description);
+    Upload(release, ArchiveFile(), "application/zip");
 }
 
 static string CreateRelease(bool beta, string branch, string description)
 {
-	dynamic data = new ExpandoObject();
+    dynamic data = new ExpandoObject();
 
-	data.tag_name = data.name = Version();
-	data.target_commitish = branch;
-	data.prerelease = beta;
+    data.tag_name = data.name = Version();
+    data.target_commitish = branch;
+    data.prerelease = beta;
     data.body = !string.IsNullOrEmpty(description) 
                 ? description 
                 : "Standalone release {Version()}";
 
-	return GitHub().Post("https://api.github.com/repos/yevhen/nake/releases",
-						  data, HttpContentTypes.ApplicationJson).Location;
+    return GitHub().Post("https://api.github.com/repos/yevhen/nake/releases",
+                          data, HttpContentTypes.ApplicationJson).Location;
 }
 
 static void Upload(string release, string filePath, string contentType)
 {
-	GitHub().Post(GetUploadUri(release) + "?name=" + Path.GetFileName(filePath), null, new List<FileData>
-	{
-		new FileData()
-		{
-			ContentType = contentType,
-			Filename = filePath
-		}
-	});
+    GitHub().Post(GetUploadUri(release) + "?name=" + Path.GetFileName(filePath), null, new List<FileData>
+    {
+        new FileData()
+        {
+            ContentType = contentType,
+            Filename = filePath
+        }
+    });
 }
 
 static string GetUploadUri(string release)
 {
-	var body = GitHub().Get(release).DynamicBody;
-	return ((string)body.upload_url).Replace("{{?name}}", "");
+    var body = GitHub().Get(release).DynamicBody;
+    return ((string)body.upload_url).Replace("{{?name}}", "");
 }
 
 static HttpClient GitHub()
 {
-	var client = new HttpClient();
+    var client = new HttpClient();
 
-	client.Request.Accept = "application/vnd.github.manifold-preview";
-	client.Request.ContentType = "application/json";
-	client.Request.AddExtraHeader("Authorization", "token $GitHubToken$");
+    client.Request.Accept = "application/vnd.github.manifold-preview";
+    client.Request.ContentType = "application/json";
+    client.Request.AddExtraHeader("Authorization", "token $GitHubToken$");
 
-	return client;
+    return client;
 }
 
 static string Version()
 {
-	return FileVersionInfo
-			.GetVersionInfo(@"{ReleaseOutputPath}\Nake.exe")
-			.ProductVersion;
+    return FileVersionInfo
+            .GetVersionInfo(@"{ReleaseOutputPath}\Nake.exe")
+            .ProductVersion;
 }
