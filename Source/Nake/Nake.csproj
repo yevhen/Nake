@@ -61,6 +61,7 @@
     <Compile Include="..\ProductAssemblyInfo.cs">
       <Link>Properties\ProductAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Scripting\AssemblyResolver.cs" />
     <Compile Include="DocumentationComment.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Application.cs" />
@@ -79,6 +80,7 @@
     <Compile Include="Scripting\Preprocessor.cs" />
     <Compile Include="Scripting\Script.cs" />
     <Compile Include="Scripting\Engine.cs" />
+    <Compile Include="Scripting\ScriptAssembly.cs" />
     <Compile Include="Scripting\Submission.cs" />
     <Compile Include="TaskArgument.cs" />
     <Compile Include="Task.cs" />

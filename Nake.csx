@@ -76,7 +76,7 @@ public const string OutputPath = RootPath + @"\Output";
 
 	var version = FileVersionInfo
 			.GetVersionInfo(@"{releasePath}\Nake.exe")
-			.FileVersion;
+			.ProductVersion;
 
 	File.WriteAllText(
 		@"{releasePath}\Nake.bat",

@@ -177,7 +177,7 @@ namespace Nake.Scripting
     internal struct AbsoluteReference : IEquatable<AbsoluteReference>
     {
         public readonly string AssemblyPath;
-        public string ScriptFile;
+        public readonly string ScriptFile;
 
         public AbsoluteReference(string scriptFile, string assemblyReference)
         {

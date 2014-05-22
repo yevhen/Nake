@@ -3,19 +3,20 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-using Microsoft.CodeAnalysis.CSharp;
-
 using Nake.Magic;
+using Microsoft.CodeAnalysis;
 
 namespace Nake.Scripting
 {
     class Script
     {
         public readonly IEnumerable<Task> Tasks;
+        public readonly IEnumerable<MetadataFileReference> References;
 
-        Script(IEnumerable<Task> tasks)
+        Script(IEnumerable<Task> tasks, IEnumerable<MetadataFileReference> references)
         {
             Tasks = tasks;
+            References = references;
         }
 
         public static Script Build(string code, IDictionary<string, string> substitutions, bool debug)
@@ -28,21 +29,20 @@ namespace Nake.Scripting
             return Build(Precompile(file), substitutions, debug);
         }
 
-        static CSharpCompilation Precompile(string code)
+        static SubmissionCompilation Precompile(string code)
         {
             return new Engine().Compile(code);
         }
 
-        static CSharpCompilation Precompile(FileInfo file)
+        static SubmissionCompilation Precompile(FileInfo file)
         {
             return new Engine().Compile(file);
         }
 
-        static Script Build(CSharpCompilation compilation, IDictionary<string, string> substitutions, bool debug)
+        static Script Build(SubmissionCompilation submission, IDictionary<string, string> substitutions, bool debug)
         {
-            var magic = new FairyDust(compilation, substitutions, debug);
-
-            return new Script(magic.Apply());
+            var magic = new FairyDust(submission.Compilation, substitutions, debug);
+            return new Script(magic.Apply(), submission.References);
         }
     }
 }

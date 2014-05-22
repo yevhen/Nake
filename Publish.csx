@@ -1,7 +1,4 @@
-﻿#r "Tools\Nake\Meta.dll"
-#r "Tools\Nake\Utility.dll"
-
-#r "System.Xml"
+﻿#r "System.Xml"
 #r "System.Xml.Linq"
 #r "System.IO.Compression"
 #r "System.IO.Compression.FileSystem"
@@ -71,8 +68,9 @@ static Func<string> ArchiveFile = () => OutputPath + @"\{Version()}.zip";
 /// </summary>
 [Task] public static void Standalone(bool beta, string branch, string description = null)
 {
-	string release = CreateRelease(beta, branch, description);
+    Zip();
 
+	string release = CreateRelease(beta, branch, description);
 	Upload(release, ArchiveFile(), "application/zip");
 }
 
@@ -124,5 +122,5 @@ static string Version()
 {
 	return FileVersionInfo
 			.GetVersionInfo(@"{ReleaseOutputPath}\Nake.exe")
-			.FileVersion;
+			.ProductVersion;
 }

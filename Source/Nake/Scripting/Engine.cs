@@ -8,7 +8,6 @@ using System.Xml;
 using System.Xml.Linq;
 
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CSharp.RuntimeBinder;
 
 namespace Nake.Scripting
@@ -51,12 +50,12 @@ namespace Nake.Scripting
             submission = new Submission(DefaultNamespaces, NakeReferences.Concat(DefaultReferences.Select(x => x.Value)));
         }
 
-        public CSharpCompilation Compile(FileInfo file)
+        public SubmissionCompilation Compile(FileInfo file)
         {
             return Compile(Preprocess(file));
         }
 
-        public CSharpCompilation Compile(string code)
+        public SubmissionCompilation Compile(string code)
         {
             return submission.Compile(code);
         }

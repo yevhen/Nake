@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-using Nake.Magic;
 using Nake.Scripting;
 
 namespace Nake
@@ -51,8 +50,9 @@ namespace Nake
             var scriptFile = FindScriptFile();
             DefineNakeEnvironmentVariables(scriptFile);
 
-            var compilation = BuildScript(scriptFile);
-            RegisterTasks(compilation);
+            var script = BuildScript(scriptFile);
+            RegisterTasks(script);
+            RegisterReferences(script);
         }
 
         void SetCurrentDirectory()
@@ -117,6 +117,14 @@ namespace Nake
             }
         }
 
+        static void RegisterReferences(Script script)
+        {
+            foreach (var reference in script.References)
+            {
+                AssemblyResolver.Add(reference);
+            }
+        }
+
         public void ShowHelp()
         {
             Options.PrintUsage();
@@ -176,22 +184,30 @@ namespace Nake
 
         public void InvokeTasks()
         {
-            var tasks = options.Tasks;
+            AssemblyResolver.Register();
 
+            var tasks = options.Tasks;
             if (tasks.Count == 0)
                 tasks.Add(Options.Task.Default);
 
             foreach (var task in tasks)
             {
                 var found = TaskRegistry.Global.Find(task.Name);
-
                 if (found == null)
                     throw new TaskNotFoundException(task.Name);
 
                 found.Invoke(task.Arguments);
             }
         }
-
+        
+        void RegisterResolver()
+        {
+            AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
+            {
+                return null;
+            };
+        }
+        
         static void SetQuiet()
         {
             Env.Var["NakeQuietMode"] = "true";

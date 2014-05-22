@@ -55,7 +55,7 @@ namespace Nake.Scripting
             namespaces.Add(ns);
         }
 
-        public CSharpCompilation Compile(string code)
+        public SubmissionCompilation Compile(string code)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(code, 
                 options: new CSharpParseOptions(kind: SourceCodeKind.Script));
@@ -63,34 +63,28 @@ namespace Nake.Scripting
             var options = new CSharpCompilationOptions(
                 OutputKind.DynamicallyLinkedLibrary, usings: namespaces);
 
-            var scriptingReference = BuildScriptingReference();
-
             var compilation = CSharpCompilation.CreateSubmission(
                 Guid.NewGuid().ToString(), syntaxTree, 
-                references.Concat(new[] {scriptingReference}), options);
+                references.Concat(new[] {ScriptAssembly.BuildReference()}), options);
 
             var diagnostics = compilation.GetDiagnostics();
             if (diagnostics.Any(x => x.Severity == DiagnosticSeverity.Error))
                 throw new ApplicationException("Script compilation failure! See diagnostics below." + Environment.NewLine +
                                                string.Join("\n", diagnostics.Where(x => x.Severity == DiagnosticSeverity.Error)));
 
-            return compilation;
+            return new SubmissionCompilation(references, compilation);
         }
+    }
 
-        static MetadataReference BuildScriptingReference()
+    class SubmissionCompilation
+    {
+        public readonly IEnumerable<MetadataFileReference> References;
+        public readonly CSharpCompilation Compilation;
+
+        public SubmissionCompilation(IEnumerable<MetadataFileReference> references, CSharpCompilation compilation)
         {
-            var currentAssembly = Assembly.GetExecutingAssembly();
-            const string resourceName = "Roslyn.Scripting.image";
-
-            using (var stream = currentAssembly.GetManifestResourceStream(typeof(Script), resourceName))
-            {
-                Debug.Assert(stream != null);
-                
-                var buffer = new byte[stream.Length];
-                stream.Read(buffer, 0, (int) stream.Length);
-
-                return new MetadataImageReference(buffer, display: "Roslyn.Scripting");
-            }
+            References = references;
+            Compilation = compilation;
         }
     }
 }
