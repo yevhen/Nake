@@ -10,18 +10,28 @@ namespace Nake.Magic
 {
     class Analyzer : CSharpSyntaxWalker
     {
-        public readonly AnalysisResult Result = new AnalysisResult();
-
+        readonly CSharpSyntaxTree tree;
         readonly SemanticModel model;
         readonly IDictionary<string, string> substitutions;
 
         Task current;
         bool visitingConstant;
-
-        public Analyzer(SemanticModel model, IDictionary<string, string> substitutions)
+        AnalyzerResult result;
+        
+        public Analyzer(CSharpCompilation compilation, IDictionary<string, string> substitutions)
         {
-            this.model = model;
-            this.substitutions = new Dictionary<string, string>(substitutions, new CaseInsensitiveEqualityComparer());
+            tree = (CSharpSyntaxTree) compilation.SyntaxTrees.Single();
+            model = compilation.GetSemanticModel(tree);
+
+            this.substitutions = new Dictionary<string, string>(
+                substitutions, new CaseInsensitiveEqualityComparer());
+        }
+
+        public AnalyzerResult Analyze()
+        {
+            result = new AnalyzerResult();
+            tree.GetRoot().Accept(this);
+            return result;
         }
 
         public override void VisitMethodDeclaration(MethodDeclarationSyntax node)
@@ -34,12 +44,12 @@ namespace Nake.Magic
                 return;
             }
 
-            current = Result.Find(symbol);
+            current = result.Find(symbol);
 
             if (current == null)
             {
                 current = new Task(symbol);
-                Result.Add(symbol, current);
+                result.Add(symbol, current);
             }
 
             base.VisitMethodDeclaration(node);
@@ -59,15 +69,15 @@ namespace Nake.Magic
                 return;
             }
 
-            var task = Result.Find(symbol);
+            var task = result.Find(symbol);
 
             if (task == null)
             {
                 task = new Task(symbol);                
-                Result.Add(symbol, task);
+                result.Add(symbol, task);
             }
             
-            Result.Add(node, new ProxyInvocation(task, node));
+            result.Add(node, new ProxyInvocation(task, node));
 
             if (current != null)
                 current.AddDependency(task);
@@ -88,7 +98,7 @@ namespace Nake.Magic
                     continue;
 
                 if (FieldSubstitution.Qualifies(symbol))
-                    Result.Add(variable, new FieldSubstitution(variable, symbol, substitutions[fullName]));
+                    result.Add(variable, new FieldSubstitution(variable, symbol, substitutions[fullName]));
             }
 
             base.VisitFieldDeclaration(node);
@@ -122,7 +132,7 @@ namespace Nake.Magic
         public override void VisitLiteralExpression(LiteralExpressionSyntax node)
         {
             if (StringExpansion.Qualifies(node))
-                Result.Add(node, new StringExpansion(model, node, visitingConstant));
+                result.Add(node, new StringExpansion(model, node, visitingConstant));
             
             base.VisitLiteralExpression(node);
         }

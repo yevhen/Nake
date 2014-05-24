@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace Nake.Scripting
 {
@@ -29,9 +28,9 @@ namespace Nake.Scripting
 
         string scriptDirectoryPath = "";
 
-        public Result Process(FileInfo file)
+        public PreprocessorResult Process(FileInfo file)
         {
-            var result = new Result();
+            var result = new PreprocessorResult();
             
             scriptDirectoryPath = file.DirectoryName;
             ParseFile(file.FullName, result);
@@ -39,7 +38,7 @@ namespace Nake.Scripting
             return result;
         }
 
-        private void ParseFile(string path, Result result)
+        private void ParseFile(string path, PreprocessorResult result)
         {
             var fileLines = File.ReadAllLines(path).ToList();
 
@@ -65,7 +64,7 @@ namespace Nake.Scripting
             fileLines.Insert(bodyIndex, directiveLine);
         }
 
-        private void ProcessLine(string currentScriptFilePath, Result result, string line, bool isBeforeCode)
+        private void ProcessLine(string currentScriptFilePath, PreprocessorResult result, string line, bool isBeforeCode)
         {
             if (IsUsingLine(line))
             {
@@ -85,7 +84,7 @@ namespace Nake.Scripting
                     if (reference.EndsWith(@".dll") || reference.EndsWith(@".exe"))
                     {
                         result.AbsoluteReferences.Add(
-                            new AbsoluteReference(currentScriptFilePath, reference));
+                            new AssemblyAbsoluteReference(currentScriptFilePath, reference));
 
                         return;
                     }
@@ -137,49 +136,14 @@ namespace Nake.Scripting
         {
             return line.Trim(' ').Replace(replaceString, string.Empty).Replace("\"", string.Empty).Replace(";", string.Empty);
         }
-
-        internal class Result
-        {
-            public readonly HashSet<string> Namespaces = new HashSet<string>();
-            public readonly HashSet<AssemblyNameReference> References = new HashSet<AssemblyNameReference>();
-            public readonly HashSet<AbsoluteReference> AbsoluteReferences = new HashSet<AbsoluteReference>();
-            public readonly List<string> LoadedScripts = new List<string>();
-            public readonly List<string> Body = new List<string>();
-
-            public string Code()
-            {
-                var code = new StringBuilder();
-
-                AppendUsings(code);
-                AppendBody(code);
-
-                return code.ToString();
-            }
-
-            void AppendUsings(StringBuilder code)
-            {
-                var lines = Namespaces.Distinct().Select(item => string.Format("using {0};", item)).ToList();
-
-                if (lines.Count == 0)
-                    return;
-
-                code.AppendLine(string.Join(Environment.NewLine, lines));
-                code.AppendLine(); // Insert a blank separator line
-            }
-
-            void AppendBody(StringBuilder code)
-            {
-                code.Append(string.Join(Environment.NewLine, Body));
-            }
-        }
     }
 
-    internal struct AbsoluteReference : IEquatable<AbsoluteReference>
+    internal struct AssemblyAbsoluteReference : IEquatable<AssemblyAbsoluteReference>
     {
         public readonly string AssemblyPath;
         public readonly string ScriptFile;
 
-        public AbsoluteReference(string scriptFile, string assemblyReference)
+        public AssemblyAbsoluteReference(string scriptFile, string assemblyReference)
         {
             ScriptFile = scriptFile;
 
@@ -189,7 +153,7 @@ namespace Nake.Scripting
             AssemblyPath = Path.GetFullPath(Path.Combine(currentScriptDirectory, assemblyReference));
         }
 
-        public bool Equals(AbsoluteReference other)
+        public bool Equals(AssemblyAbsoluteReference other)
         {
             return String.Equals(AssemblyPath, other.AssemblyPath);
         }
@@ -199,7 +163,7 @@ namespace Nake.Scripting
             if (ReferenceEquals(null, obj))
                 return false;
 
-            return obj is AbsoluteReference && Equals((AbsoluteReference)obj);
+            return obj is AssemblyAbsoluteReference && Equals((AssemblyAbsoluteReference)obj);
         }
 
         public override int GetHashCode()
@@ -212,17 +176,17 @@ namespace Nake.Scripting
             return AssemblyPath;
         }
 
-        public static bool operator ==(AbsoluteReference left, AbsoluteReference right)
+        public static bool operator ==(AssemblyAbsoluteReference left, AssemblyAbsoluteReference right)
         {
             return left.Equals(right);
         }
 
-        public static bool operator !=(AbsoluteReference left, AbsoluteReference right)
+        public static bool operator !=(AssemblyAbsoluteReference left, AssemblyAbsoluteReference right)
         {
             return !left.Equals(right);
         }
 
-        public static implicit operator string(AbsoluteReference obj)
+        public static implicit operator string(AssemblyAbsoluteReference obj)
         {
             return obj.AssemblyPath;
         }

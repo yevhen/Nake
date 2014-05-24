@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 
 using Microsoft.CodeAnalysis;
+using Nake.Magic;
 
 namespace Nake
 {
@@ -14,29 +15,33 @@ namespace Nake
         readonly List<Task> dependencies = new List<Task>();
         readonly HashSet<TaskInvocation> invocations = new HashSet<TaskInvocation>();
 
-        readonly IMethodSymbol symbol;
+        readonly string displayName;
         MethodInfo reflected;
 
         public Task(IMethodSymbol symbol)
         {
             CheckSignature(symbol);
             CheckPlacement(symbol);
-            CheckSummary(symbol);
 
-            this.symbol = symbol;
+            displayName = symbol.ToString();
+        }
+
+        public Task(TaskDeclaration declaration)
+        {
+            displayName = declaration.DisplayName;
         }
 
         static void CheckSignature(IMethodSymbol symbol)
         {
             if (!symbol.IsStatic ||
                 !symbol.ReturnsVoid ||
-                 symbol.DeclaredAccessibility != Accessibility.Public ||
-                 symbol.IsGenericMethod ||
-                 symbol.Parameters.Any(p => p.RefKind != RefKind.None || !TypeConverter.IsSupported(p.Type)))
+                symbol.DeclaredAccessibility != Accessibility.Public ||
+                symbol.IsGenericMethod ||
+                symbol.Parameters.Any(p => p.RefKind != RefKind.None || !TypeConverter.IsSupported(p.Type)))
                 throw new TaskSignatureViolationException(symbol.ToString());
         }
 
-        static void CheckPlacement(IMethodSymbol symbol)
+        static void CheckPlacement(ISymbol symbol)
         {
             var parentType = symbol.ContainingType;
             
@@ -53,38 +58,21 @@ namespace Nake
             }
         }
 
-        static void CheckSummary(IMethodSymbol symbol)
-        {
-            var comments = Comments(symbol);
-            if (comments.HadXmlParseError || comments.FullXmlFragment.Contains("Badly formed XML"))
-                throw new InvalidXmlDocumentationException(symbol.ToString());
-        }
-
         public static bool IsAnnotated(ISymbol symbol)
         {
             return symbol.GetAttributes().SingleOrDefault(x => x.AttributeClass.Name == "TaskAttribute") != null;
         }
 
-        public string Summary
+        bool IsGlobal
         {
-            get { return Comments(symbol).SummaryText ?? ""; }
+            get { return !FullName.Contains("."); }
         }
 
-        static DocumentationComment Comments(IMethodSymbol symbol)
-        {
-            return DocumentationComment.FromXmlFragment(symbol.GetDocumentationCommentXml());
-        }
-
-        public bool IsGlobal()
-        {
-            return !FullName.Contains(".");
-        }
-
-        public string Name
+        string Name
         {
             get
             {
-                return IsGlobal()
+                return IsGlobal
                         ? FullName
                         : FullName.Substring(FullName.LastIndexOf(".", StringComparison.Ordinal) + 1);
             }
@@ -92,32 +80,22 @@ namespace Nake
 
         public string FullName
         {
-            get
-            {
-                return DisplayName.Substring(0, DisplayName.IndexOf("(", StringComparison.Ordinal));
-            }
+            get { return DisplayName.Substring(0, DisplayName.IndexOf("(", StringComparison.Ordinal)); }
         }
 
-        public string DeclaringType
+        string DeclaringType
         {
             get
-            {                
-                if (IsGlobal())
-                    return ScriptClass;
-
-                return ScriptClass + "+" + FullName.Substring(0,
-                    FullName.LastIndexOf(".", StringComparison.Ordinal)).Replace(".", "+");
+            {
+                return !IsGlobal
+                        ? ScriptClass + "+" + FullName.Substring(0, FullName.LastIndexOf(".", StringComparison.Ordinal)).Replace(".", "+")
+                        : ScriptClass;
             }
         }
 
         public string DisplayName
         {
-            get { return symbol.ToString(); }
-        }
-
-        public bool HasRequiredParameters()
-        {
-            return symbol.Parameters.Any(x => !x.HasExplicitDefaultValue);
+            get { return displayName; }
         }
 
         public void AddDependency(Task dependency)

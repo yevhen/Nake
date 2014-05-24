@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -10,6 +11,8 @@ namespace Nake.Magic
 {
     class StringExpansion
     {
+        public readonly HashSet<EnvironmentVariable> Captured = new HashSet<EnvironmentVariable>();
+
         public static bool Qualifies(LiteralExpressionSyntax node)
         {
             return node.CSharpKind() == SyntaxKind.StringLiteralExpression;
@@ -86,13 +89,14 @@ namespace Nake.Magic
                 span.StartLinePosition.Character + 1 + matchPosition);
         }
 
-        static string InlineEnvironmentVariables(string token)
+        string InlineEnvironmentVariables(string token)
         {
             return environmentVariablePattern.Replace(token, match =>
             {
-                var variable = match.Groups["variable"].Value;
-                var value = Env.Var[variable] ?? "$" + variable + "$";
-
+                var name = match.Groups["variable"].Value;
+                var value = Env.Var[name] ?? "$" + name + "$";
+                Captured.Add(new EnvironmentVariable(name, value));
+                
                 return Verbatimize(value);
             });
         }
@@ -128,6 +132,29 @@ namespace Nake.Magic
             return !constant 
                     ? result.Replace("{{", "{").Replace("}}", "}") 
                     : result;
+        }
+    }
+
+    struct EnvironmentVariable
+    {
+        public readonly string Name;
+        public readonly string Value;
+
+        public EnvironmentVariable(string name, string value)
+        {
+            Name = name;
+            Value = value;
+        }
+
+        public override bool Equals(object obj)
+        {
+            var other = (EnvironmentVariable) obj;
+            return string.Equals(Name, other.Name);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked { return (Name.GetHashCode() * 397); }
         }
     }
 }

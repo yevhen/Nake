@@ -61,16 +61,18 @@
     <Compile Include="..\ProductAssemblyInfo.cs">
       <Link>Properties\ProductAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Magic\TaskDeclaration.cs" />
+    <Compile Include="Magic\TaskDeclarationScanner.cs" />
+    <Compile Include="Caching.cs" />
+    <Compile Include="Scripting\AssemblyReference.cs" />
     <Compile Include="Scripting\AssemblyResolver.cs" />
-    <Compile Include="DocumentationComment.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Application.cs" />
-    <Compile Include="Magic\AnalysisResult.cs" />
+    <Compile Include="Magic\AnalyzerResult.cs" />
     <Compile Include="Magic\Analyzer.cs" />
     <Compile Include="Magic\FieldSubstitution.cs" />
     <Compile Include="Magic\ProxyInvocation.cs" />
     <Compile Include="Magic\Rewriter.cs" />
-    <Compile Include="Magic\FairyDust.cs" />
     <Compile Include="Magic\StringExpansion.cs" />
     <Compile Include="Options.cs" />
     <Compile Include="Exceptions.cs" />
@@ -78,10 +80,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scripting\GAC.cs" />
     <Compile Include="Scripting\Preprocessor.cs" />
+    <Compile Include="Scripting\PreprocessorResult.cs" />
+    <Compile Include="Engine.cs" />
+    <Compile Include="Scripting\Roslyn.Scripting.Assembly.cs" />
     <Compile Include="Scripting\Script.cs" />
-    <Compile Include="Scripting\Engine.cs" />
-    <Compile Include="Scripting\ScriptAssembly.cs" />
-    <Compile Include="Scripting\Submission.cs" />
     <Compile Include="TaskArgument.cs" />
     <Compile Include="Task.cs" />
     <Compile Include="TaskInvocation.cs" />

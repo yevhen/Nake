@@ -154,6 +154,11 @@
               Looks up a localized string similar to Can&apos;t embed interop types from module..
             </summary>
         </member>
+        <member name="P:Microsoft.CodeAnalysis.CodeAnalysisResources.ChangesMustBeOrderedAndNotOverlapping">
+            <summary>
+              Looks up a localized string similar to The changes must be ordered and not overlapping..
+            </summary>
+        </member>
         <member name="P:Microsoft.CodeAnalysis.CodeAnalysisResources.Class1">
             <summary>
               Looks up a localized string similar to class.
@@ -8375,27 +8380,26 @@
             Underlying string on which this SourceText instance is based
             </summary>
         </member>
-        <member name="F:Microsoft.CodeAnalysis.Text.EncodedStringText.sha1Checksum">
+        <member name="M:Microsoft.CodeAnalysis.Text.EncodedStringText.Create(System.IO.Stream,System.Text.Encoding)">
             <summary>
-            Sha1 checksum of the underlying stream.
+            Initializes an instance of <see cref="T:StringText"/> with provided bytes.
             </summary>
+            <param name="stream"></param>
+            <param name="defaultEncoding">
+            Specifies an encoding to be used if the actual encoding can't be determined from the stream content (the stream doesn't start with Byte Order Mark).
+            If not specified auto-detect heristics are used to determine the encoding. If these heristics fail the decoding is assumed to be <see cref="P:System.Text.Encoding.Default"/>.
+            Note that if the stream starts with Byte Order Mark the value of <paramref name="defaultEncoding"/> is ignored.
+            </param>
+            <exception cref="T:System.IO.InvalidDataException">
+            The stream content can't be decoded using the specified <paramref name="defaultEncoding"/>, or
+            <paramref name="defaultEncoding"/> is null and the stream appears to be a binary file.
+            </exception>
+            <exception cref="T:System.IO.IOException">An IO error occured while reading from the stream.</exception>
         </member>
         <member name="P:Microsoft.CodeAnalysis.Text.EncodedStringText.Source">
             <summary>
             Underlying string which is the source of this SourceText instance
             </summary>
-        </member>
-        <member name="M:Microsoft.CodeAnalysis.Text.EncodedStringText.#ctor(System.IO.Stream,System.Text.Encoding)">
-            <summary>
-            Initializes an instance of <see cref="T:StringText"/> with provided bytes.
-            </summary>
-            <param name="stream"></param>
-            <param name="encodingOpt">
-            Automatically detected, if not specified: BigEndianUnicode, Unicode, UTF8
-            (with or without byte order mark). Windows-1252 will be used as a fallback.
-            This method will throw an InvalidDataException if the stream appears to be a binary file and 
-            a DecoderFallbackException if it can't be decoded.
-            </param>
         </member>
         <member name="P:Microsoft.CodeAnalysis.Text.EncodedStringText.Length">
             <summary>
@@ -8417,44 +8421,23 @@
             </summary>
             <exception cref="T:ArgumentOutOfRangeException">When given span is outside of the text range.</exception>
         </member>
-        <member name="M:Microsoft.CodeAnalysis.Text.EncodedStringText.DetectEncodingAndDecode(System.IO.Stream)">
+        <member name="M:Microsoft.CodeAnalysis.Text.EncodedStringText.IsBinary(System.String)">
             <summary>
-            The following encodings will be automatically detected: 
-            BigEndianUnicode, Unicode, UTF8 (with or without byte order mark).
-            The default windows codepage will be used as a fallback. If the 
-            default windows codepage is 1252 (Western European), we will try to
-            detect if the stream is binary encoded. Does not close the stream 
-            after decoding.
-            </summary>
-            <exception cref="T:System.IO.InvalidDataException">If a binary file is 
-            detected.</exception>
-            <exception cref="T:System.Text.DecoderFallbackException">If the detected 
-            encoding can't decode the stream.</exception>
-        </member>
-        <member name="M:Microsoft.CodeAnalysis.Text.EncodedStringText.DecodeIfNotBinary(System.IO.Stream,System.Text.Encoding)">
-            <summary>
-            Decodes the file using the supplied <paramref name="encoding"/> if and only 
-            if the file fails the heuristic for detecting a binary file. The heuristic checks
+            The heuristic checks
             for occurrence of two consecutive NUL (U+0000) characters in the stream, which are 
             highly unlikely to appear in a text file. Since the heuristic is applied after 
             the text has been decoded, it can be used with any encoding.
-            Does not close the stream when finished.
             </summary>
-            <param name="data">Data stream</param>
-            <param name="encoding">Encoding to use for decode</param>
-            <exception cref="T:System.IO.InvalidDataException">If the stream is binary encoded</exception>
-            <returns>Decoded stream as a text string</returns>
         </member>
-        <member name="M:Microsoft.CodeAnalysis.Text.EncodedStringText.Decode(System.IO.Stream,System.Text.Encoding)">
+        <member name="M:Microsoft.CodeAnalysis.Text.EncodedStringText.Decode(System.IO.Stream,System.Text.Encoding,System.Text.Encoding@)">
             <summary>
             Decode the given stream using the given encoding. Does not
             close the stream afterwards.
             </summary>
             <param name="data">Data stream</param>
-            <param name="encoding">Encoding to use for decode</param>
-            <exception cref="T:System.Text.DecoderFallbackException">If the given 
-            encoding is set to use <see cref="T:System.Text.DecoderExceptionFallback"/>
-            as its fallback decoder.</exception>
+            <param name="encoding">Default encoding to use for decoding.</param>
+            <param name="actualEncoding">Actual encoding used to read the text.</param>
+            <exception cref="T:System.Text.DecoderFallbackException">If the given encoding is set to use <see cref="T:System.Text.DecoderExceptionFallback"/> as its fallback decoder.</exception>
             <returns>Decoded stream as a text string</returns>
         </member>
         <member name="M:Microsoft.CodeAnalysis.Text.EncodedStringText.ReadUnicodeStringFromMemoryMappedViewStream(System.IO.MemoryMappedFiles.MemoryMappedViewStream)">
@@ -8464,7 +8447,7 @@
             <param name="memoryMappedViewStream">A view over a memory mapped stream which contains a Unicode string (preceded by a Unicode BOM)</param>
             <returns>The string</returns>
         </member>
-        <member name="M:Microsoft.CodeAnalysis.Text.EncodedStringText.TryDecodeMemoryStream(System.IO.MemoryStream,System.Text.Encoding,System.Boolean,System.String@)">
+        <member name="M:Microsoft.CodeAnalysis.Text.EncodedStringText.TryDecodeMemoryStream(System.IO.MemoryStream,System.Text.Encoding,System.Text.Encoding@,System.String@)">
             <summary>
             If the MemoryStream was created with publiclyVisible=true, then we can access its buffer
             directly and save allocations in StreamReader. The input MemoryStream is not closed on exit.
@@ -8472,14 +8455,9 @@
             <exception cref="T:System.Text.DecoderFallbackException">If the given encoding is set to use <see cref="T:System.Text.DecoderExceptionFallback"/> 
             as its fallback decoder.</exception>
         </member>
-        <member name="M:Microsoft.CodeAnalysis.Text.EncodedStringText.TryDecodeUTF8NoBOM(System.IO.Stream,System.String@)">
-            <summary>
-            Assume that the input is UTF8 encoded with no byte order mark (BOM)
-            </summary>
-        </member>
         <member name="T:Microsoft.CodeAnalysis.Text.CompositeText">
             <summary>
-            An SourceText that is a composite of a sequence of ITexts
+            A composite of a sequence of <see cref="T:Microsoft.CodeAnalysis.Text.SourceText"/>s.
             </summary>
         </member>
         <member name="M:Microsoft.CodeAnalysis.Text.CompositeText.CheckCopyToArguments(System.Int32,System.Char[],System.Int32,System.Int32)">
@@ -8591,15 +8569,16 @@
             An abstraction of source text.
             </summary>
         </member>
-        <member name="M:Microsoft.CodeAnalysis.Text.SourceText.From(System.String,System.Collections.Immutable.ImmutableArray{System.Byte})">
+        <member name="M:Microsoft.CodeAnalysis.Text.SourceText.From(System.String,System.Text.Encoding)">
             <summary>
             Constructs a <see cref="T:Microsoft.CodeAnalysis.Text.SourceText"/> from text in a string.
             </summary>
             <param name="text">Text.</param>
-            <param name="checksum">
-            SHA1 checksum of the binary representation of the text. 
-            Used by the compiler to produce debug information for the corresponding document.
-            The document won't be debuggable if checksum is not specified.
+            <param name="encoding">
+            Encoding of the file that the <paramref name="text"/> was read from or is going to be saved to.
+            <c>null</c> if the encoding is unspecified.
+            If the encoding is not specified the resulting <see cref="T:Microsoft.CodeAnalysis.Text.SourceText"/> isn't debuggable.
+            If an encoding-less <see cref="T:Microsoft.CodeAnalysis.Text.SourceText"/> is written to a file a <see cref="P:System.Text.Encoding.UTF8"/> shall be used as a default.
             </param>
             <exception cref="T:System.ArgumentNullException"><paramref name="text"/> is null.</exception>
         </member>
@@ -8609,15 +8588,22 @@
             </summary>
             <param name="stream">Stream.</param>
             <param name="encoding">
-            Data encoding to use unless the stream starts with Byte Order Mark specifying the encoding.
-            UTF8 if not specified.</param>
+            Data encoding to use if the stream doesn't start with Byte Order Mark specifying the encoding.
+            <see cref="P:System.Text.Encoding.UTF8"/> if not specified.
+            </param>
             <exception cref="T:System.ArgumentNullException"><paramref name="stream"/> is null.</exception>
             <exception cref="T:System.ArgumentException"><paramref name="stream"/> doesn't support reading or seeking.</exception>
             <exception cref="T:System.IO.IOException">An I/O error occurs.</exception>
+            <remarks>Reads from the beginning of the stream. Leaves the stream open.</remarks>
+        </member>
+        <member name="P:Microsoft.CodeAnalysis.Text.SourceText.Encoding">
+            <summary>
+            Encoding of the file that the text was read from or is going to be saved to.
+            <c>null</c> if the encoding is unspecified.
+            </summary>
             <remarks>
-            Reads from the beginning of the stream. Leaves the stream open.
-            Attaches SHA1 checksum of the binary content to the <see cref="T:Microsoft.CodeAnalysis.Text.SourceText"/>. 
-            This information is used by the compiler to produce debug information for the document.
+            If the encoding is not specified the source isn't debuggable.
+            If an encoding-less <see cref="T:Microsoft.CodeAnalysis.Text.SourceText"/> is written to a file a <see cref="P:System.Text.Encoding.UTF8"/> shall be used as a default.
             </remarks>
         </member>
         <member name="P:Microsoft.CodeAnalysis.Text.SourceText.Length">
@@ -8654,25 +8640,15 @@
             Returns a <see cref="T:Microsoft.CodeAnalysis.Text.SourceText"/> that has the contents of this text including and after the start position.
             </summary>
         </member>
-        <member name="M:Microsoft.CodeAnalysis.Text.SourceText.Write(System.IO.TextWriter)">
+        <member name="M:Microsoft.CodeAnalysis.Text.SourceText.Write(System.IO.TextWriter,System.Threading.CancellationToken)">
             <summary>
             Write this <see cref="T:Microsoft.CodeAnalysis.Text.SourceText"/> to a text writer.
             </summary>
         </member>
-        <member name="M:Microsoft.CodeAnalysis.Text.SourceText.Write(System.IO.TextWriter,Microsoft.CodeAnalysis.Text.TextSpan)">
+        <member name="M:Microsoft.CodeAnalysis.Text.SourceText.Write(System.IO.TextWriter,Microsoft.CodeAnalysis.Text.TextSpan,System.Threading.CancellationToken)">
             <summary>
             Write a span of text to a text writer.
             </summary>
-            <param name="writer"></param>
-            <param name="span"></param>
-        </member>
-        <member name="M:Microsoft.CodeAnalysis.Text.SourceText.GetSha1ChecksumImpl">
-            <summary>
-            Computes SHA1 hash of the text binary representation.
-            </summary>
-            <remarks>
-            Returns <see cref="F:System.Collections.Immutable.ImmutableArray`1.Empty"/> if the binary representation is not available.
-            </remarks>
         </member>
         <member name="M:Microsoft.CodeAnalysis.Text.SourceText.ToString">
             <summary>
@@ -8722,6 +8698,16 @@
         <member name="P:Microsoft.CodeAnalysis.Text.SourceText.Lines">
             <summary>
             The collection of individual text lines.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.Text.SourceText.ContentEquals(Microsoft.CodeAnalysis.Text.SourceText)">
+            <summary>
+            Compares the content with content of another <see cref="T:Microsoft.CodeAnalysis.Text.SourceText"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.Text.SourceText.ContentEqualsImpl(Microsoft.CodeAnalysis.Text.SourceText)">
+            <summary>
+            Implements equality comparison of the content of two different instances of <see cref="T:Microsoft.CodeAnalysis.Text.SourceText"/>.
             </summary>
         </member>
         <member name="T:Microsoft.CodeAnalysis.Text.SourceTextContainer">
@@ -9199,11 +9185,6 @@
         <member name="T:Microsoft.CodeAnalysis.Text.TextUtilities">
             <summary>
             Holder for common Text Utility functions and values
-            </summary>
-        </member>
-        <member name="M:Microsoft.CodeAnalysis.Text.TextUtilities.Create(System.Action{System.IO.TextWriter})">
-            <summary>
-            Create a new SourceText instance from a function that writes to a TextWriter
             </summary>
         </member>
         <member name="M:Microsoft.CodeAnalysis.Text.TextUtilities.GetStartAndLengthOfLineBreakEndingAt(Microsoft.CodeAnalysis.Text.SourceText,System.Int32,System.Int32@,System.Int32@)">
@@ -12827,8 +12808,9 @@
         <member name="P:Microsoft.CodeAnalysis.ISymbol.IsImplicitlyDeclared">
             <summary>
             Returns true if this symbol was automatically created by the compiler, and does not have
-            an explicit corresponding source code declaration.  
-            
+            an explicit corresponding source code declaration. 
+            </summary> 
+            <remarks>
             This is intended for symbols that are ordinary symbols in the language sense, and may be
             used by code, but that are simply declared implicitly rather than with explicit language
             syntax.
@@ -12841,7 +12823,7 @@
               the "value" parameter for a property setter,
               the parameters on indexer accessor methods (not on the indexer itself),
               methods in anonymous types
-            </summary>
+            </remarks>
         </member>
         <member name="P:Microsoft.CodeAnalysis.ISymbol.CanBeReferencedByName">
             <summary>
@@ -14541,14 +14523,19 @@
         </member>
         <member name="M:Microsoft.CodeAnalysis.SyntaxNode.WriteTo(System.IO.TextWriter)">
             <summary>
-            Writes the full text of this node to the specified TextWriter.
+            Writes the full text of this node to the specified <see cref="T:System.IO.TextWriter"/>.
             </summary>
         </member>
-        <member name="M:Microsoft.CodeAnalysis.SyntaxNode.GetText">
+        <member name="M:Microsoft.CodeAnalysis.SyntaxNode.GetText(System.Text.Encoding)">
             <summary>
-            Gets the full text of this node as an new SourceText instance.
+            Gets the full text of this node as an new <see cref="T:Microsoft.CodeAnalysis.Text.SourceText"/> instance.
             </summary>
-            <returns></returns>
+            <param name="encoding">
+            Encoding of the file that the text was read from or is going to be saved to.
+            <c>null</c> if the encoding is unspecified.
+            If the encoding is not specified the <see cref="T:Microsoft.CodeAnalysis.Text.SourceText"/> isn't debuggable.
+            If an encoding-less <see cref="T:Microsoft.CodeAnalysis.Text.SourceText"/> is written to a file a <see cref="P:System.Text.Encoding.UTF8"/> shall be used as a default.
+            </param>
         </member>
         <member name="M:Microsoft.CodeAnalysis.SyntaxNode.IsEquivalentTo(Microsoft.CodeAnalysis.SyntaxNode)">
             <summary>
@@ -16637,6 +16624,16 @@
             <remarks>The list of changes may be different than the original changes that produced
             this tree.</remarks>
         </member>
+        <member name="M:Microsoft.CodeAnalysis.SyntaxTree.WithRootAndOptions(Microsoft.CodeAnalysis.SyntaxNode,Microsoft.CodeAnalysis.ParseOptions)">
+            <summary>
+            Returns a new tree whose root and options are as specified and other properties are copied from the current tree.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.SyntaxTree.WithFilePath(System.String)">
+            <summary>
+            Returns a new tree whose <see cref="P:Microsoft.CodeAnalysis.SyntaxTree.FilePath"/> is the specified node and other properties are copied from the current tree.
+            </summary>
+        </member>
         <member name="M:Microsoft.CodeAnalysis.SyntaxTreeExtensions.VerifySource(Microsoft.CodeAnalysis.SyntaxTree,System.Collections.Generic.IEnumerable{Microsoft.CodeAnalysis.Text.TextChangeRange})">
             <summary>
             Verify nodes match source.
@@ -17058,11 +17055,6 @@
         <member name="T:Microsoft.CodeAnalysis.TreeDumperNode">
             <summary>
             This is ONLY used for debugging purpose
-            </summary>
-        </member>
-        <member name="T:Microsoft.CodeAnalysis.VbStringDisplay">
-            <summary>
-            Implements VB string escaping. Uses iterators and thus it's implemented in shared code.
             </summary>
         </member>
         <member name="M:Microsoft.CodeAnalysis.VersionHelper.TryParse(System.String,System.Version@)">
@@ -17784,6 +17776,12 @@
             <summary>
             If the method is generic then this list contains the type parameters.
             </summary>
+        </member>
+        <member name="P:Microsoft.Cci.IMethodDefinition.IsImplicitlyDeclared">
+            <summary>
+            Returns true if this symbol was automatically created by the compiler, and does not have
+            an explicit corresponding source code declaration. 
+            </summary> 
         </member>
         <member name="P:Microsoft.Cci.IMethodDefinition.HasDeclarativeSecurity">
             <summary>
@@ -18788,12 +18786,12 @@
             Return a visitor for traversing all references to be emitted.
             </summary>
         </member>
-        <member name="M:Microsoft.Cci.PeWriter.OnSerializedMethodBody(Microsoft.Cci.IMethodDefinition,Microsoft.Cci.IMethodBody)">
+        <member name="M:Microsoft.Cci.PeWriter.OnSerializedMethodBody(Microsoft.Cci.IMethodBody)">
             <summary>
             Invoked after serializing the method body.
             </summary>
         </member>
-        <member name="M:Microsoft.Cci.PeWriter.OnSerializedMetadataTables">
+        <member name="M:Microsoft.Cci.PeWriter.OnBeforeHeapsAligned">
             <summary>
             Invoked after serializing metadata tables.
             </summary>
@@ -18824,7 +18822,7 @@
             An override to SerializeIndex does the resolving at the right time.
             </summary>
         </member>
-        <member name="M:Microsoft.Cci.PeWriter.FoldStrings">
+        <member name="M:Microsoft.Cci.PeWriter.SerializeStringHeap">
             <summary>
             Fills in stringIndexMap with data from stringIndex and write to stringWriter.
             Releases stringIndex as the stringTable is sealed after this point.
@@ -18995,16 +18993,6 @@
         <member name="M:Microsoft.Cci.IParameterTypeInformation.GetType(Microsoft.CodeAnalysis.Emit.EmitContext)">
             <summary>
             The type of argument value that corresponds to this parameter.
-            </summary>
-        </member>
-        <member name="T:Microsoft.Cci.IFunctionPointerTypeReference">
-            <summary>
-            This interface models the metadata representation of a function pointer type reference.
-            </summary>
-        </member>
-        <member name="P:Microsoft.Cci.IFunctionPointerTypeReference.ExtraArgumentTypes">
-            <summary>
-            The types and modifiers of extra arguments that the caller will pass to the methods that are pointed to by this pointer.
             </summary>
         </member>
         <member name="T:Microsoft.Cci.IGenericParameter">

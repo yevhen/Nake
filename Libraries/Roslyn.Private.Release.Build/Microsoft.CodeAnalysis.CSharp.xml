@@ -817,13 +817,13 @@
             without adding two links to the binder chain.
             </remarks>
         </member>
-        <member name="M:Microsoft.CodeAnalysis.CSharp.Binder.BindRegularCSharpFieldInitializers(Microsoft.CodeAnalysis.CSharp.CSharpCompilation,System.Collections.Immutable.ImmutableArray{System.Collections.Immutable.ImmutableArray{Microsoft.CodeAnalysis.CSharp.Symbols.FieldInitializer}},Microsoft.CodeAnalysis.ArrayBuilder{Microsoft.CodeAnalysis.CSharp.BoundInitializer},Microsoft.CodeAnalysis.DiagnosticBag,System.Boolean,Roslyn.Utilities.ConsList{Microsoft.CodeAnalysis.CSharp.Imports}@)">
+        <member name="M:Microsoft.CodeAnalysis.CSharp.Binder.BindRegularCSharpFieldInitializers(Microsoft.CodeAnalysis.CSharp.CSharpCompilation,System.Collections.Immutable.ImmutableArray{Microsoft.CodeAnalysis.CSharp.Symbols.FieldInitializers},Microsoft.CodeAnalysis.ArrayBuilder{Microsoft.CodeAnalysis.CSharp.BoundInitializer},Microsoft.CodeAnalysis.DiagnosticBag,System.Boolean,Roslyn.Utilities.ConsList{Microsoft.CodeAnalysis.CSharp.Imports}@)">
             <summary>
             In regular C#, all field initializers are assignments to fields and the assigned expressions
             may not reference instance members.
             </summary>
         </member>
-        <member name="M:Microsoft.CodeAnalysis.CSharp.Binder.BindScriptFieldInitializers(Microsoft.CodeAnalysis.CSharp.CSharpCompilation,Microsoft.CodeAnalysis.CSharp.Symbols.MethodSymbol,System.Collections.Immutable.ImmutableArray{System.Collections.Immutable.ImmutableArray{Microsoft.CodeAnalysis.CSharp.Symbols.FieldInitializer}},Microsoft.CodeAnalysis.ArrayBuilder{Microsoft.CodeAnalysis.CSharp.BoundInitializer},Microsoft.CodeAnalysis.DiagnosticBag,System.Boolean,Roslyn.Utilities.ConsList{Microsoft.CodeAnalysis.CSharp.Imports}@)">
+        <member name="M:Microsoft.CodeAnalysis.CSharp.Binder.BindScriptFieldInitializers(Microsoft.CodeAnalysis.CSharp.CSharpCompilation,Microsoft.CodeAnalysis.CSharp.Symbols.MethodSymbol,System.Collections.Immutable.ImmutableArray{Microsoft.CodeAnalysis.CSharp.Symbols.FieldInitializers},Microsoft.CodeAnalysis.ArrayBuilder{Microsoft.CodeAnalysis.CSharp.BoundInitializer},Microsoft.CodeAnalysis.DiagnosticBag,System.Boolean,Roslyn.Utilities.ConsList{Microsoft.CodeAnalysis.CSharp.Imports}@)">
             <summary>
             In script C#, some field initializers are assignments to fields and others are global
             statements.  There are no restrictions on accessing instance members.
@@ -1368,6 +1368,11 @@
         <member name="M:Microsoft.CodeAnalysis.CSharp.BinderFactory.GetEnclosingDocumentationComment(Microsoft.CodeAnalysis.CSharp.CSharpSyntaxNode)">
             <summary>
             Walk up from an XML syntax node (attribute or tag) to the enclosing documentation comment trivia.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.CSharp.BinderFactory.GetBinder(Microsoft.CodeAnalysis.CSharp.CSharpSyntaxNode)">
+            <summary>
+            Note, there is no guarantee that the factory always gives back the same binder instance for the same <param name="node"/>.
             </summary>
         </member>
         <member name="M:Microsoft.CodeAnalysis.CSharp.BinderFactory.GetImportsBinder(Microsoft.CodeAnalysis.CSharp.CSharpSyntaxNode)">
@@ -9804,6 +9809,16 @@
             A reference to <see cref="T:Microsoft.CodeAnalysis.CSharp.Syntax.EqualsValueClauseSyntax"/> or <see cref="T:Microsoft.CodeAnalysis.CSharp.Syntax.GlobalStatementSyntax"/>.
             </summary>
         </member>
+        <member name="T:Microsoft.CodeAnalysis.CSharp.Symbols.FieldInitializers">
+            <summary>
+            Represents a field initializers from particular type declaration.
+            </summary>
+        </member>
+        <member name="F:Microsoft.CodeAnalysis.CSharp.Symbols.FieldInitializers.TypeDeclarationSyntax">
+            <summary>
+            A reference to the <see cref="F:Microsoft.CodeAnalysis.CSharp.Symbols.FieldInitializers.TypeDeclarationSyntax"/>.
+            </summary>
+        </member>
         <member name="T:Microsoft.CodeAnalysis.CSharp.Symbols.LabelSymbol">
             <summary>
             Represents a label in method body
@@ -12606,11 +12621,6 @@
             Base class for all parameters that are emitted.
             </summary>
         </member>
-        <member name="T:Microsoft.CodeAnalysis.CSharp.Symbols.SourcePrimaryConstructorParameterSymbolWithBackingField">
-            <summary>
-            A Primary Constructor parameter that will have backing field fo sure.
-            </summary>
-        </member>
         <member name="P:Microsoft.CodeAnalysis.CSharp.Symbols.SourcePropertyAccessorSymbol.LocalAccessibility">
             <summary>
             Return Accessibility declared locally on the accessor, or
@@ -13785,11 +13795,12 @@
             generate code for them.
             </summary>
         </member>
-        <member name="M:Microsoft.CodeAnalysis.CSharp.MethodCompiler.BindConstructorInitializer(Microsoft.CodeAnalysis.CSharp.Symbols.MethodSymbol,Microsoft.CodeAnalysis.DiagnosticBag,Microsoft.CodeAnalysis.CSharp.CSharpCompilation,System.Collections.Immutable.ImmutableArray{Microsoft.CodeAnalysis.CSharp.Symbols.LocalSymbol}@)">
+        <member name="M:Microsoft.CodeAnalysis.CSharp.MethodCompiler.BindConstructorInitializer(Microsoft.CodeAnalysis.CSharp.Symbols.MethodSymbol,System.Collections.Immutable.ImmutableArray{Microsoft.CodeAnalysis.CSharp.Symbols.LocalSymbol},Microsoft.CodeAnalysis.DiagnosticBag,Microsoft.CodeAnalysis.CSharp.CSharpCompilation,System.Collections.Immutable.ImmutableArray{Microsoft.CodeAnalysis.CSharp.Symbols.LocalSymbol}@)">
             <summary>
             Bind the (implicit or explicit) constructor initializer of a constructor symbol.
             </summary>
             <param name="constructor">Constructor method.</param>
+            <param name="initializationScopeLocals">Locals declared within an initialization scope.</param>
             <param name="diagnostics">Accumulates errors (e.g. access "this" in constructor initializer).</param>
             <param name="compilation">Used to retrieve binder.</param>
             <param name="localsDeclaredInInitializer">Locals declared in the initializer are returned through this parameter.</param>
@@ -14616,11 +14627,6 @@
         <member name="P:Microsoft.CodeAnalysis.CSharp.CSharpResources.ERR_AnonDelegateCantUse">
             <summary>
               Looks up a localized string similar to Cannot use ref or out parameter &apos;{0}&apos; inside an anonymous method, lambda expression, or query expression.
-            </summary>
-        </member>
-        <member name="P:Microsoft.CodeAnalysis.CSharp.CSharpResources.ERR_AnonDelegateCantUsePrimaryConstructorParameter">
-            <summary>
-              Looks up a localized string similar to Cannot use primary constructor parameter &apos;{0}&apos; inside an anonymous method, lambda expression, or query expression within variable initializers and arguments to the base constructor..
             </summary>
         </member>
         <member name="P:Microsoft.CodeAnalysis.CSharp.CSharpResources.ERR_AnonMethGrpInForEach">
@@ -16040,7 +16046,7 @@
         </member>
         <member name="P:Microsoft.CodeAnalysis.CSharp.CSharpResources.ERR_DeclarationExpressionOutsideOfAMethodBody">
             <summary>
-              Looks up a localized string similar to A declaration expression is not permitted in a variable-initializer of a field declaration, or in an attribute application..
+              Looks up a localized string similar to A declaration expression is not permitted in this context..
             </summary>
         </member>
         <member name="P:Microsoft.CodeAnalysis.CSharp.CSharpResources.ERR_DefaultMemberOnIndexedType">
@@ -16321,6 +16327,11 @@
         <member name="P:Microsoft.CodeAnalysis.CSharp.CSharpResources.ERR_EnCNoPIAReference">
             <summary>
               Looks up a localized string similar to Cannot continue since the edit includes a reference to an embedded type: &apos;{0}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.CodeAnalysis.CSharp.CSharpResources.ERR_EncodinglessSyntaxTree">
+            <summary>
+              Looks up a localized string similar to Cannot emit debug information for a source text without encoding..
             </summary>
         </member>
         <member name="P:Microsoft.CodeAnalysis.CSharp.CSharpResources.ERR_EndifDirectiveExpected">
@@ -17243,11 +17254,6 @@
               Looks up a localized string similar to &apos;{0}&apos; is not a valid format specifier.
             </summary>
         </member>
-        <member name="P:Microsoft.CodeAnalysis.CSharp.CSharpResources.ERR_InvalidUseOfPrimaryConstructorParameter">
-            <summary>
-              Looks up a localized string similar to Parameters of a primary constructor can only be accessed in instance variable initializers and arguments to the base constructor..
-            </summary>
-        </member>
         <member name="P:Microsoft.CodeAnalysis.CSharp.CSharpResources.ERR_InvalidVersionFormat">
             <summary>
               Looks up a localized string similar to The specified version string does not conform to the required format - major[.minor[.build[.revision]]].
@@ -18043,11 +18049,6 @@
               Looks up a localized string similar to Parameter not valid for the specified unmanaged type..
             </summary>
         </member>
-        <member name="P:Microsoft.CodeAnalysis.CSharp.CSharpResources.ERR_ParamMissingAccessMod">
-            <summary>
-              Looks up a localized string similar to A parameter must either have an accessibility modifier or must not have any field modifiers..
-            </summary>
-        </member>
         <member name="P:Microsoft.CodeAnalysis.CSharp.CSharpResources.ERR_ParamsCantBeRefOut">
             <summary>
               Looks up a localized string similar to The params parameter cannot be declared as ref or out.
@@ -18216,11 +18217,6 @@
         <member name="P:Microsoft.CodeAnalysis.CSharp.CSharpResources.ERR_PredefinedTypeNotFound">
             <summary>
               Looks up a localized string similar to Predefined type &apos;{0}&apos; is not defined or imported.
-            </summary>
-        </member>
-        <member name="P:Microsoft.CodeAnalysis.CSharp.CSharpResources.ERR_PrimaryCtorParameterInConstructorInitializer">
-            <summary>
-              Looks up a localized string similar to Constructor initializer cannot access the parameters to a primary constructor..
             </summary>
         </member>
         <member name="P:Microsoft.CodeAnalysis.CSharp.CSharpResources.ERR_PrimaryCtorParameterSameNameAsContainingType">
@@ -18411,11 +18407,6 @@
         <member name="P:Microsoft.CodeAnalysis.CSharp.CSharpResources.ERR_RefOutDefaultValue">
             <summary>
               Looks up a localized string similar to A ref or out parameter cannot have a default value.
-            </summary>
-        </member>
-        <member name="P:Microsoft.CodeAnalysis.CSharp.CSharpResources.ERR_RefOutParameterWithFieldModifier">
-            <summary>
-              Looks up a localized string similar to A ref or out parameter cannot have any field modifiers..
             </summary>
         </member>
         <member name="P:Microsoft.CodeAnalysis.CSharp.CSharpResources.ERR_RefProperty">
@@ -18691,11 +18682,6 @@
         <member name="P:Microsoft.CodeAnalysis.CSharp.CSharpResources.ERR_StaticNotVirtual">
             <summary>
               Looks up a localized string similar to A static member &apos;{0}&apos; cannot be marked as override, virtual, or abstract.
-            </summary>
-        </member>
-        <member name="P:Microsoft.CodeAnalysis.CSharp.CSharpResources.ERR_StaticParamMod">
-            <summary>
-              Looks up a localized string similar to A parameter cannot have static modifier..
             </summary>
         </member>
         <member name="P:Microsoft.CodeAnalysis.CSharp.CSharpResources.ERR_StructLayoutCycle">
@@ -21171,11 +21157,6 @@
             Does the struct variable at the given slot have all of its instance fields assigned?
             </summary>
         </member>
-        <member name="M:Microsoft.CodeAnalysis.CSharp.DataFlowPass.EnterPrimaryConstructorParameter(Microsoft.CodeAnalysis.CSharp.Symbols.ParameterSymbol)">
-            <summary>
-            Called for each primary constructor parameter when we are not in primary constructor.
-            </summary>
-        </member>
         <member name="M:Microsoft.CodeAnalysis.CSharp.DataFlowPass.VisitUsingStatement(Microsoft.CodeAnalysis.CSharp.BoundUsingStatement)">
             <remarks>
             Variables declared in a using statement are always considered used, so this is just an assert.
@@ -21388,12 +21369,6 @@
             <summary>
             If a method is currently being analyzed returns its parameters, returns an empty array
             otherwise.
-            </summary>
-        </member>
-        <member name="P:Microsoft.CodeAnalysis.CSharp.PreciseAbstractFlowPass`1.PrimaryConstructorParameters">
-            <summary>
-            If we are not in primary constructor and primary constructor parameters are in scope,
-            return them. Returns an empty array otherwise.
             </summary>
         </member>
         <member name="P:Microsoft.CodeAnalysis.CSharp.PreciseAbstractFlowPass`1.MethodThisParameter">
@@ -26762,10 +26737,10 @@
         </member>
         <member name="P:Microsoft.CodeAnalysis.CSharp.CSharpSyntaxNode.SyntaxTree">
             <summary>
-            Returns a non-null SyntaxTree that owns this node.
-            If this node was created with an explicit non-null SyntaxTree, returns that tree.
-            Otherwise, if this node has a non-null parent, then returns the parent's SyntaxTree.
-            Otherwise, returns a newly created SyntaxTree rooted at this node, preserving this node's reference identity.
+            Returns a non-null <see cref="P:Microsoft.CodeAnalysis.CSharp.CSharpSyntaxNode.SyntaxTree"/> that owns this node.
+            If this node was created with an explicit non-null <see cref="P:Microsoft.CodeAnalysis.CSharp.CSharpSyntaxNode.SyntaxTree"/>, returns that tree.
+            Otherwise, if this node has a non-null parent, then returns the parent's <see cref="P:Microsoft.CodeAnalysis.CSharp.CSharpSyntaxNode.SyntaxTree"/>.
+            Otherwise, returns a newly created <see cref="P:Microsoft.CodeAnalysis.CSharp.CSharpSyntaxNode.SyntaxTree"/> rooted at this node, preserving this node's reference identity.
             </summary>
         </member>
         <member name="P:Microsoft.CodeAnalysis.CSharp.CSharpSyntaxNode.Parent">
@@ -27030,12 +27005,12 @@
             Preprocessor states corresponding to positions in <see cref="F:Microsoft.CodeAnalysis.CSharp.CSharpSyntaxTree.preprocessorStateChangePositions"/>.
             </summary>
         </member>
-        <member name="M:Microsoft.CodeAnalysis.CSharp.CSharpSyntaxTree.Create(Microsoft.CodeAnalysis.CSharp.CSharpSyntaxNode,System.String,Microsoft.CodeAnalysis.CSharp.CSharpParseOptions)">
+        <member name="M:Microsoft.CodeAnalysis.CSharp.CSharpSyntaxTree.Create(Microsoft.CodeAnalysis.CSharp.CSharpSyntaxNode,Microsoft.CodeAnalysis.CSharp.CSharpParseOptions,System.String,System.Text.Encoding)">
             <summary>
             Create a new syntax tree from a syntax node.
             </summary>
         </member>
-        <member name="M:Microsoft.CodeAnalysis.CSharp.CSharpSyntaxTree.CreateWithoutClone(Microsoft.CodeAnalysis.CSharp.CSharpSyntaxNode,System.String)">
+        <member name="M:Microsoft.CodeAnalysis.CSharp.CSharpSyntaxTree.CreateWithoutClone(Microsoft.CodeAnalysis.CSharp.CSharpSyntaxNode)">
             <summary>
             Internal helper for <see cref="T:Microsoft.CodeAnalysis.CSharp.CSharpSyntaxNode"/> class to create a new syntax tree rooted at the given root node.
             This method does not create a clone of the given root, but instead preserves it's reference identity.
@@ -27044,12 +27019,12 @@
             NOTE: Do not use this method elsewhere, instead use <see cref="M:SyntaxTree.Create"/> method for creating a syntax tree.
             </summary>
         </member>
-        <member name="M:Microsoft.CodeAnalysis.CSharp.CSharpSyntaxTree.ParseText(System.String,System.String,Microsoft.CodeAnalysis.CSharp.CSharpParseOptions,System.Threading.CancellationToken)">
+        <member name="M:Microsoft.CodeAnalysis.CSharp.CSharpSyntaxTree.ParseText(System.String,Microsoft.CodeAnalysis.CSharp.CSharpParseOptions,System.String,System.Text.Encoding,System.Threading.CancellationToken)">
             <summary>
             Produces a syntax tree by parsing the source text.
             </summary>
         </member>
-        <member name="M:Microsoft.CodeAnalysis.CSharp.CSharpSyntaxTree.ParseText(Microsoft.CodeAnalysis.Text.SourceText,System.String,Microsoft.CodeAnalysis.CSharp.CSharpParseOptions,System.Threading.CancellationToken)">
+        <member name="M:Microsoft.CodeAnalysis.CSharp.CSharpSyntaxTree.ParseText(Microsoft.CodeAnalysis.Text.SourceText,Microsoft.CodeAnalysis.CSharp.CSharpParseOptions,System.String,System.Threading.CancellationToken)">
             <summary>
             Produces a syntax tree by parsing the source text.
             </summary>
@@ -28874,17 +28849,17 @@
             </summary>
             <param name="name">The identifier name.</param>
         </member>
-        <member name="M:Microsoft.CodeAnalysis.CSharp.SyntaxFactory.SyntaxTree(Microsoft.CodeAnalysis.SyntaxNode,System.String,Microsoft.CodeAnalysis.ParseOptions)">
+        <member name="M:Microsoft.CodeAnalysis.CSharp.SyntaxFactory.SyntaxTree(Microsoft.CodeAnalysis.SyntaxNode,Microsoft.CodeAnalysis.ParseOptions,System.String,System.Text.Encoding)">
             <summary>
             Create a new syntax tree from a syntax node.
             </summary>
         </member>
-        <member name="M:Microsoft.CodeAnalysis.CSharp.SyntaxFactory.ParseSyntaxTree(System.String,System.String,Microsoft.CodeAnalysis.ParseOptions,System.Threading.CancellationToken)">
+        <member name="M:Microsoft.CodeAnalysis.CSharp.SyntaxFactory.ParseSyntaxTree(System.String,Microsoft.CodeAnalysis.ParseOptions,System.String,System.Text.Encoding,System.Threading.CancellationToken)">
             <summary>
             Produces a syntax tree by parsing the source text.
             </summary>
         </member>
-        <member name="M:Microsoft.CodeAnalysis.CSharp.SyntaxFactory.ParseSyntaxTree(Microsoft.CodeAnalysis.Text.SourceText,System.String,Microsoft.CodeAnalysis.ParseOptions,System.Threading.CancellationToken)">
+        <member name="M:Microsoft.CodeAnalysis.CSharp.SyntaxFactory.ParseSyntaxTree(Microsoft.CodeAnalysis.Text.SourceText,Microsoft.CodeAnalysis.ParseOptions,System.String,System.Threading.CancellationToken)">
             <summary>
             Produces a syntax tree by parsing the source text.
             </summary>
@@ -29010,7 +28985,7 @@
             used.</param>
             <param name="consumeFullText">True if extra tokens in the input should be treated as an error</param>
         </member>
-        <member name="M:Microsoft.CodeAnalysis.CSharp.SyntaxFactory.MakeIText(System.String,System.Int32)">
+        <member name="M:Microsoft.CodeAnalysis.CSharp.SyntaxFactory.MakeSourceText(System.String,System.Int32)">
             <summary>
             Helper method for wrapping a string in an SourceText.
             </summary>
