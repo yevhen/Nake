@@ -1,10 +1,9 @@
 ﻿#r "System.Xml"
 #r "System.Xml.Linq"
-#r "System.IO.Compression"
-#r "System.IO.Compression.FileSystem"
 
 #r "Packages\EasyHttp.1.6.58.0\lib\net40\EasyHttp.dll"
 #r "Packages\JsonFx.2.0.1209.2802\lib\net40\JsonFx.dll"
+#r "Packages\DotNetZip.1.9.2\lib\net20\Ionic.Zip.dll"
 
 using Nake;
 using Nake.FS;
@@ -12,13 +11,13 @@ using Nake.Cmd;
 
 using System;
 using System.IO;
-using System.IO.Compression;
 using System.Diagnostics;
 using System.Dynamic;
 using System.Collections.Generic;
 
 using EasyHttp.Http;
 using EasyHttp.Infrastructure;
+using Ionic.Zip;
 
 static string OutputPath = @"$NakeScriptDirectory$\Output";
 static string PackagePath = @"{OutputPath}\Package";
@@ -47,10 +46,12 @@ static Func<string> ArchiveFile = () => OutputPath + @"\{Version()}.zip";
 
     Delete(ArchiveFile());
 
-    using (ZipArchive archive = ZipFile.Open(ArchiveFile(), ZipArchiveMode.Create))
+    using (ZipFile archive = new ZipFile())
     {
         foreach (var file in files)
-            archive.CreateEntryFromFile(file, Path.GetFileName(file));
+            archive.AddFile(file, "");
+
+        archive.Save(ArchiveFile());
     }
 }
 
