@@ -23,12 +23,12 @@ static void EmitRoslynScriptingImage()
 				{
 					public static object GetSubmission(Session session, int id)
 					{
-						throw new NotImplementedException();
+						return null;
 					}
 
 					public static object SetSubmission(Session session, int slotIndex, object submission)
 					{
-						throw new NotImplementedException();
+						return null;
 					}
 				}
 			}")

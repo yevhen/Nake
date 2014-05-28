@@ -12,19 +12,19 @@ namespace Nake
         {
             Build(@"
             
-                static int counter = 0;
+                var counter = 0;
 
-                [Task] public static void Task1() 
+                [Task] void Task1() 
                 {
                     Env.Var[""Task1ExecutedCount""] = (++counter).ToString();
                 }
 
-                [Task] public static void Task2() 
+                [Task] void Task2() 
                 {
                     Task1();
                 }
 
-                [Task] public static void Task3() 
+                [Task] void Task3() 
                 {
                     Task1();
                     Task2();

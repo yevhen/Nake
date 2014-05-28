@@ -15,20 +15,20 @@ public const string RootPath = "$NakeScriptDirectory$";
 public const string OutputPath = RootPath + @"\Output";
 
 /// Builds sources in debug mode 
-[Task] public static void Default()
+[Task] void Default()
 {
     Build();
 }
 
 /// Wipeout all build output and temporary build files 
-[Task] public static void Clean(string path = OutputPath)
+[Task] void Clean(string path = OutputPath)
 {
     Delete(@"{path}\*.*|-:*.vshost.exe");
     RemoveDir(@"**\bin|**\obj|{path}\*|-:*.vshost.exe");    
 }
 
 /// Builds sources using specified configuration and output path
-[Task] public static void Build(string configuration = "Debug", string outputPath = OutputPath)
+[Task] void Build(string configuration = "Debug", string outputPath = OutputPath)
 {
     Clean(outputPath);
 
@@ -42,7 +42,7 @@ public const string OutputPath = RootPath + @"\Output";
 }
 
 /// Runs unit tests 
-[Task] public static void Test(string outputPath = OutputPath)
+[Task] void Test(string outputPath = OutputPath)
 {
     Build("Debug", outputPath);
 
@@ -51,7 +51,7 @@ public const string OutputPath = RootPath + @"\Output";
 }
 
 /// Builds official NuGet package 
-[Task] public static void Package()
+[Task] void Package()
 {
     var packagePath = OutputPath + @"\Package";
     var releasePath = packagePath + @"\Release";
@@ -74,7 +74,7 @@ public const string OutputPath = RootPath + @"\Output";
 }
 
 /// Installs dependencies (packages) from NuGet 
-[Task] public static void Install()
+[Task] void Install()
 {
     var packagesDir = @"{RootPath}\Packages";
 

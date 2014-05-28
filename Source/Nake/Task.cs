@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
@@ -21,8 +22,6 @@ namespace Nake
         public Task(IMethodSymbol symbol)
         {
             CheckSignature(symbol);
-            CheckPlacement(symbol);
-
             displayName = symbol.ToString();
         }
 
@@ -33,29 +32,10 @@ namespace Nake
 
         static void CheckSignature(IMethodSymbol symbol)
         {
-            if (!symbol.IsStatic ||
-                !symbol.ReturnsVoid ||
-                symbol.DeclaredAccessibility != Accessibility.Public ||
+            if (!symbol.ReturnsVoid ||                
                 symbol.IsGenericMethod ||
                 symbol.Parameters.Any(p => p.RefKind != RefKind.None || !TypeConverter.IsSupported(p.Type)))
                 throw new TaskSignatureViolationException(symbol.ToString());
-        }
-
-        static void CheckPlacement(ISymbol symbol)
-        {
-            var parentType = symbol.ContainingType;
-            
-            while (!parentType.IsScriptClass)
-            {
-                var isNamespace =
-                    parentType.IsStatic &&
-                    parentType.DeclaredAccessibility == Accessibility.Public;
-
-                if (!isNamespace)
-                    throw new TaskPlacementViolationException(symbol.ToString());
-
-                parentType = parentType.ContainingType;
-            }
         }
 
         public static bool IsAnnotated(ISymbol symbol)
@@ -63,7 +43,7 @@ namespace Nake
             return symbol.GetAttributes().SingleOrDefault(x => x.AttributeClass.Name == "TaskAttribute") != null;
         }
 
-        bool IsGlobal
+        internal bool IsGlobal
         {
             get { return !FullName.Contains("."); }
         }
@@ -122,7 +102,9 @@ namespace Nake
         public void Reflect(Assembly assembly)
         {
             reflected = assembly.GetType(DeclaringType)
-                .GetMethod(Name, BindingFlags.Static | BindingFlags.Public);
+                .GetMethod(Name, BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+
+            Debug.Assert(reflected != null);            
         }
 
         public void Invoke(TaskArgument[] arguments)

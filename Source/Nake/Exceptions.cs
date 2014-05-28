@@ -87,13 +87,6 @@ namespace Nake
         {}
     }
 
-    class DuplicateDependencyCallException : NakeException
-    {
-        public DuplicateDependencyCallException(Task task, string prerequisite)
-            : base("Cannot add duplicate pre-requisite '{0}' to task '{1}'", prerequisite, task)
-        {}
-    }
-
     class CyclicDependencyException : NakeException
     {
         public CyclicDependencyException(Task from, Task to, string via)
@@ -115,20 +108,6 @@ namespace Nake
         {}
     }
 
-    class TaskPlacementViolationException : NakeException
-    {
-        public TaskPlacementViolationException(string method)
-            : base("Bad task method placement: '{0}'. Tasks may only be declared in public static class hierarchy", method)
-        {}
-    }
-
-    class InvalidXmlDocumentationException : NakeException
-    {
-        public InvalidXmlDocumentationException(string method)
-            : base("Task '{0}' has invalid xml documentation", method)
-        {}
-    }
-
     class ExpressionReturnTypeIsVoidException : NakeException
     {
         public ExpressionReturnTypeIsVoidException(string expression, string diagnostics)
@@ -147,13 +126,6 @@ namespace Nake
     {
         public ExpressionSyntaxException(string expression, string diagnostics)
             : base("{0}: error CSX0102: Expression {{{1}}}' has invalid syntax", diagnostics, expression)
-        {}
-    }
-    
-    class InlineEnvironmentVariableUndefinedException : NakeException
-    {
-        public InlineEnvironmentVariableUndefinedException(string variable, string diagnostics)
-            : base("{0}: error CSX0103: Environment variable '{1}' is undefined", diagnostics, variable)
         {}
     }
 }

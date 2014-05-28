@@ -1,7 +1,4 @@
-﻿#r "System.Xml"
-#r "System.Xml.Linq"
-
-#r "Packages\EasyHttp.1.6.58.0\lib\net40\EasyHttp.dll"
+﻿#r "Packages\EasyHttp.1.6.58.0\lib\net40\EasyHttp.dll"
 #r "Packages\JsonFx.2.0.1209.2802\lib\net40\JsonFx.dll"
 #r "Packages\DotNetZip.1.9.2\lib\net20\Ionic.Zip.dll"
 
@@ -9,14 +6,12 @@ using Nake;
 using Nake.FS;
 using Nake.Cmd;
 
-using System;
-using System.IO;
 using System.Diagnostics;
 using System.Dynamic;
-using System.Collections.Generic;
 
 using EasyHttp.Http;
 using EasyHttp.Infrastructure;
+
 using Ionic.Zip;
 
 static string OutputPath = @"$NakeScriptDirectory$\Output";
@@ -25,11 +20,11 @@ static string PackagePath = @"{OutputPath}\Package";
 static string DebugOutputPath = @"{PackagePath}\Debug";
 static string ReleaseOutputPath = @"{PackagePath}\Release";
 
-static Func<string> PackageFile = () => PackagePath + @"\Nake.{Version()}.nupkg";
-static Func<string> ArchiveFile = () => OutputPath + @"\{Version()}.zip";
+Func<string> PackageFile = () => PackagePath + @"\Nake.{Version()}.nupkg";
+Func<string> ArchiveFile = () => OutputPath + @"\{Version()}.zip";
 
 /// Zips all binaries for standalone installation
-[Task] public static void Zip()
+[Task] void Zip()
 {
     var files = new FileSet
     {
@@ -56,14 +51,13 @@ static Func<string> ArchiveFile = () => OutputPath + @"\{Version()}.zip";
 }
 
 /// Publishes package to NuGet gallery
-[Task] public static void NuGet()
+[Task] void NuGet()
 {
     Exec(@"Tools\Nuget.exe push {PackageFile()} $NuGetApiKey$");
 }
 
-
 /// Publishes standalone version to GitHub releases
-[Task] public static void Standalone(bool beta, string branch, string description = null)
+[Task] void Standalone(bool beta, string branch, string description = null)
 {
     Zip();
 
@@ -71,7 +65,7 @@ static Func<string> ArchiveFile = () => OutputPath + @"\{Version()}.zip";
     Upload(release, ArchiveFile(), "application/zip");
 }
 
-static string CreateRelease(bool beta, string branch, string description)
+string CreateRelease(bool beta, string branch, string description)
 {
     dynamic data = new ExpandoObject();
 
@@ -86,7 +80,7 @@ static string CreateRelease(bool beta, string branch, string description)
                           data, HttpContentTypes.ApplicationJson).Location;
 }
 
-static void Upload(string release, string filePath, string contentType)
+void Upload(string release, string filePath, string contentType)
 {
     GitHub().Post(GetUploadUri(release) + "?name=" + Path.GetFileName(filePath), null, new List<FileData>
     {
@@ -98,13 +92,13 @@ static void Upload(string release, string filePath, string contentType)
     });
 }
 
-static string GetUploadUri(string release)
+string GetUploadUri(string release)
 {
     var body = GitHub().Get(release).DynamicBody;
     return ((string)body.upload_url).Replace("{{?name}}", "");
 }
 
-static HttpClient GitHub()
+HttpClient GitHub()
 {
     var client = new HttpClient();
 
@@ -115,7 +109,7 @@ static HttpClient GitHub()
     return client;
 }
 
-static string Version()
+string Version()
 {
     return FileVersionInfo
             .GetVersionInfo(@"{ReleaseOutputPath}\Nake.exe")

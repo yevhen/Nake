@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -78,8 +79,13 @@ namespace Nake
         {
             try
             {
+                object instance = null;
+
+                if (!method.IsStatic)
+                    instance = CreateInstance();                    
+
                 method.Invoke(
-                    null, BindingFlags.OptionalParamBinding, null,
+                    instance, BindingFlags.OptionalParamBinding, null,
                     values, CultureInfo.InvariantCulture);
             }
             catch (ArgumentException)
@@ -96,7 +102,16 @@ namespace Nake
             }
         }
 
-        protected bool Equals(TaskInvocation other)
+        object CreateInstance()
+        {
+            Debug.Assert(method.DeclaringType != null);
+
+            return task.IsGlobal 
+                    ? Activator.CreateInstance(method.DeclaringType, new object[] {null, null}) 
+                    : Activator.CreateInstance(method.DeclaringType);
+        }
+
+        bool Equals(TaskInvocation other)
         {
             return !values.Where((value, index) => value != other.values[index]).Any();
         }

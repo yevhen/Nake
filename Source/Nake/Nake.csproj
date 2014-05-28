@@ -93,8 +93,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="Scripting\Roslyn.Scripting.gen" />
     <EmbeddedResource Include="Scripting\Roslyn.Scripting.image" />
+    <None Include="Scripting\Roslyn.Scripting.gen" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Meta\Meta.csproj">

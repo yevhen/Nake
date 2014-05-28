@@ -28,54 +28,72 @@ namespace Nake
             return new[]
             {
                 TaskDeclaration(
-                    @"public static void NotAnnotated() {}", isTask: false
+                    @"void NotAnnotated() {}", isTask: false
                 ),                
 
                 TaskDeclaration(
-                    @"[Task] public static void GlobalTask() {}"
+                    @"[Task] void GlobalTask() {}"
                 ),
 
                 TaskDeclaration(
                     @" 
-                      public static class Namespace
+                      class Namespace
                       {
-                         [Task] public static void NamespaceTask(){}
+                         [Task] void NamespaceTask(){}
                       }
                     "
                 ),
 
                 TaskDeclaration(
                     @" 
-                    public static class Deep
+                    class Deep
                     {
-                        public static class Namespace
+                        class Namespace
                         {
-                            [Task] public static void Task(){}
+                            [Task] void Task(){}
                         }
                     }
                     "
                 ),
 
                 TaskDeclaration(
-                    @"[Task] public static void AllParametersAreConvertChangeTypeCompatible(
+                    @"[Task] static void StaticPrivate() {}"
+                ),                
+
+                TaskDeclaration(
+                    @"[Task] public static void StaticPublic() {}"
+                ),                
+
+                TaskDeclaration(
+                    @"
+                    class InternalClass
+                    {
+                        [Task] static void PrivateStaticTask(){}
+                    }
+                    "
+                ),
+
+                TaskDeclaration(
+                    @"
+                    class InternalClass
+                    {
+                        [Task] public static void PublicStaticTask(){}
+                    }
+                    "
+                ),
+
+                TaskDeclaration(
+                    @"[Task] void AllParametersAreConvertChangeTypeCompatible(
                         int p0, bool p1, string p3    
                     ){}"
                 ),
   
                 BadTaskDeclaration<TaskSignatureViolationException>(
-                    @"[Task] public static void HasIncompatibleParam(object o) {}"
+                    @"[Task] void HasIncompatibleParam(object o) {}"
                 ),
 
                 BadTaskDeclaration<TaskSignatureViolationException>(
-                    @"[Task] public static string NotVoid() { return null; }"
-                ),
-
-                BadTaskDeclaration<TaskSignatureViolationException>(
-                    @"[Task] static void NotPublic() {}"
-                ),                
-
-                BadTaskDeclaration<TaskSignatureViolationException>(
-                    @"[Task] public void NotStatic() {}"
+                    @"[Task] string NotVoid() { return null; }"
                 ),
 
                 BadTaskDeclaration<TaskSignatureViolationException>(
@@ -89,24 +107,6 @@ namespace Nake
                 BadTaskDeclaration<TaskSignatureViolationException>(
                     @"[Task] public static void HasRefParameters(ref int p) {}"
                 ),
-
-                BadTaskDeclaration<TaskPlacementViolationException>(
-                    @"
-                    public class NotStaticClass
-                    {
-                        [Task] public static void BadlyPlacedTask(){}
-                    }
-                    "
-                ),
-
-                BadTaskDeclaration<TaskPlacementViolationException>(
-                    @"
-                    class NotPublicStaticClass
-                    {
-                        [Task] public static void AlsoBadlyPlacedTask(){}
-                    }
-                    "
-                )
             };
         }
 
