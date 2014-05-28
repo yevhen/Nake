@@ -11,8 +11,8 @@ using System.Linq;
 using System.Xml.Linq;
 using System.Diagnostics;
 
-public const string RootPath = "$NakeScriptDirectory$";
-public const string OutputPath = RootPath + @"\Output";
+const string RootPath = "$NakeScriptDirectory$";
+const string OutputPath = RootPath + @"\Output";
 
 /// Builds sources in debug mode 
 [Task] void Default()

@@ -14,11 +14,11 @@ using EasyHttp.Infrastructure;
 
 using Ionic.Zip;
 
-static string OutputPath = @"$NakeScriptDirectory$\Output";
-static string PackagePath = @"{OutputPath}\Package";
+var OutputPath = @"$NakeScriptDirectory$\Output";
+var PackagePath = @"{OutputPath}\Package";
 
-static string DebugOutputPath = @"{PackagePath}\Debug";
-static string ReleaseOutputPath = @"{PackagePath}\Release";
+var DebugOutputPath = @"{PackagePath}\Debug";
+var ReleaseOutputPath = @"{PackagePath}\Release";
 
 Func<string> PackageFile = () => PackagePath + @"\Nake.{Version()}.nupkg";
 Func<string> ArchiveFile = () => OutputPath + @"\{Version()}.zip";

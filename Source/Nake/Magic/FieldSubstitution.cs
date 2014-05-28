@@ -80,13 +80,7 @@ namespace Nake.Magic
 
         public static bool Qualifies(IFieldSymbol symbol)
         {
-            var isAccessible =
-                symbol.DeclaredAccessibility == Accessibility.Public &&
-                (symbol.IsConst || symbol.IsStatic);
-
-            var isTypeSupported = TypeConverter.IsSupported(symbol.Type);
-
-            return isAccessible && isTypeSupported;
+            return TypeConverter.IsSupported(symbol.Type);
         }
     }
 }
