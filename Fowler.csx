@@ -1,44 +1,39 @@
 ﻿using Nake;
 using Nake.Log;
 
-using System;
-
-public const string RootPath = "$NakeScriptDirectory$";
-public const string OutputPath = RootPath + @"\Output";
-
 /// Compile the application code
-[Task] public static void Default()
+[Task] void Default()
 {
-	Compile();
+    Compile();
 }
 
 /// Take data configuration files and use them to generate the database structure and the code to access the database
-[Task] public static void CodeGen()
+[Task] void CodeGen()
 {
-	Message("do code gen stuff");
+    Message("do code gen stuff");
 }
 
 /// Compile the application code
-[Task] public static void Compile()
+[Task] void Compile()
 {
-	CodeGen();
+    CodeGen();
 
-	Message("do compile stuff");
+    Message("do compile stuff");
 }
 
 /// Load test data into the database
-[Task] public static void DataLoad()
+[Task] void DataLoad()
 {
-	CodeGen();
+    CodeGen();
 
-	Message("do data load stuff");
+    Message("do data load stuff");
 }
 
 /// Run the tests
-[Task] public static void Test()
+[Task] void Test()
 {
-	Compile();
-	DataLoad();
+    Compile();
+    DataLoad();
 
-	Message("run tests");
+    Message("run tests");
 }
