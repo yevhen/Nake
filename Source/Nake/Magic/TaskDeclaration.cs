@@ -35,15 +35,20 @@ namespace Nake.Magic
                             .Replace("///", "").Trim(' ').TrimEnd('\n').TrimEnd('\r');
         }
 
+        public string DisplayName
+        {
+            get { return FullName.ToLowerInvariant(); }
+        }
+
         public string FullName
         {
             get
             {
-                return DisplayName.Substring(0, DisplayName.IndexOf("(", StringComparison.Ordinal));
+                return Signature.Substring(0, Signature.IndexOf("(", StringComparison.Ordinal));
             }
         }
 
-        public string DisplayName
+        public string Signature
         {
             get
             {

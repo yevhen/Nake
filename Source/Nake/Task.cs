@@ -16,18 +16,18 @@ namespace Nake
         readonly List<Task> dependencies = new List<Task>();
         readonly HashSet<TaskInvocation> invocations = new HashSet<TaskInvocation>();
 
-        readonly string displayName;
+        readonly string signature;
         MethodInfo reflected;
 
         public Task(IMethodSymbol symbol)
         {
             CheckSignature(symbol);
-            displayName = symbol.ToString();
+            signature = symbol.ToString();
         }
 
         public Task(TaskDeclaration declaration)
         {
-            displayName = declaration.DisplayName;
+            signature = declaration.Signature;
         }
 
         static void CheckSignature(IMethodSymbol symbol)
@@ -60,7 +60,7 @@ namespace Nake
 
         public string FullName
         {
-            get { return DisplayName.Substring(0, DisplayName.IndexOf("(", StringComparison.Ordinal)); }
+            get { return Signature.Substring(0, Signature.IndexOf("(", StringComparison.Ordinal)); }
         }
 
         string DeclaringType
@@ -73,9 +73,9 @@ namespace Nake
             }
         }
 
-        public string DisplayName
+        public string Signature
         {
-            get { return displayName; }
+            get { return signature; }
         }
 
         public void AddDependency(Task dependency)
@@ -120,7 +120,7 @@ namespace Nake
 
         public override string ToString()
         {
-            return DisplayName;
+            return Signature;
         }
     }
 }

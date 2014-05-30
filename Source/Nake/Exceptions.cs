@@ -61,12 +61,12 @@ namespace Nake
     {
         public static DuplicateTaskException Create(Task existent, Task duplicate)
         {
-            return Create(existent.DisplayName, duplicate.DisplayName);
+            return Create(existent.Signature, duplicate.Signature);
         }
 
         public static DuplicateTaskException Create(TaskDeclaration existent, TaskDeclaration duplicate)
         {
-            return Create(existent.DisplayName, duplicate.DisplayName);
+            return Create(existent.Signature, duplicate.Signature);
         }
 
         static DuplicateTaskException Create(string existent, string duplicate)

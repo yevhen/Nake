@@ -150,19 +150,22 @@ namespace Nake
             }
 
             var filter = options.ShowTasksFilter;
-            var breadth = tasks.Max(x => x.FullName.Length);
+            var breadth = tasks.Max(x => x.DisplayName.Length);
 
             tasks = tasks
-                .OrderBy(x => x.FullName)
-                .Where(x => filter == null || x.FullName.ToLower().Contains(filter.ToLower())).ToArray();
+                .OrderBy(x => x.DisplayName)
+                .Where(x => filter == null || 
+                            x.DisplayName.Contains(filter.ToLower()) || 
+                            x.Summary.Contains(filter.ToLower()))
+                .ToArray();
 
             Console.WriteLine();
 
-            var defaultTask = tasks.SingleOrDefault(x => x.FullName.ToLower() == "default");
-            if (defaultTask != null)
-                PrintTask(defaultTask, breadth, ConsoleColor.Cyan);
+            var @default = tasks.SingleOrDefault(x => x.DisplayName == "default");
+            if (@default != null)
+                PrintTask(@default, breadth, ConsoleColor.Cyan);
 
-            foreach (var task in tasks.Where(x => x.FullName.ToLower() != "default"))
+            foreach (var task in tasks.Where(x => x.DisplayName != "default"))
                 PrintTask(task, breadth);
 
             Console.WriteLine();
@@ -174,7 +177,7 @@ namespace Nake
             Console.Write(Runner.Label(options.RunnerName) + " ");
 
             Console.ForegroundColor = color;
-            Console.Write(task.FullName.ToLower().PadRight(breadth + 2));
+            Console.Write(task.DisplayName.PadRight(breadth + 2));
 
             Console.ForegroundColor = ConsoleColor.DarkGray;
             Console.Write("# " + task.Summary);
