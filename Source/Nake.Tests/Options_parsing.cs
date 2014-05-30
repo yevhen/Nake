@@ -31,7 +31,7 @@ namespace Nake
         [Test]
         public void Named_arguments()
         {
-            var options = Parse("build configuration: Debug platform: AnyCPU");            
+            var options = Parse("build configuration=Debug platform=AnyCPU");
             Assert.That(options.Tasks.Count, Is.EqualTo(1));
             
             var task = options.Tasks[0];
@@ -52,7 +52,7 @@ namespace Nake
         [Test]
         public void Mixed_arguments()
         {
-            var options = Parse("build Debug platform: AnyCPU");            
+            var options = Parse("build Debug platform=AnyCPU");            
             Assert.That(options.Tasks.Count, Is.EqualTo(1));
             
             var task = options.Tasks[0];
@@ -73,7 +73,7 @@ namespace Nake
         public void Checks_argument_specification_order()
         {
             Assert.Throws<TaskArgumentOrderException>(
-                ()=> Parse("build configuration: Debug AnyCPU"));            
+                ()=> Parse("build configuration=Debug AnyCPU"));            
         }
 
         [Test]
@@ -89,7 +89,7 @@ namespace Nake
         [Test]
         public void Multiple_tasks_with_parameters()
         {
-            var options = Parse("build Debug ; package version: 1.0");
+            var options = Parse("build Debug ; package version=1.0");
             Assert.That(options.Tasks.Count, Is.EqualTo(2));
 
             Assert.That(options.Tasks[0].Name, Is.EqualTo("build"));
@@ -103,6 +103,24 @@ namespace Nake
             Assert.That(arguments[0].IsNamed());
             Assert.That(arguments[0].Name, Is.EqualTo("version"));
             Assert.That(arguments[0].Value, Is.EqualTo("1.0"));
+        }
+
+        [Test]
+        public void Handling_of_spaces_and_equal_sign_in_argument_values()
+        {
+            var options = Parse(@"build pathWithSpace=""C:\Space \f.exe"" pathWithEq=C:\Eq=\F=.exe");
+            Assert.That(options.Tasks.Count, Is.EqualTo(1));
+            Assert.That(options.Tasks[0].Name, Is.EqualTo("build"));
+
+            var argWithSpace = options.Tasks[0].Arguments[0];
+            Assert.That(argWithSpace.IsNamed());
+            Assert.That(argWithSpace.Name, Is.EqualTo("pathWithSpace"));
+            Assert.That(argWithSpace.Value, Is.EqualTo(@"C:\Space \f.exe"));
+
+            var argWithEqSign = options.Tasks[0].Arguments[1];
+            Assert.That(argWithEqSign.IsNamed());
+            Assert.That(argWithEqSign.Name, Is.EqualTo("pathWithEq"));
+            Assert.That(argWithEqSign.Value, Is.EqualTo(@"C:\Eq=\F=.exe"));
         }
 
         static Options Parse(string commandLine)

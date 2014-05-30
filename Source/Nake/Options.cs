@@ -78,7 +78,7 @@ namespace Nake
         public static void PrintUsage()
         {
             var banner = string.Format(
-                "Usage: {0} [options ...]  [VAR=VALUE ...]  [task ...]", Runner.Label());
+                "Usage: {0} [options ...] [VAR=VALUE ...] [task ...]", Runner.Label());
 
             Console.WriteLine(Environment.NewLine + banner);
             Console.WriteLine(Environment.NewLine + "Options:");
@@ -392,10 +392,16 @@ namespace Nake
                             arguments.Add(current = new Argument());
                         }
 
-                        if (arg.EndsWith(":"))
+                        if (arg.Contains("="))
                         {
-                            current.SetName(arg.Remove(arg.Length - 1));
-                            continue;
+                            var parts = arg.Split(new[] {"="}, StringSplitOptions.RemoveEmptyEntries);
+                            
+                            if (parts.Length > 1)
+                            {
+                                current.SetName(parts[0]);
+                                current.SetValue(string.Join("=", Slice(parts, 1)));
+                                continue;
+                            }
                         }
 
                         current.SetValue(arg);
