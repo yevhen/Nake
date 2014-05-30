@@ -123,6 +123,28 @@ namespace Nake
             Assert.That(argWithEqSign.Value, Is.EqualTo(@"C:\Eq=\F=.exe"));
         }
 
+        [Test]
+        public void Switch_style_boolean_parameters()
+        {
+            var options = Parse(@"build dev --beta --no-lock");
+            Assert.That(options.Tasks.Count, Is.EqualTo(1));
+            Assert.That(options.Tasks[0].Name, Is.EqualTo("build"));
+
+            var postionalArg = options.Tasks[0].Arguments[0];
+            Assert.That(postionalArg.IsPositional());
+            Assert.That(postionalArg.Value, Is.EqualTo("dev"));
+
+            var simpleSwitch = options.Tasks[0].Arguments[1];
+            Assert.That(simpleSwitch.IsNamed());
+            Assert.That(simpleSwitch.Name, Is.EqualTo("beta"));
+            Assert.That(simpleSwitch.Value, Is.EqualTo("true"));
+
+            var switchWithDashes = options.Tasks[0].Arguments[2];
+            Assert.That(switchWithDashes.IsNamed());
+            Assert.That(switchWithDashes.Name, Is.EqualTo("nolock"));
+            Assert.That(switchWithDashes.Value, Is.EqualTo("true"));
+        }
+
         static Options Parse(string commandLine)
         {
             return Options.Parse(SplitArgs(commandLine));

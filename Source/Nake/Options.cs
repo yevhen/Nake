@@ -404,6 +404,13 @@ namespace Nake
                             }
                         }
 
+                        if (arg.StartsWith("--"))
+                        {
+                            current.SetName(arg.Substring(2).Replace("-", ""));
+                            current.SetValue("true");
+                            continue;
+                        }
+
                         current.SetValue(arg);
                     }
                     
