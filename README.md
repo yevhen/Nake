@@ -105,6 +105,11 @@ class Azure                             //  namespace declarations cannot be use
         {}                              //  this task by its full path (ie, azure.queue.clean)
     }
 }
+
+[Task] void Default()                   //     running Nake without any options 
+{                                       //  will cause it to run the "default" task
+	Build();
+}
 ```
 
 ## Command line reference
