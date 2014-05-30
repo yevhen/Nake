@@ -43,14 +43,27 @@ namespace Nake.Magic
 
         public override void VisitMethodDeclaration(MethodDeclarationSyntax node)
         {
-            if (!TaskDeclaration.IsAnnotated(node))
+            var isTask = IsTask(node);
+            var isStep = IsStep(node);
+
+            if (!isTask && !isStep)
                 return;
             
-            var task = new TaskDeclaration(string.Join(".", scope.Reverse()), node);
+            var task = new TaskDeclaration(string.Join(".", scope.Reverse()), node, isStep);
             if (tasks.ContainsKey(task.FullName))
                 throw DuplicateTaskException.Create(tasks[task.FullName], task);
 
             tasks.Add(task.FullName, task);
+        }
+
+        static bool IsTask(MethodDeclarationSyntax node)
+        {
+            return node.AttributeLists.Any(x => x.Attributes.Any(y => y.Name.ToString() == "Task"));
+        }
+
+        static bool IsStep(MethodDeclarationSyntax node)
+        {
+            return node.AttributeLists.Any(x => x.Attributes.Any(y => y.Name.ToString() == "Step"));
         }
     }
 }

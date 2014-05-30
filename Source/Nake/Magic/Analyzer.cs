@@ -38,7 +38,10 @@ namespace Nake.Magic
         {
             var symbol = model.GetDeclaredSymbol(node);
 
-            if (!Task.IsAnnotated(symbol))
+            var isTask = IsTask(symbol);
+            var isStep = IsStep(symbol);
+
+            if (!isTask && !isStep)
             {
                 base.VisitMethodDeclaration(node);
                 return;
@@ -48,13 +51,23 @@ namespace Nake.Magic
 
             if (current == null)
             {
-                current = new Task(symbol);
+                current = new Task(symbol, isStep);
                 result.Add(symbol, current);
             }
 
             base.VisitMethodDeclaration(node);
             current = null;
         }
+
+        static bool IsTask(ISymbol symbol)
+        {
+            return symbol.GetAttributes().SingleOrDefault(x => x.AttributeClass.Name == "TaskAttribute") != null;
+        }     
+
+        static bool IsStep(ISymbol symbol)
+        {
+            return symbol.GetAttributes().SingleOrDefault(x => x.AttributeClass.Name == "StepAttribute") != null;
+        }     
 
         public override void VisitInvocationExpression(InvocationExpressionSyntax node)
         {
@@ -63,7 +76,7 @@ namespace Nake.Magic
             if (symbol == null)
                 return;
 
-            if (!Task.IsAnnotated(symbol))
+            if (!IsStep(symbol))
             {
                 base.VisitInvocationExpression(node);
                 return;
@@ -73,7 +86,7 @@ namespace Nake.Magic
 
             if (task == null)
             {
-                task = new Task(symbol);                
+                task = new Task(symbol, true);                
                 result.Add(symbol, task);
             }
             

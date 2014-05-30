@@ -24,7 +24,7 @@ Func<string> PackageFile = () => PackagePath + @"\Nake.{Version()}.nupkg";
 Func<string> ArchiveFile = () => OutputPath + @"\{Version()}.zip";
 
 /// Zips all binaries for standalone installation
-[Task] void Zip()
+[Step] void Zip()
 {
     var files = new FileSet
     {
@@ -51,13 +51,13 @@ Func<string> ArchiveFile = () => OutputPath + @"\{Version()}.zip";
 }
 
 /// Publishes package to NuGet gallery
-[Task] void NuGet()
+[Step] void NuGet()
 {
     Exec(@"Tools\Nuget.exe push {PackageFile()} $NuGetApiKey$");
 }
 
 /// Publishes standalone version to GitHub releases
-[Task] void Standalone(bool beta, string description = null)
+[Step] void Standalone(bool beta, string description = null)
 {
     Zip();
 

@@ -21,14 +21,14 @@ const string OutputPath = RootPath + @"\Output";
 }
 
 /// Wipeout all build output and temporary build files 
-[Task] void Clean(string path = OutputPath)
+[Step] void Clean(string path = OutputPath)
 {
     Delete(@"{path}\*.*|-:*.vshost.exe");
     RemoveDir(@"**\bin|**\obj|{path}\*|-:*.vshost.exe");    
 }
 
 /// Builds sources using specified configuration and output path
-[Task] void Build(string configuration = "Debug", string outputPath = OutputPath)
+[Step] void Build(string configuration = "Debug", string outputPath = OutputPath)
 {
     Clean(outputPath);
 
@@ -42,7 +42,7 @@ const string OutputPath = RootPath + @"\Output";
 }
 
 /// Runs unit tests 
-[Task] void Test(string outputPath = OutputPath)
+[Step] void Test(string outputPath = OutputPath)
 {
     Build("Debug", outputPath);
 
@@ -51,7 +51,7 @@ const string OutputPath = RootPath + @"\Output";
 }
 
 /// Builds official NuGet package 
-[Task] void Package()
+[Step] void Package()
 {
     var packagePath = OutputPath + @"\Package";
     var releasePath = packagePath + @"\Release";

@@ -2,19 +2,19 @@
 using Nake.Log;
 
 /// Compile the application code
-[Task] void Default()
+[Step] void Default()
 {
     Compile();
 }
 
 /// Take data configuration files and use them to generate the database structure and the code to access the database
-[Task] void CodeGen()
+[Step] void CodeGen()
 {
     Message("do code gen stuff");
 }
 
 /// Compile the application code
-[Task] void Compile()
+[Step] void Compile()
 {
     CodeGen();
 
@@ -22,7 +22,7 @@ using Nake.Log;
 }
 
 /// Load test data into the database
-[Task] void DataLoad()
+[Step] void DataLoad()
 {
     CodeGen();
 
@@ -30,7 +30,7 @@ using Nake.Log;
 }
 
 /// Run the tests
-[Task] void Test()
+[Step] void Test()
 {
     Compile();
     DataLoad();

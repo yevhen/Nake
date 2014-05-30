@@ -8,7 +8,7 @@ namespace Nake
     class Invoking_tasks : CodeFixture
     {
         [Test]
-        public void Task_will_only_be_executed_once()
+        public void Simple_task_invocation()
         {
             Build(@"
             
@@ -22,19 +22,42 @@ namespace Nake
                 [Task] void Task2() 
                 {
                     Task1();
-                }
-
-                [Task] void Task3() 
-                {
                     Task1();
-                    Task2();
                 }
             ");
 
-            Invoke("Task3");
+            Invoke("Task2");
 
-            var task1ExecutedCount = int.Parse(Env.Var["Task1ExecutedCount"]);
-            Assert.That(task1ExecutedCount, Is.EqualTo(1));
+            Assert.That(int.Parse(Env.Var["Task1ExecutedCount"]), Is.EqualTo(2));
+        }
+
+        [Test]
+        public void Step_will_only_be_executed_once()
+        {
+            Build(@"
+            
+                var counter = 0;
+
+                [Step] void Step1() 
+                {
+                    Env.Var[""Step1ExecutedCount""] = (++counter).ToString();
+                }
+
+                [Step] void Step2() 
+                {
+                    Step1();
+                }
+
+                [Step] void Step3() 
+                {
+                    Step1();
+                    Step2();
+                }
+            ");
+
+            Invoke("Step3");
+            
+            Assert.That(int.Parse(Env.Var["Step1ExecutedCount"]), Is.EqualTo(1));
         }
 
         [Test]
@@ -44,22 +67,21 @@ namespace Nake
             
                 static int counter = 0;
 
-                [Task] public static void Task1(string p) 
+                [Step] void Step1(string p) 
                 {
-                    Env.Var[""Task1ExecutedCount""] = (++counter).ToString();
+                    Env.Var[""Step1ExecutedCount""] = (++counter).ToString();
                 }
 
-                [Task] public static void Task2() 
+                [Step] void Step2() 
                 {
-                    Task1(""first time"");
-                    Task1(""second time"");
+                    Step1(""first time"");
+                    Step1(""second time"");
                 }
             ");
 
-            Invoke("Task2");
+            Invoke("Step2");
 
-            var task1ExecutedCount = int.Parse(Env.Var["Task1ExecutedCount"]);
-            Assert.That(task1ExecutedCount, Is.EqualTo(2));
+            Assert.That(int.Parse(Env.Var["Step1ExecutedCount"]), Is.EqualTo(2));
         }
 
         [Test]
@@ -67,7 +89,7 @@ namespace Nake
         {
             Build(@"
             
-                [Task] public static void Task() 
+                [Task] void Task() 
                 {
                     throw new ApplicationException(""crash"");
                 }

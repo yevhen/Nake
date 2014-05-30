@@ -8,22 +8,19 @@ namespace Nake.Magic
 {
     public class TaskDeclaration
     {
-        public static bool IsAnnotated(MethodDeclarationSyntax node)
-        {
-            return node.AttributeLists.Any(x => x.Attributes.Any(y => y.Name.ToString() == "Task"));
-        }
-
         readonly string path;
         readonly MethodDeclarationSyntax declaration;
+        readonly bool step;
         readonly string comments = "";
 
-        public TaskDeclaration(string path, MethodDeclarationSyntax declaration)
+        public TaskDeclaration(string path, MethodDeclarationSyntax declaration, bool step)
         {
             Debug.Assert(path != null);
             Debug.Assert(declaration != null);
 
             this.path = path;
             this.declaration = declaration;
+            this.step = step;
 
             var documentation = declaration
                 .DescendantNodes(descendIntoTrivia: true)
@@ -33,6 +30,11 @@ namespace Nake.Magic
             if (documentation != null)
                 comments = documentation.Content.ToString()
                             .Replace("///", "").Trim(' ').TrimEnd('\n').TrimEnd('\r');
+        }
+
+        public bool IsStep
+        {
+            get { return step; }
         }
 
         public string DisplayName

@@ -17,17 +17,20 @@ namespace Nake
         readonly HashSet<TaskInvocation> invocations = new HashSet<TaskInvocation>();
 
         readonly string signature;
+        readonly bool step;
         MethodInfo reflected;
 
-        public Task(IMethodSymbol symbol)
+        public Task(IMethodSymbol symbol, bool step)
         {
             CheckSignature(symbol);
             signature = symbol.ToString();
+            this.step = step;
         }
 
         public Task(TaskDeclaration declaration)
         {
             signature = declaration.Signature;
+            step = declaration.IsStep;
         }
 
         static void CheckSignature(IMethodSymbol symbol)
@@ -36,12 +39,7 @@ namespace Nake
                 symbol.IsGenericMethod ||
                 symbol.Parameters.Any(p => p.RefKind != RefKind.None || !TypeConverter.IsSupported(p.Type)))
                 throw new TaskSignatureViolationException(symbol.ToString());
-        }
-
-        public static bool IsAnnotated(ISymbol symbol)
-        {
-            return symbol.GetAttributes().SingleOrDefault(x => x.AttributeClass.Name == "TaskAttribute") != null;
-        }
+        }  
 
         internal bool IsGlobal
         {
@@ -111,9 +109,12 @@ namespace Nake
         {
             var invocation = new TaskInvocation(this, reflected, arguments);
 
-            var alreadyInvoked = !invocations.Add(invocation);
-            if (alreadyInvoked)
-                return;
+            if (step)
+            {
+                var alreadyInvoked = !invocations.Add(invocation);
+                if (alreadyInvoked)
+                    return;
+            }
 
             invocation.Invoke();
         }       
