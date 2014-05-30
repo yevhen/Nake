@@ -4,7 +4,7 @@ Nake is a magic task runner tool for .NET. It's a hybrid of Shovel and Rake. The
 
 ### How to install
 
-There multiple ways in which Nake could be installed. You can install it by using NuGet [package](https://www.nuget.org/packages/Nake), or you can install it by downloading a [standalone](https://github.com/yevhen/Nake/releases) executable from GitHub releases page, and of course you can always build it from sources. 
+There multiple ways in which Nake could be installed. You can install it by using NuGet [package](https://www.nuget.org/packages/Nake), or you can get it by downloading a [standalone](https://github.com/yevhen/Nake/releases) executable from GitHub releases page, and of course you can always build it from sources. 
 
 To install Nake via NuGet, run this command in NuGet package manager console:
 
@@ -60,11 +60,6 @@ var who = "world";                      //  with the values passed from the comm
 	    WriteLine("{what},{whom}{emphasis}");
 }                                   
 
-[Task] int Compute(int x, int y)    	//      tasks can have return values (functions)
-{					                    //  (returned value will be ToString()'ed to console)
-    return Math.Pow(x, y);	
-}                                   
-
 [Step] void Clean()   			        //      Steps are Tasks with 'run once' semantics      
 {					                    //  (the foundation of any popular build automation tool)
     Delete("{OutputPath}\*.*");	
@@ -96,8 +91,11 @@ var who = "world";                      //  with the values passed from the comm
 var apiKey = "$NugetKey$";              //  $var$ is the shortcut syntax for getting 
 Push(apiKey, "{PackagePath}");          //      value of environment variable
 
-Write("$NakeStartupDirectory$");        //  these 2 predefined environment variables
-Write("$NakeScriptDirectory$");         //      are automatically created by Nake
+Write("$NakeStartupDirectory$");        //  these special environment variables
+Write("$NakeScriptDirectory$");         //   are automatically created by Nake
+
+Write("{{esc}}");                       //  will simply print {esc} (no string interpolation)
+Write("$$esc$$");                       //  will simply print $esc$ (no env variable inlining)
 
 class Azure                             //  namespace declarations cannot be used with scripts,
 {                                       //  but could be easily emulated with class declarations
@@ -130,10 +128,6 @@ Options:
 ## Tips & tricks
 
 ```cs
-
-Write("{{esc}}");                       //  will simply print {esc} (no string interpolation)
-Write("$$esc$$");                       //  will simply print $esc$ (no env variable inlining)
-
 class Azure
 {                                       
     StorageAccount account;
