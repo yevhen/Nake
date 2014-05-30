@@ -33,7 +33,7 @@ namespace Nake
             return magic.Apply(substitutions, debug);
         }
 
-        ScriptCompilationOutput Compile(string code)
+        CompiledScript Compile(string code)
         {
             var script = new Script();
 
@@ -52,19 +52,19 @@ namespace Nake
 
     class PixieDust
     {
-        readonly ScriptCompilationOutput output;
+        readonly CompiledScript script;
 
-        public PixieDust(ScriptCompilationOutput output)
+        public PixieDust(CompiledScript script)
         {
-            this.output = output;
+            this.script = script;
         }
 
         public BuildOutput Apply(IDictionary<string, string> substitutions, bool debug)
         {
-            var analyzer = new Analyzer(output.Compilation, substitutions);
+            var analyzer = new Analyzer(script.Compilation, substitutions);
             var analyzed = analyzer.Analyze();
 
-            var rewriter = new Rewriter(output.Compilation, analyzed);
+            var rewriter = new Rewriter(script.Compilation, analyzed);
             var rewritten = rewriter.Rewrite();
 
             byte[] assembly;
@@ -77,7 +77,7 @@ namespace Nake
 
             return new BuildOutput(
                 analyzed.Tasks.ToArray(), 
-                output.References.ToArray(), 
+                script.References.ToArray(), 
                 rewriter.Captured.ToArray(), 
                 assembly, symbols
             );            

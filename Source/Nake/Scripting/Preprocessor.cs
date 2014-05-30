@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace Nake.Scripting
 {
@@ -28,9 +29,9 @@ namespace Nake.Scripting
 
         string scriptDirectoryPath = "";
 
-        public PreprocessorResult Process(FileInfo file)
+        public PreprocessedScript Process(FileInfo file)
         {
-            var result = new PreprocessorResult();
+            var result = new PreprocessedScript();
             
             scriptDirectoryPath = file.DirectoryName;
             ParseFile(file.FullName, result);
@@ -38,7 +39,7 @@ namespace Nake.Scripting
             return result;
         }
 
-        private void ParseFile(string path, PreprocessorResult result)
+        private void ParseFile(string path, PreprocessedScript result)
         {
             var fileLines = File.ReadAllLines(path).ToList();
 
@@ -64,7 +65,7 @@ namespace Nake.Scripting
             fileLines.Insert(bodyIndex, directiveLine);
         }
 
-        private void ProcessLine(string currentScriptFilePath, PreprocessorResult result, string line, bool isBeforeCode)
+        private void ProcessLine(string currentScriptFilePath, PreprocessedScript result, string line, bool isBeforeCode)
         {
             if (IsUsingLine(line))
             {
@@ -89,7 +90,8 @@ namespace Nake.Scripting
                         return;
                     }
 
-                    result.References.Add(new AssemblyNameReference(currentScriptFilePath, reference));
+                    result.References.Add(
+                        new AssemblyNameReference(currentScriptFilePath, reference));
                 }
 
                 return;
@@ -135,6 +137,41 @@ namespace Nake.Scripting
         public static string GetPath(string replaceString, string line)
         {
             return line.Trim(' ').Replace(replaceString, string.Empty).Replace("\"", string.Empty).Replace(";", string.Empty);
+        }
+    }
+
+    class PreprocessedScript
+    {
+        public readonly HashSet<string> Namespaces = new HashSet<string>();
+        public readonly HashSet<AssemblyNameReference> References = new HashSet<AssemblyNameReference>();
+        public readonly HashSet<AssemblyAbsoluteReference> AbsoluteReferences = new HashSet<AssemblyAbsoluteReference>();
+        public readonly List<string> LoadedScripts = new List<string>();
+        public readonly List<string> Body = new List<string>();
+
+        public string Code()
+        {
+            var code = new StringBuilder();
+
+            AppendUsings(code);
+            AppendBody(code);
+
+            return code.ToString();
+        }
+
+        void AppendUsings(StringBuilder code)
+        {
+            var lines = Namespaces.Distinct().Select(item => String.Format("using {0};", item)).ToList();
+
+            if (lines.Count == 0)
+                return;
+
+            code.AppendLine(String.Join(Environment.NewLine, lines));
+            code.AppendLine(); // Insert a blank separator line
+        }
+
+        void AppendBody(StringBuilder code)
+        {
+            code.Append(String.Join(Environment.NewLine, Body));
         }
     }
 

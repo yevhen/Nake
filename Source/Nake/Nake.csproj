@@ -80,7 +80,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scripting\GAC.cs" />
     <Compile Include="Scripting\Preprocessor.cs" />
-    <Compile Include="Scripting\PreprocessorResult.cs" />
     <Compile Include="Engine.cs" />
     <Compile Include="Scripting\Roslyn.Scripting.Assembly.cs" />
     <Compile Include="Scripting\Script.cs" />

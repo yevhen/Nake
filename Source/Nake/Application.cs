@@ -37,19 +37,19 @@ namespace Nake
             if (options.TraceEnabled)
                 SetTrace();
 
-            var scriptFile = FindScriptFile();
-            var preprocessed = Preprocess(scriptFile);
+            var file   = Find();
+            var script = Preprocess(file);
             
-            var code = preprocessed.Code();
-            var declarations = ScanTaskDeclarations(code);
+            var code = script.Code();
+            var declarations = Scan(code);
 
             if (options.ShowTasks)
                 ShowTasks(declarations);
 
             OverrideEnvironmentVariables();
-            DefineNakeEnvironmentVariables(scriptFile);
+            DefineNakeEnvironmentVariables(file);
 
-            var tasks = Build(scriptFile, preprocessed, code, declarations);
+            var tasks = Build(file, script, code, declarations);
             Register(tasks);
 
             Invoke();
@@ -75,7 +75,7 @@ namespace Nake
             Env.Var["NakeStartupDirectory"] = Location.CurrentDirectory();
         }
 
-        FileInfo FindScriptFile()
+        FileInfo Find()
         {
             if (options.ScriptFile != null)
             {
@@ -97,7 +97,7 @@ namespace Nake
             return new FileInfo(defaultScriptFile);
         }
 
-        IEnumerable<Task> Build(FileInfo file, PreprocessorResult script, string code, IEnumerable<TaskDeclaration> declarations)
+        IEnumerable<Task> Build(FileInfo file, PreprocessedScript script, string code, IEnumerable<TaskDeclaration> declarations)
         {
             var engine = new Engine(
                 script.References, 
@@ -186,14 +186,14 @@ namespace Nake
             Console.WriteLine();
         }
 
-        TaskDeclaration[] ScanTaskDeclarations(string code)
+        TaskDeclaration[] Scan(string code)
         {
             return new TaskDeclarationScanner().Scan(code, options.ShowTasks).ToArray();
         }
 
-        static PreprocessorResult Preprocess(FileInfo scriptFile)
+        static PreprocessedScript Preprocess(FileInfo file)
         {
-            return new Preprocessor().Process(scriptFile);
+            return new Preprocessor().Process(file);
         }
 
         void Invoke()

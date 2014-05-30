@@ -55,7 +55,7 @@ namespace Nake.Scripting
                 NakeReferences.Concat(DefaultReferences.Select(x => x.Value)));
         }
 
-        public ScriptCompilationOutput Compile(string code)
+        public CompiledScript Compile(string code)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(code, 
                 new CSharpParseOptions(kind: SourceCodeKind.Script), 
@@ -76,7 +76,7 @@ namespace Nake.Scripting
                 throw new NakeException("Script compilation failure! See diagnostics below." + Environment.NewLine +
                                         string.Join("\n", diagnostics.Where(x => x.Severity == DiagnosticSeverity.Error)));
 
-            return new ScriptCompilationOutput(references.Select(x => new AssemblyReference(x)), compilation);
+            return new CompiledScript(references.Select(x => new AssemblyReference(x)), compilation);
         }
 
         public void AddReference(AssemblyNameReference reference)
@@ -117,12 +117,12 @@ namespace Nake.Scripting
         }
     }
 
-    class ScriptCompilationOutput
+    class CompiledScript
     {
         public readonly IEnumerable<AssemblyReference> References;
         public readonly CSharpCompilation Compilation;
 
-        public ScriptCompilationOutput(IEnumerable<AssemblyReference> references, CSharpCompilation compilation)
+        public CompiledScript(IEnumerable<AssemblyReference> references, CSharpCompilation compilation)
         {
             References = references;
             Compilation = compilation;
