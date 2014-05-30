@@ -57,20 +57,20 @@ Func<string> ArchiveFile = () => OutputPath + @"\{Version()}.zip";
 }
 
 /// Publishes standalone version to GitHub releases
-[Task] void Standalone(string branch, bool beta, string description = null)
+[Task] void Standalone(bool beta, string description = null)
 {
     Zip();
 
-    string release = CreateRelease(branch, beta, description);
+    string release = CreateRelease(beta, description);
     Upload(release, ArchiveFile(), "application/zip");
 }
 
-string CreateRelease(string branch, bool beta, string description)
+string CreateRelease(bool beta, string description)
 {
     dynamic data = new ExpandoObject();
 
     data.tag_name = data.name = Version();
-    data.target_commitish = branch;
+    data.target_commitish = beta ? "dev" : "master";
     data.prerelease = beta;
     data.body = !string.IsNullOrEmpty(description) 
                 ? description 
