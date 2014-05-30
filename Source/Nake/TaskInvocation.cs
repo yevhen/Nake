@@ -9,12 +9,14 @@ namespace Nake
 {
     class TaskInvocation
     {
+        readonly object script;
         readonly Task task;
         readonly MethodInfo method;
         readonly object[] values;
 
-        public TaskInvocation(Task task, MethodInfo method, IList<TaskArgument> arguments)
+        public TaskInvocation(object script, Task task, MethodInfo method, IList<TaskArgument> arguments)
         {
+            this.script = script;
             this.task = task;
             this.method = method;
 
@@ -79,13 +81,13 @@ namespace Nake
         {
             try
             {
-                object instance = null;
+                object host = null;
 
                 if (!method.IsStatic)
-                    instance = CreateInstance();                    
+                    host = GetMethodHost();                    
 
                 method.Invoke(
-                    instance, BindingFlags.OptionalParamBinding, null,
+                    host, BindingFlags.OptionalParamBinding, null,
                     values, CultureInfo.InvariantCulture);
             }
             catch (ArgumentException)
@@ -102,13 +104,10 @@ namespace Nake
             }
         }
 
-        object CreateInstance()
+        object GetMethodHost()
         {
             Debug.Assert(method.DeclaringType != null);
-
-            return task.IsGlobal 
-                    ? Activator.CreateInstance(method.DeclaringType, new object[] {null, null}) 
-                    : Activator.CreateInstance(method.DeclaringType);
+            return task.IsGlobal ? script : Activator.CreateInstance(method.DeclaringType);
         }
 
         bool Equals(TaskInvocation other)

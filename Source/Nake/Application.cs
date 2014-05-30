@@ -49,8 +49,8 @@ namespace Nake
             OverrideEnvironmentVariables();
             DefineNakeEnvironmentVariables(file);
 
-            var tasks = Build(file, script, code, declarations);
-            Register(tasks);
+            var result = Build(file, script, code, declarations);
+            Initialize(result);
 
             Invoke();
         }
@@ -97,7 +97,7 @@ namespace Nake
             return new FileInfo(defaultScriptFile);
         }
 
-        IEnumerable<Task> Build(FileInfo file, PreprocessedScript script, string code, IEnumerable<TaskDeclaration> declarations)
+        BuildResult Build(FileInfo file, PreprocessedScript script, string code, IEnumerable<TaskDeclaration> declarations)
         {
             var engine = new Engine(
                 script.References, 
@@ -109,11 +109,11 @@ namespace Nake
                 engine, file, declarations.Select(x => new Task(x)).ToArray()              
             );
 
-            var output = cachingEngine.Build(
+            var result = cachingEngine.Build(
                 code, VariableSubstitutions(), options.DebugScript
             );
 
-            return output.Tasks;
+            return result;
         }
 
         Dictionary<string, string> VariableSubstitutions()
@@ -121,10 +121,9 @@ namespace Nake
             return options.Variables.ToDictionary(x => x.Name, x => x.Value);
         }
 
-        static void Register(IEnumerable<Task> tasks)
+        static void Initialize(BuildResult result)
         {
-            foreach (var task in tasks)
-                TaskRegistry.Global.Register(task);
+            TaskRegistry.Global = new TaskRegistry(result);
         }
 
         static void ShowHelp()
@@ -204,14 +203,7 @@ namespace Nake
                 tasks.Add(Options.Task.Default);
 
             foreach (var task in tasks)
-            {
-                var found = TaskRegistry.Global.Find(task.Name);
-
-                if (found == null)
-                    throw new TaskNotFoundException(task.Name);
-
-                found.Invoke(task.Arguments);
-            }
+                TaskRegistry.Invoke(task.Name, task.Arguments);
         }
         
         static void SetQuiet()

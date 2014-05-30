@@ -11,7 +11,7 @@ namespace Nake
 {
     class Task
     {
-        const string ScriptClass = "Script";
+        internal const string ScriptClass = "Script";
 
         readonly List<Task> dependencies = new List<Task>();
         readonly HashSet<TaskInvocation> invocations = new HashSet<TaskInvocation>();
@@ -105,9 +105,9 @@ namespace Nake
             Debug.Assert(reflected != null);            
         }
 
-        public void Invoke(TaskArgument[] arguments)
+        public void Invoke(object script, TaskArgument[] arguments)
         {
-            var invocation = new TaskInvocation(this, reflected, arguments);
+            var invocation = new TaskInvocation(script, this, reflected, arguments);
 
             if (step)
             {

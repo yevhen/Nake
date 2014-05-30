@@ -22,7 +22,7 @@ namespace Nake
             this.tasks = tasks;
         }
 
-        public BuildOutput Build(string code, IDictionary<string, string> substitutions, bool debug)
+        public BuildResult Build(string code, IDictionary<string, string> substitutions, bool debug)
         {
             var key = new CacheKey(script, code, substitutions, debug);
 
@@ -106,7 +106,7 @@ namespace Nake
             return Convert.ToBase64String(sha1.ComputeHash(Encoding.UTF8.GetBytes(s)));
         }
 
-        public BuildOutput Find(Task[] tasks)
+        public BuildResult Find(Task[] tasks)
         {
             if (!CachedAssemblyExists())
                 return null;
@@ -118,7 +118,7 @@ namespace Nake
             var assembly = ReadAssembly();
             var symbols = ReadSymbols();
 
-            return new BuildOutput(tasks, references, null, assembly, debug ? symbols : null);
+            return new BuildResult(tasks, references, null, assembly, debug ? symbols : null);
         }
 
         bool CachedAssemblyExists()
@@ -160,14 +160,14 @@ namespace Nake
             return debug && File.Exists(PdbFile) ? File.ReadAllBytes(PdbFile) : null;
         }
 
-        public void Store(BuildOutput output)
+        public void Store(BuildResult result)
         {
             CreateCacheFolder();
 
-            WriteReferences(output);
-            WriteVariables(output);
-            WriteAssembly(output);
-            WriteSymbols(output);
+            WriteReferences(result);
+            WriteVariables(result);
+            WriteAssembly(result);
+            WriteSymbols(result);
         }
 
         void CreateCacheFolder()
@@ -175,14 +175,14 @@ namespace Nake
             Directory.CreateDirectory(CacheFolder);
         }
 
-        void WriteReferences(BuildOutput output)
+        void WriteReferences(BuildResult result)
         {
-            File.WriteAllLines(ReferencesFile, output.References.Select(x => x.FullPath));
+            File.WriteAllLines(ReferencesFile, result.References.Select(x => x.FullPath));
         }
 
-        void WriteVariables(BuildOutput output)
+        void WriteVariables(BuildResult result)
         {
-            var variables = output.Variables
+            var variables = result.Variables
                 .OrderBy(x => x.Name)
                 .ToArray();
 
@@ -192,15 +192,15 @@ namespace Nake
             File.WriteAllLines(CapturedVariablesFile, new[]{names, values});
         }
 
-        void WriteAssembly(BuildOutput output)
+        void WriteAssembly(BuildResult result)
         {
-            File.WriteAllBytes(AssemblyFile, output.Assembly);
+            File.WriteAllBytes(AssemblyFile, result.AssemblyBytes);
         }
 
-        void WriteSymbols(BuildOutput output)
+        void WriteSymbols(BuildResult result)
         {
-            if (output.Symbols != null)
-                File.WriteAllBytes(PdbFile, output.Symbols);
+            if (result.SymbolBytes != null)
+                File.WriteAllBytes(PdbFile, result.SymbolBytes);
         }
     }
 }

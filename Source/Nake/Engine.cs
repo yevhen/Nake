@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Emit;
@@ -27,7 +28,7 @@ namespace Nake
             this.namespaces = namespaces ?? Enumerable.Empty<string>();
         }
 
-        public BuildOutput Build(string code, IDictionary<string, string> substitutions, bool debug)
+        public BuildResult Build(string code, IDictionary<string, string> substitutions, bool debug)
         {
             var magic = new PixieDust(Compile(code));
             return magic.Apply(substitutions, debug);
@@ -59,7 +60,7 @@ namespace Nake
             this.script = script;
         }
 
-        public BuildOutput Apply(IDictionary<string, string> substitutions, bool debug)
+        public BuildResult Apply(IDictionary<string, string> substitutions, bool debug)
         {
             var analyzer = new Analyzer(script.Compilation, substitutions);
             var analyzed = analyzer.Analyze();
@@ -75,7 +76,7 @@ namespace Nake
             else
                 Emit(rewritten, out assembly);
 
-            return new BuildOutput(
+            return new BuildResult(
                 analyzed.Tasks.ToArray(), 
                 script.References.ToArray(), 
                 rewriter.Captured.ToArray(), 
@@ -118,15 +119,16 @@ namespace Nake
         }
     }
 
-    class BuildOutput
+    class BuildResult
     {
         public readonly Task[] Tasks;
         public readonly AssemblyReference[] References;
         public readonly EnvironmentVariable[] Variables;
-        public readonly byte[] Assembly;
-        public readonly byte[] Symbols;
+        public readonly Assembly Assembly;
+        public readonly byte[] AssemblyBytes;
+        public readonly byte[] SymbolBytes;
 
-        public BuildOutput(
+        public BuildResult(
             Task[] tasks,
             AssemblyReference[] references,
             EnvironmentVariable[] variables,
@@ -135,25 +137,29 @@ namespace Nake
         {
             Tasks = tasks;
             References = references;
-            Assembly = assembly;
-            Symbols = symbols;
+            AssemblyBytes = assembly;
+            SymbolBytes = symbols;
             Variables = variables;
-            Reflect(tasks);
+            Assembly = Load();
+            Reflect();
         }
 
-        void Reflect(IEnumerable<Task> tasks)
+        Assembly Load()
         {
             AssemblyResolver.Register();
 
             foreach (var reference in References)
                 AssemblyResolver.Add(reference);
 
-            var assembly = Symbols != null
-                ? System.Reflection.Assembly.Load(Assembly, Symbols)
-                : System.Reflection.Assembly.Load(Assembly);
+            return SymbolBytes != null
+                       ? Assembly.Load(AssemblyBytes, SymbolBytes)
+                       : Assembly.Load(AssemblyBytes);
+        }
 
-            foreach (var task in tasks)
-                task.Reflect(assembly);
+        void Reflect()
+        {
+            foreach (var task in Tasks)
+                task.Reflect(Assembly);
         }
     }
 }

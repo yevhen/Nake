@@ -133,5 +133,27 @@ namespace Nake
                 new TaskArgument("arg4", "1")
             );
         }
+
+        [Test]
+        public void Script_level_code_should_be_invoked_only_once()
+        {
+            Build(@"
+            
+                static int counter = 0;
+                counter++;
+                counter++;
+
+                [Task] void Task() 
+                {
+                    Env.Var[""counter""] = counter.ToString();
+                }
+            ");
+
+            Invoke("Task");
+            Invoke("Task");
+            Invoke("Task");
+
+            Assert.That(int.Parse(Env.Var["counter"]), Is.EqualTo(2));
+        }
     }
 }

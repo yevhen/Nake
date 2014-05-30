@@ -1,6 +1,7 @@
 using System.Collections.Generic;
+using System.Linq;
+
 using NUnit.Framework;
-using Nake.Scripting;
 
 namespace Nake
 {
@@ -12,29 +13,20 @@ namespace Nake
             TaskRegistry.Global = new TaskRegistry();
         }
 
-        [TearDown]
-        public void TearDown()
-        {
-            TaskRegistry.Invoker = (task, args) => task.Invoke(args);
-        }
-
         protected static void Invoke(string taskName, params TaskArgument[] args)
         {
-            Find(taskName).Invoke(args);
+            TaskRegistry.Invoke(taskName, args);
         }
 
         protected static void Build(string code, Dictionary<string, string> substitutions = null)
         {
             var engine = new Engine();
             
-            var output = engine.Build(
+            var result = engine.Build(
                 code, substitutions ?? new Dictionary<string, string>(), false
             );
 
-            foreach (var task in output.Tasks)
-            {
-                TaskRegistry.Global.Register(task);    
-            }
+            TaskRegistry.Global = new TaskRegistry(result);
         }
 
         protected static IEnumerable<Task> Tasks
