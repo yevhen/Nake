@@ -3,8 +3,8 @@
 
 using Nake;
 using Nake.FS;
-using Nake.Cmd;
 using Nake.Log;
+using Nake.Run;
 
 using System.IO;
 using System.Linq;
@@ -28,17 +28,12 @@ const string OutputPath = RootPath + @"\Output";
 }
 
 /// Builds sources using specified configuration and output path
-[Step] void Build(string configuration = "Debug", string outputPath = OutputPath)
+[Step] void Build(string config = "Debug", string outDir = OutputPath)
 {
-    Clean(outputPath);
+    Clean(outDir);
 
-    MSBuild
-        .Projects("Nake.sln")
-            .Property("Platform", "Any CPU")
-            .Property("Configuration", configuration)
-            .Property("OutDir", outputPath)
-            .Property("ReferencePath", outputPath)
-    .Build();
+    MSBuild("Nake.sln", 
+            "Configuration={config};OutDir={outDir};ReferencePath={outDir}");
 }
 
 /// Runs unit tests 
@@ -46,8 +41,8 @@ const string OutputPath = RootPath + @"\Output";
 {
     Build("Debug", outputPath);
 
-    string tests = new FileSet(@"{outputPath}\*.Tests.dll");
-    Exec(@"Packages\NUnit.Runners.2.6.2\tools\nunit-console.exe /framework:net-4.0 /noshadow /nologo {tests}");
+    string tests = new FileSet{@"{outputPath}\*.Tests.dll"};
+    Cmd(@"Packages\NUnit.Runners.2.6.2\tools\nunit-console.exe /framework:net-4.0 /noshadow /nologo {tests}");
 }
 
 /// Builds official NuGet package 
@@ -69,8 +64,8 @@ const string OutputPath = RootPath + @"\Output";
         @"Packages\Nake.{version}\tools\net45\Nake.exe %*"
     );
 
-    Exec(@"Tools\Nuget.exe pack Build\NuGet\Nake.nuspec -Version {version} " +
-          "-OutputDirectory {packagePath} -BasePath {RootPath} -NoPackageAnalysis");
+    Cmd(@"Tools\Nuget.exe pack Build\NuGet\Nake.nuspec -Version {version} " +
+         "-OutputDirectory {packagePath} -BasePath {RootPath} -NoPackageAnalysis");
 }
 
 /// Installs dependencies (packages) from NuGet 
@@ -84,5 +79,5 @@ const string OutputPath = RootPath + @"\Output";
         .Select(x => x.Attribute("path").Value.Replace("..", RootPath)); 
 
     foreach (var config in configs)
-        Exec(@"Tools\NuGet.exe install {config} -o {packagesDir}");
+        Cmd(@"Tools\NuGet.exe install {config} -o {packagesDir}");
 }

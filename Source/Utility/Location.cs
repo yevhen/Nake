@@ -17,6 +17,18 @@ namespace Nake
             get { return Env.Var["NakeStartupDirectory"]; }
         }
 
+        public static string GetRootedPath(string path)
+        {
+            return GetRootedPath(path, CurrentDirectory());
+        }
+
+        public static string GetRootedPath(string path, string basePath)
+        {
+            return Path.IsPathRooted(path)
+                       ? path
+                       : Path.Combine(basePath, path);
+        }
+
         public static string GetFullPath(string path)
         {
             return GetFullPath(path, CurrentDirectory());
@@ -25,15 +37,8 @@ namespace Nake
         public static string GetFullPath(string path, string basePath)
         {
             return Path.IsPathRooted(path)
-                    ? path
-                    : Path.GetFullPath(Path.Combine(basePath, path));
-        }
-
-        public static string GetRootedPath(string path)
-        {
-            return Path.IsPathRooted(path)
-                    ? path
-                    : Path.Combine(CurrentDirectory(), path);
+                       ? path
+                       : Path.GetFullPath(Path.Combine(basePath, path));
         }
     }
 }

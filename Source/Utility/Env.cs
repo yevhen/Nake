@@ -6,29 +6,17 @@ namespace Nake
 {
     public class Env
     {
-        public static readonly EnvironmentScope Process = new EnvironmentScope(EnvironmentVariableTarget.Process);
-        public static readonly EnvironmentScope User = new EnvironmentScope(EnvironmentVariableTarget.User);
-        public static readonly EnvironmentScope Machine = new EnvironmentScope(EnvironmentVariableTarget.Machine);
-        
-        public static readonly Indexer Var = new Indexer();
+        public static readonly DefaultScope Var = new DefaultScope();
 
-        public class Indexer
+        public class DefaultScope : EnvironmentScope
         {
-            public string this[string name]
-            {
-                get { return Process.Var[name]; }
-                set { Process.Var[name] = value; }
-            }
-        }
+            public readonly EnvironmentScope Process = new EnvironmentScope(EnvironmentVariableTarget.Process);
+            public readonly EnvironmentScope User = new EnvironmentScope(EnvironmentVariableTarget.User);
+            public readonly EnvironmentScope Machine = new EnvironmentScope(EnvironmentVariableTarget.Machine);
 
-        public static bool Defined(string name)
-        {
-            return Process.Defined(name);
-        }
-
-        public static string[] All()
-        {
-            return Process.All();
+            internal DefaultScope()
+                : base(EnvironmentVariableTarget.Process)
+            {}
         }
     }
 
@@ -39,32 +27,19 @@ namespace Nake
         internal EnvironmentScope(EnvironmentVariableTarget target)
         {
             this.target = target;
-            Var = new Indexer(this);
         }
 
-        public readonly Indexer Var;
-
-        public class Indexer
+        public string this[string name]
         {
-            readonly EnvironmentScope scope;
-
-            internal Indexer(EnvironmentScope scope)
+            get
             {
-                this.scope = scope;
-            }
-
-            public string this[string name]
-            {
-                get
-                {
-                    return scope.Defined(name)
-                        ? Environment.GetEnvironmentVariable(name, scope.target)
+                return Defined(name)
+                        ? Environment.GetEnvironmentVariable(name, target)
                         : null;
-                }
-                set
-                {
-                    Environment.SetEnvironmentVariable(name, value, scope.target);
-                }
+            }
+            set
+            {
+                Environment.SetEnvironmentVariable(name, value, target);
             }
         }
 

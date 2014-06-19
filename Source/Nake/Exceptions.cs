@@ -47,13 +47,17 @@ namespace Nake
 
     class TaskInvocationException : NakeException
     {
+        readonly Exception source;
+
         public TaskInvocationException(Task task, Exception source)
             : base(string.Format("'{0}' task failed. Error: '{1}'", task, source.Message), source)
-        {}
+        {
+            this.source = source;
+        }
 
         public Exception SourceException
         {
-            get { return InnerException.InnerException; }
+            get { return source; }
         }
     }
 

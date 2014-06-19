@@ -30,6 +30,7 @@
     <DefineConstants>TRACE;RELEASE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>..\..\Output\Utility.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
@@ -60,20 +61,19 @@
     <Compile Include="..\ProductAssemblyInfo.cs">
       <Link>Properties\ProductAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Cmd.cs" />
+    <Compile Include="App.cs" />
+    <Compile Include="Colors.cs" />
     <Compile Include="FileSet.Extensions.cs" />
     <Compile Include="FileSet.cs" />
-    <Compile Include="Exit.cs" />
     <Compile Include="Env.cs" />
     <Compile Include="FS.cs" />
     <Compile Include="Location.cs" />
-    <Compile Include="MSBuild.cs" />
     <Compile Include="MSBuild.EngineStub.cs" />
     <Compile Include="MSBuild.Extensions.cs" />
-    <Compile Include="MSBuild.Projects.cs" />
+    <Compile Include="MSBuild.Tool.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Strings.cs" />
+    <Compile Include="Run.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Packages.config" />

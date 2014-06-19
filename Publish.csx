@@ -4,7 +4,7 @@
 
 using Nake;
 using Nake.FS;
-using Nake.Cmd;
+using Nake.Run;
 
 using System.Diagnostics;
 using System.Dynamic;
@@ -26,16 +26,16 @@ Func<string> ArchiveFile = () => OutputPath + @"\{Version()}.zip";
 /// Zips all binaries for standalone installation
 [Step] void Zip()
 {
-    var files = new FileSet
+    var files = new FileSet("{ReleaseOutputPath}")
     {
-        @"{ReleaseOutputPath}\Nake.*",
-        @"{ReleaseOutputPath}\Meta.*",
-        @"{ReleaseOutputPath}\Utility.*",
-        @"{ReleaseOutputPath}\GlobDir.dll",
-        @"{ReleaseOutputPath}\Microsoft.CodeAnalysis.dll",
-        @"{ReleaseOutputPath}\Microsoft.CodeAnalysis.CSharp.dll",
-        @"{ReleaseOutputPath}\System.Collections.Immutable.dll",
-        @"{ReleaseOutputPath}\System.Reflection.Metadata.dll",
+        "Nake.*",
+        "Meta.*",
+        "Utility.*",
+        "GlobDir.dll",
+        "Microsoft.CodeAnalysis.dll",
+        "Microsoft.CodeAnalysis.CSharp.dll",
+        "System.Collections.Immutable.dll",
+        "System.Reflection.Metadata.dll",
         "-:*.Tests.*"
     };
 
@@ -53,7 +53,7 @@ Func<string> ArchiveFile = () => OutputPath + @"\{Version()}.zip";
 /// Publishes package to NuGet gallery
 [Step] void NuGet()
 {
-    Exec(@"Tools\Nuget.exe push {PackageFile()} $NuGetApiKey$");
+    Cmd(@"Tools\Nuget.exe push {PackageFile()} $NuGetApiKey$");
 }
 
 /// Publishes standalone version to GitHub releases

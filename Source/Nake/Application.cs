@@ -130,14 +130,14 @@ namespace Nake
         {
             Options.PrintUsage();
 
-            Exit.Ok();
+            App.Exit();
         }
 
         static void ShowVersion()
         {
             Log.Info(Assembly.GetExecutingAssembly().GetName().Version.ToString());
 
-            Exit.Ok();
+            App.Exit(); ;
         }
 
         void ShowTasks(TaskDeclaration[] tasks)
@@ -145,7 +145,7 @@ namespace Nake
             if (!tasks.Any())
             {
                 Log.Info("Project defines 0 tasks");
-                Exit.Ok();
+                App.Exit();
             }
 
             var filter = options.ShowTasksFilter;
@@ -168,7 +168,7 @@ namespace Nake
                 PrintTask(task, breadth);
 
             Console.WriteLine();
-            Exit.Ok();
+            App.Exit();
         }
 
         void PrintTask(TaskDeclaration task, int breadth, ConsoleColor color = ConsoleColor.DarkGreen)

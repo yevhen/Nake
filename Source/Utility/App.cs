@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Nake
 {
-    public static class Exit
+    public static class App
     {
         internal static Action<int, string, Exception> Terminator = (code, msg, ex) =>
         {
@@ -19,22 +20,23 @@ namespace Nake
             Console.ReadKey();
         }
 
-        public static void Ok()
+        public static void Exit(string message = null)
         {
+            if (message != null)
+                Log.Message(message);
+
             Terminator(0, null, null);
         }
 
-        public static void Fail()
+        public static void Fail(string message = null)
         {
-            Terminator(-1, null, null);
-        }
+            if (message != null)
+                Log.Message(message);
 
-        public static void Fail(string message)
-        {
             Terminator(-1, message, null);
         }
 
-        public static void Fail(Exception exception)
+        internal static void Fail(Exception exception)
         {
             Terminator(-1, exception.Message, exception);
         }

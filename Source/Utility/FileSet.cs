@@ -17,15 +17,21 @@ namespace Nake
         readonly List<Inclusion> includes = new List<Inclusion>();
         readonly List<Exclusion> excludes = new List<Exclusion>();
         readonly HashSet<Item> absolutes = new HashSet<Item>();
-
+        
+        readonly string basePath;
         HashSet<Item> resolved;
 
-        public FileSet(params string[] patterns)
+        public FileSet(string basePath = null)
+        {
+            this.basePath = basePath ?? Location.CurrentDirectory();
+        }
+
+        public FileSet Add(IEnumerable<string> patterns)
         {
             foreach (var pattern in patterns)
-            {
                 Add(pattern);
-            }
+
+            return this;
         }
 
         public FileSet Add(string pattern)
@@ -58,9 +64,9 @@ namespace Nake
                     throw new ArgumentException("Include does not accept patterns with exclusion markers : " + part, pattern);
 
                 if (!ContainsWildcards(part))
-                    Include(new Item(Location.GetFullPath(part)));
+                    Include(new Item(Location.GetFullPath(part, basePath)));
 
-                includes.Add(new Inclusion(Location.GetRootedPath(part)));
+                includes.Add(new Inclusion(Location.GetRootedPath(part, basePath)));
             }
 
             return this;
@@ -165,12 +171,12 @@ namespace Nake
         
         public static implicit operator FileSet(string[] arg)
         {
-            return new FileSet(arg);
+            return new FileSet().Add(arg);
         }
 
         public static implicit operator FileSet(string arg)
         {
-            return new FileSet(arg);
+            return new FileSet().Add(arg);
         }
 
         public static implicit operator string[](FileSet arg)

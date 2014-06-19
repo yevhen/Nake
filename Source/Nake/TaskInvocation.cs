@@ -100,7 +100,7 @@ namespace Nake
             }
             catch (TargetInvocationException ex)
             {
-                throw new TaskInvocationException(task, ex);
+                throw new TaskInvocationException(task, ex.GetBaseException());
             }
         }
 

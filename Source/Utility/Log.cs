@@ -6,9 +6,9 @@ namespace Nake
     {
         public static Action<string> Out = text => Console.WriteLine(text);
 
-        static readonly bool QuietMode = Env.Defined("NakeQuietMode");
-        static readonly bool SilentMode = Env.Defined("NakeSilentMode");
-        static readonly bool TraceEnabled = Env.Defined("NakeTraceEnabled");
+        static readonly bool QuietMode = Env.Var.Defined("NakeQuietMode");
+        static readonly bool SilentMode = Env.Var.Defined("NakeSilentMode");
+        static readonly bool TraceEnabled = Env.Var.Defined("NakeTraceEnabled");
 
         public static void TraceFormat(string message, params object[] args)
         {
@@ -60,18 +60,6 @@ namespace Nake
         public static void Error(string message)
         {
             With.Color(ConsoleColor.DarkRed, () => Out(message));
-        }
-    }
-
-    public static class With
-    {
-        public static void Color(ConsoleColor color, Action action)
-        {
-            Console.ForegroundColor = color;
-
-            action();
-
-            Console.ResetColor();
         }
     }
 }

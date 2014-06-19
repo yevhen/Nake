@@ -89,7 +89,7 @@ namespace Nake
         {
             return Execute(new Delete
             {
-                Files = new FileSet(files).AsTaskItems(),
+                Files = new FileSet().Add(files).AsTaskItems(),
                 TreatErrorsAsWarnings = false
             })
             .DeletedFiles.AsStrings();
@@ -107,7 +107,7 @@ namespace Nake
         {
             return Execute(new RemoveDir
             {                
-                Directories = new FileSet(directories).AsTaskItems()			
+                Directories = new FileSet().Add(directories).AsTaskItems()			
             })
             .RemovedDirectories.AsStrings();
         }
@@ -119,16 +119,16 @@ namespace Nake
 
             var outdated = false;
 
-            foreach (var inputFile in new FileSet(inputFiles))
+            foreach (var inputFile in new FileSet().Add(inputFiles))
             {
                 if (!File.Exists(inputFile))
                     throw new ArgumentException("Specified input file does not exists: " + inputFile);
 
-                if (File.GetLastWriteTime(inputFile) > File.GetLastWriteTime(Location.GetFullPath(outputFile)))
-                {
-                    outdated = true;
-                    break;
-                }
+                if (File.GetLastWriteTime(inputFile) <= File.GetLastWriteTime(Location.GetFullPath(outputFile)))
+                    continue;
+
+                outdated = true;
+                break;
             }
 
             return !outdated;
@@ -136,7 +136,7 @@ namespace Nake
 
         static TTask Execute<TTask>(TTask task) where TTask : MSBuildTask
         {
-            return MSBuild.Execute(task);
+            return Run.MSBuild(task);
         }
     }
 }
