@@ -7,8 +7,18 @@ using MSBuildTask = Microsoft.Build.Utilities.Task;
 
 namespace Nake
 {
+    /// <summary>
+    /// File-system convinience methods
+    /// </summary>
     public static class FS
     {
+        /// <summary>
+        /// Copies the specified files into specified destination files.
+        /// </summary>
+        /// <param name="sourceFiles">The source files.</param>
+        /// <param name="destinationFiles">The destination files.</param>
+        /// <param name="overwriteReadOnlyFiles">if set to <c>true</c> will overwrite read only files. Default is <c>false</c></param>
+        /// <param name="skipUnchangedFiles">if set to <c>true</c> will skip unchanged files. Default is <c>true</c></param>
         public static void Copy
         (
             string[] sourceFiles, 
@@ -25,6 +35,13 @@ namespace Nake
             });
         }
 
+        /// <summary>
+        /// Copies the specified files into a specifed destination folder.
+        /// </summary>
+        /// <param name="sourceFiles">The source files.</param>
+        /// <param name="destinationFolder">The destination folder.</param>
+        /// <param name="overwriteReadOnlyFiles">if set to <c>true</c> will overwrite read only files. Default is <c>false</c></param>
+        /// <param name="skipUnchangedFiles">if set to <c>true</c> will skip unchanged files. Default is <c>true</c></param>
         public static void Copy
         (
             string[] sourceFiles, 
@@ -41,6 +58,13 @@ namespace Nake
             });
         }
 
+        /// <summary>
+        /// Copies the files, specified as file selection patterns, into a specifed destination folder.
+        /// </summary>
+        /// <param name="sourceFiles">The source file selection patterns</param>
+        /// <param name="destinationFolder">The destination folder.</param>
+        /// <param name="overwriteReadOnlyFiles">if set to <c>true</c> will overwrite read only files. Default is <c>false</c></param>
+        /// <param name="skipUnchangedFiles">if set to <c>true</c> will skip unchanged files. Default is <c>true</c></param>
         public static void Copy
         (
             string sourceFiles, 
@@ -51,6 +75,12 @@ namespace Nake
             Copy(new FileSet(sourceFiles).ToArray(), destinationFolder, overwriteReadOnlyFiles, skipUnchangedFiles);
         }
 
+        /// <summary>
+        /// Moves the specified files into specified destination files.
+        /// </summary>
+        /// <param name="sourceFiles">The source files.</param>
+        /// <param name="destinationFiles">The destination files.</param>
+        /// <param name="overwriteReadOnlyFiles">if set to <c>true</c> will overwrite read only files. Default is <c>false</c></param>
         public static void Move(
             string[] sourceFiles, 
             string[] destinationFiles, 
@@ -64,6 +94,12 @@ namespace Nake
             });
         }
 
+        /// <summary>
+        /// Moves the specified files into a specifed destination folder..
+        /// </summary>
+        /// <param name="sourceFiles">The source files.</param>
+        /// <param name="destinationFolder">The destination folder.</param>
+        /// <param name="overwriteReadOnlyFiles">if set to <c>true</c> will overwrite read only files. Default is <c>false</c></param>
         public static void Move(
             string[] sourceFiles, 
             string destinationFolder, 
@@ -75,8 +111,14 @@ namespace Nake
                 OverwriteReadOnlyFiles = overwriteReadOnlyFiles,
                 DestinationFolder = destinationFolder.AsTaskItem(),                
             });
-        }        
-        
+        }
+
+        /// <summary>
+        /// Moves the files, specified as file selection patterns, into a specifed destination folder.
+        /// </summary>
+        /// <param name="sourceFiles">The source file selection patterns</param>
+        /// <param name="destinationFolder">The destination folder.</param>
+        /// <param name="overwriteReadOnlyFiles">if set to <c>true</c> will overwrite read only files. Default is <c>false</c></param>
         public static void Move(
             string sourceFiles, 
             string destinationFolder, 
@@ -85,6 +127,11 @@ namespace Nake
             Move(new FileSet(sourceFiles).ToArray(), destinationFolder, overwriteReadOnlyFiles);
         }
 
+        /// <summary>
+        /// Deletes the specified files.
+        /// </summary>
+        /// <param name="files">The file selection patterns.</param>
+        /// <returns>Array of actually deleted files</returns>
         public static string[] Delete(params string[] files)
         {
             return Execute(new Delete
@@ -95,6 +142,10 @@ namespace Nake
             .DeletedFiles.AsStrings();
         }
 
+        /// <summary>
+        /// Makes specified directories.
+        /// </summary>
+        /// <param name="directories">The directories.</param>
         public static void MakeDir(params string[] directories)
         {
             Execute(new MakeDir
@@ -103,6 +154,11 @@ namespace Nake
             });
         }
 
+        /// <summary>
+        /// Removes specified directories.
+        /// </summary>
+        /// <param name="directories">The directories.</param>
+        /// <returns>Array of actually removed directories</returns>
         public static string[] RemoveDir(params string[] directories)
         {
             return Execute(new RemoveDir
@@ -112,6 +168,13 @@ namespace Nake
             .RemovedDirectories.AsStrings();
         }
 
+        /// <summary>
+        /// Checks that specified output file is up to date in respect to specified set of input files.
+        /// </summary>
+        /// <param name="outputFile">The output file</param>
+        /// <param name="inputFiles">The input files.</param>
+        /// <returns><c>true</c> if output file is up to date or doesn't exists, <c>false</c> otherwise</returns>
+        /// <exception cref="System.ArgumentException">Specified input files do not exist</exception>
         public static bool UpToDate(string outputFile, params string[] inputFiles)
         {
             if (!File.Exists(Location.GetFullPath(outputFile)))

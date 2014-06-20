@@ -11,6 +11,8 @@ using System.Xml.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CSharp.RuntimeBinder;
+using Microsoft.Build.Framework;
+using Microsoft.Build.Utilities;
 
 namespace Nake.Scripting
 {
@@ -33,11 +35,15 @@ namespace Nake.Scripting
             {"System.Xml",                      Reference(typeof(XmlElement))},
             {"System.Xml.Linq",                 Reference(typeof(XElement))},
             {"Microsoft.CSharp",                Reference(typeof(RuntimeBinderException))},
+            {"Microsoft.Build.Framework",       Reference(typeof(ITaskItem))},
+            {"Microsoft.Build.Utilities.v4.0",  Reference(typeof(TaskItem))}
         };
 
         static readonly string[] DefaultNamespaces =
         {
-            "Nake", "System", "System.Collections.Generic", "System.Linq", "System.Text", "System.IO"
+            "Nake", 
+            "System", "System.Collections.Generic", "System.Linq", "System.Text", "System.IO", 
+            "Microsoft.Build.Framework", "Microsoft.Build.Utilities"
         };
 
         static MetadataFileReference Reference(Type type)

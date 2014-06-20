@@ -1,0 +1,5 @@
+﻿HTML Help Workshop
+http://msdn.microsoft.com/en-us/library/ms669985.aspx
+
+Sandcastle
+https://shfb.codeplex.com/

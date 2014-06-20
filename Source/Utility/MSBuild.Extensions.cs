@@ -7,16 +7,11 @@ using Microsoft.Build.Utilities;
 
 namespace Nake
 {
-    public static class MSBuildExtensions
+    static class MSBuildExtensions
     {
         public static string[] AsStrings(this IEnumerable<ITaskItem> sequence)
         {
-            return sequence.Select(AsString).ToArray();
-        }
-
-        public static string AsString(this ITaskItem item)
-        {
-            return item.ItemSpec;
+            return sequence.Select(x => x.ItemSpec).ToArray();
         }
 
         public static ITaskItem[] AsTaskItems(this IEnumerable<string> sequence)

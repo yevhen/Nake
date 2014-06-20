@@ -62,8 +62,7 @@
       <Link>Properties\ProductAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="App.cs" />
-    <Compile Include="Colors.cs" />
-    <Compile Include="FileSet.Extensions.cs" />
+    <Compile Include="Color.cs" />
     <Compile Include="FileSet.cs" />
     <Compile Include="Env.cs" />
     <Compile Include="FS.cs" />
@@ -78,7 +77,9 @@
   <ItemGroup>
     <None Include="Packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Documentation.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

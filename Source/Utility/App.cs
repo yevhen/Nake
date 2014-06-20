@@ -4,9 +4,12 @@ using System.Linq;
 
 namespace Nake
 {
+    /// <summary>
+    /// Helper methods to control Nake runner
+    /// </summary>
     public static class App
     {
-        internal static Action<int, string, Exception> Terminator = (code, msg, ex) =>
+        static readonly Action<int, string, Exception> Terminator = (code, msg, ex) =>
         {
             if (Debugger.IsAttached)
                 WaitTermination();
@@ -20,6 +23,10 @@ namespace Nake
             Console.ReadKey();
         }
 
+        /// <summary>
+        /// Exits Nake runner with optional printing of the given message.
+        /// </summary>
+        /// <param name="message">The message.</param>
         public static void Exit(string message = null)
         {
             if (message != null)
@@ -28,6 +35,10 @@ namespace Nake
             Terminator(0, null, null);
         }
 
+        /// <summary>
+        /// Exits Nake runner with failure code (-1), optionally printing the given message.
+        /// </summary>
+        /// <param name="message">The message.</param>
         public static void Fail(string message = null)
         {
             if (message != null)
