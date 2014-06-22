@@ -1,4 +1,4 @@
-## Nake
+![Nake](Logo.Wide.png)
 
 Nake is a magic task runner tool for .NET. It's a hybrid of Shovel and Rake. The DSL for defining tasks is uniquely minimal and it's just plain C# code! Nake is built on top of the latest Roslyn release so you can use all of the C# V6 features in you scripts and even more.
 
