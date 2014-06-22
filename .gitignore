@@ -47,3 +47,4 @@ TestResults/
 /Packages/
 /Tools/Nake/Roslyn
 /Packages/!Repositories.config
+/Source/Utility/Help

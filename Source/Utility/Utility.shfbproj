@@ -14,12 +14,13 @@
     <Name>Documentation</Name>
     <!-- SHFB properties -->
     <FrameworkVersion>.NET Framework 4.0</FrameworkVersion>
-    <OutputPath>.\Help\</OutputPath>
+    <OutputPath>..\..\Output</OutputPath>
+    <SourcePath>..\..\Output</SourcePath>
     <HtmlHelpName>Utility</HtmlHelpName>
     <Language>en-US</Language>
     <DocumentationSources>
-      <DocumentationSource sourceFile="..\..\Output\Utility.dll" xmlns="" />
-      <DocumentationSource sourceFile="..\..\Output\Utility.xml" xmlns="" />
+      <DocumentationSource sourceFile="$(SourcePath)\Utility.dll" xmlns="" />
+      <DocumentationSource sourceFile="$(SourcePath)\Utility.xml" xmlns="" />
     </DocumentationSources>
     <BuildAssemblerVerbosity>OnlyWarningsAndErrors</BuildAssemblerVerbosity>
     <HelpFileFormat>HtmlHelp1</HelpFileFormat>

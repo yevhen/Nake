@@ -19,6 +19,8 @@
     <file src="Output\Package\Release\Nake.exe.config" target="tools/net45" />
     <file src="Output\Package\Release\Meta.dll" target="tools/net45" />
     <file src="Output\Package\Release\Utility.dll" target="tools/net45" />
+    <file src="Output\Package\Release\Utility.xml" target="tools/net45" />
+    <file src="Output\Package\Release\Utility.chm" target="help" />
     <file src="Output\Package\Release\GlobDir.dll" target="tools/net45" />
     <file src="Output\Package\Release\Microsoft.CodeAnalysis.dll" target="tools/net45" />
     <file src="Output\Package\Release\Microsoft.CodeAnalysis.CSharp.dll" target="tools/net45" />

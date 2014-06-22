@@ -63,6 +63,9 @@ const string OutputPath = RootPath + @"\Output";
         "@ECHO OFF \r\n" +
         @"Packages\Nake.{version}\tools\net45\Nake.exe %*"
     );
+    
+    MSBuild(@"Source\Utility\Utility.shfbproj", 
+             "OutputPath={releasePath};SourcePath={releasePath}");
 
     Cmd(@"Tools\Nuget.exe pack Build\NuGet\Nake.nuspec -Version {version} " +
          "-OutputDirectory {packagePath} -BasePath {RootPath} -NoPackageAnalysis");
