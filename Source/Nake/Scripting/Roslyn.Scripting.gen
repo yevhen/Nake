@@ -1,0 +1,47 @@
+﻿static readonly MetadataFileReference Mscorlib = new MetadataFileReference(typeof(object).Assembly.Location);
+
+static void EmitRoslynScriptingImage()
+{
+    var compilation = CSharpCompilation.Create("Roslyn.Scripting", new[]
+    {
+        CSharpSyntaxTree.ParseText(@"
+
+			using System;
+
+			namespace Roslyn.Scripting
+			{ 
+				public class Session
+				{
+				}
+			}
+
+			namespace Microsoft.CSharp.RuntimeHelpers
+			{
+				using Roslyn.Scripting;
+
+				public static class SessionHelpers
+				{
+					public static object GetSubmission(Session session, int id)
+					{
+						return null;
+					}
+
+					public static object SetSubmission(Session session, int slotIndex, object submission)
+					{
+						return null;
+					}
+				}
+			}")
+    },
+	new[] {Mscorlib},
+	new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+    File.WriteAllBytes(@"C:\Temp\Roslyn.Scripting.image", Emit(compilation));    
+}
+
+static byte[] Emit(Compilation compilation)
+{
+    var stream = new MemoryStream();
+    compilation.Emit(stream);
+    return stream.ToArray();
+}

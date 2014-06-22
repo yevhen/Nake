@@ -1,125 +1,117 @@
-﻿#r "Tools\Nake\Meta.dll"
-#r "Tools\Nake\Utility.dll"
-
-#r "System.Xml"
-#r "System.Xml.Linq"
-#r "System.IO.Compression"
-#r "System.IO.Compression.FileSystem"
-
-#r "Packages\EasyHttp.1.6.58.0\lib\net40\EasyHttp.dll"
+﻿#r "Packages\EasyHttp.1.6.58.0\lib\net40\EasyHttp.dll"
 #r "Packages\JsonFx.2.0.1209.2802\lib\net40\JsonFx.dll"
+#r "Packages\DotNetZip.1.9.2\lib\net20\Ionic.Zip.dll"
 
 using Nake;
+using Nake.FS;
+using Nake.Run;
 
-using System;
-using System.IO;
-using System.IO.Compression;
 using System.Diagnostics;
 using System.Dynamic;
-using System.Collections.Generic;
 
 using EasyHttp.Http;
 using EasyHttp.Infrastructure;
 
-static string OutputPath = @"$NakeScriptDirectory$\Output";
-static string PackagePath = @"{OutputPath}\Package";
+using Ionic.Zip;
 
-static string DebugOutputPath = @"{PackagePath}\Debug";
-static string ReleaseOutputPath = @"{PackagePath}\Release";
+var OutputPath = @"$NakeScriptDirectory$\Output";
+var PackagePath = @"{OutputPath}\Package";
 
-static Func<string> PackageFile = () => PackagePath + @"\Nake.{Version()}.nupkg";
-static Func<string> ArchiveFile = () => OutputPath + @"\{Version()}.zip";
+var DebugOutputPath = @"{PackagePath}\Debug";
+var ReleaseOutputPath = @"{PackagePath}\Release";
 
-/// <summary> 
+Func<string> PackageFile = () => PackagePath + @"\Nake.{Version()}.nupkg";
+Func<string> ArchiveFile = () => OutputPath + @"\{Version()}.zip";
+
 /// Zips all binaries for standalone installation
-/// </summary>
-[Task] public static void Zip()
+[Step] void Zip()
 {
-	var files = new FileSet
-	{
-		@"{ReleaseOutputPath}\Nake.*",
-		@"{ReleaseOutputPath}\Meta.*",
-		@"{ReleaseOutputPath}\Utility.*",
-		@"{ReleaseOutputPath}\GlobDir.dll",
-		@"{ReleaseOutputPath}\NuGet.Core.dll",
-		"-:*.Tests.*"
-	};
+    var files = new FileSet("{ReleaseOutputPath}")
+    {
+        "Nake.*",
+        "Meta.*",
+        "Utility.*",
+        "GlobDir.dll",
+        "Microsoft.CodeAnalysis.dll",
+        "Microsoft.CodeAnalysis.CSharp.dll",
+        "System.Collections.Immutable.dll",
+        "System.Reflection.Metadata.dll",
+        "-:*.Tests.*"
+    };
 
-	FS.Delete(ArchiveFile());
+    Delete(ArchiveFile());
 
-	using (ZipArchive archive = ZipFile.Open(ArchiveFile(), ZipArchiveMode.Create))
-	{
-		foreach (var file in files)
-			archive.CreateEntryFromFile(file, Path.GetFileName(file));
-	}
+    using (ZipFile archive = new ZipFile())
+    {
+        foreach (var file in files)
+            archive.AddFile(file, "");
+
+        archive.Save(ArchiveFile());
+    }
 }
 
-/// <summary>
 /// Publishes package to NuGet gallery
-/// </summary>
-[Task] public static void NuGet()
+[Step] void NuGet()
 {
-	Cmd.Exec(@"Tools\Nuget.exe push {PackageFile()} $NuGetApiKey$");
+    Cmd(@"Tools\Nuget.exe push {PackageFile()} $NuGetApiKey$");
 }
 
-
-/// <summary> 
 /// Publishes standalone version to GitHub releases
-/// </summary>
-[Task] public static void Standalone(string description = null)
+[Step] void Standalone(bool beta, string description = null)
 {
-	string release = CreateRelease(description);
+    Zip();
 
-	Upload(release, ArchiveFile(), "application/zip");
+    string release = CreateRelease(beta, description);
+    Upload(release, ArchiveFile(), "application/zip");
 }
 
-static string CreateRelease(string description)
+string CreateRelease(bool beta, string description)
 {
-	IDictionary<string, object> data = new ExpandoObject();
+    dynamic data = new ExpandoObject();
 
-	data["tag_name"] = data["name"] = Version();
-	data["target_commitish"] = "dev";
-	data["prerelease"] = true;
+    data.tag_name = data.name = Version();
+    data.target_commitish = beta ? "dev" : "master";
+    data.prerelease = beta;
+    data.body = !string.IsNullOrEmpty(description) 
+                ? description 
+                : "Standalone release {Version()}";
 
-	if (!string.IsNullOrEmpty(description))
-		data["body"] = description;
-
-	return GitHub().Post("https://api.github.com/repos/yevhen/nake/releases",
-						  data, HttpContentTypes.ApplicationJson).Location;
+    return GitHub().Post("https://api.github.com/repos/yevhen/nake/releases",
+                          data, HttpContentTypes.ApplicationJson).Location;
 }
 
-static void Upload(string release, string filePath, string contentType)
+void Upload(string release, string filePath, string contentType)
 {
-	GitHub().Post(GetUploadUri(release) + "?name=" + Path.GetFileName(filePath), null, new List<FileData>
-	{
-		new FileData()
-		{
-			ContentType = contentType,
-			Filename = filePath
-		}
-	});
+    GitHub().Post(GetUploadUri(release) + "?name=" + Path.GetFileName(filePath), null, new List<FileData>
+    {
+        new FileData()
+        {
+            ContentType = contentType,
+            Filename = filePath
+        }
+    });
 }
 
-static string GetUploadUri(string release)
+string GetUploadUri(string release)
 {
-	var body = (IDictionary<string, object>)GitHub().Get(release).DynamicBody;
-	return ((string)body["upload_url"]).Replace("{{?name}}", "");
+    var body = GitHub().Get(release).DynamicBody;
+    return ((string)body.upload_url).Replace("{{?name}}", "");
 }
 
-static HttpClient GitHub()
+HttpClient GitHub()
 {
-	var client = new HttpClient();
+    var client = new HttpClient();
 
-	client.Request.Accept = "application/vnd.github.manifold-preview";
-	client.Request.ContentType = "application/json";
-	client.Request.AddExtraHeader("Authorization", "token $GitHubToken$");
+    client.Request.Accept = "application/vnd.github.manifold-preview";
+    client.Request.ContentType = "application/json";
+    client.Request.AddExtraHeader("Authorization", "token $GitHubToken$");
 
-	return client;
+    return client;
 }
 
-static string Version()
+string Version()
 {
-	return FileVersionInfo
-			.GetVersionInfo(@"{ReleaseOutputPath}\Nake.exe")
-			.FileVersion;
+    return FileVersionInfo
+            .GetVersionInfo(@"{ReleaseOutputPath}\Nake.exe")
+            .ProductVersion;
 }

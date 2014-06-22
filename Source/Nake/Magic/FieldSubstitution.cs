@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Linq;
 
-using Roslyn.Compilers.CSharp;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Nake.Magic
 {
     class FieldSubstitution
     {
         readonly VariableDeclaratorSyntax node;
-        readonly FieldSymbol symbol;
+        readonly IFieldSymbol symbol;
         readonly string substitution;
 
-        public FieldSubstitution(VariableDeclaratorSyntax node, FieldSymbol symbol, string substitution)
+        public FieldSubstitution(VariableDeclaratorSyntax node, IFieldSymbol symbol, string substitution)
         {
             this.node = node;
             this.symbol = symbol;
@@ -23,7 +25,7 @@ namespace Nake.Magic
             var literal = TryCreateLiteral();
 
             if (literal != null)
-                return node.WithInitializer(Syntax.EqualsValueClause(literal));
+                return node.WithInitializer(SyntaxFactory.EqualsValueClause(literal));
 
             Log.Trace(string.Format("Matched field {0} with substitution coming from cmd line but type conversion failed", symbol));
 
@@ -52,8 +54,8 @@ namespace Nake.Magic
 
             var kind = value ? SyntaxKind.TrueLiteralExpression : SyntaxKind.FalseLiteralExpression;
 
-            return Syntax.LiteralExpression(kind)
-                         .WithLeadingTrivia(new[]{Syntax.Space});            
+            return SyntaxFactory.LiteralExpression(kind)
+                         .WithLeadingTrivia(new[] {SyntaxFactory.Space});            
         }
 
         LiteralExpressionSyntax IntegerLiteral()
@@ -62,29 +64,23 @@ namespace Nake.Magic
             if (!int.TryParse(substitution, out value))
                 return null;
 
-            return Syntax.LiteralExpression(
-                        SyntaxKind.NumericLiteralExpression, 
-                        Syntax.Literal(value))
-                              .WithLeadingTrivia(new[]{Syntax.Space});            
+            return SyntaxFactory.LiteralExpression(
+                        SyntaxKind.NumericLiteralExpression,
+                        SyntaxFactory.Literal(value))
+                              .WithLeadingTrivia(new[] {SyntaxFactory.Space});            
         }
 
         LiteralExpressionSyntax StringLiteral()
         {
-            return Syntax.LiteralExpression(
-                    SyntaxKind.StringLiteralExpression, 
-                    Syntax.Literal(@"@""" + substitution + @"""", substitution)
-                          .WithLeadingTrivia(new[]{Syntax.Space}));
+            return SyntaxFactory.LiteralExpression(
+                    SyntaxKind.StringLiteralExpression,
+                    SyntaxFactory.Literal(@"@""" + substitution + @"""", substitution)
+                          .WithLeadingTrivia(new[] {SyntaxFactory.Space}));
         }
 
-        public static bool Qualifies(FieldSymbol symbol)
+        public static bool Qualifies(IFieldSymbol symbol)
         {
-            var isAccessible =
-                symbol.DeclaredAccessibility == Accessibility.Public &&
-                (symbol.IsConst || symbol.IsStatic);
-
-            var isTypeSupported = TypeConverter.IsSupported(symbol.Type);
-
-            return isAccessible && isTypeSupported;
+            return TypeConverter.IsSupported(symbol.Type);
         }
     }
 }

@@ -1,72 +1,96 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
-using Roslyn.Compilers.CSharp;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Nake.Magic
 {
-    class Analyzer : SyntaxWalker
+    class Analyzer : CSharpSyntaxWalker
     {
-        public readonly AnalysisResult Result = new AnalysisResult();
-
+        readonly CSharpSyntaxTree tree;
         readonly SemanticModel model;
         readonly IDictionary<string, string> substitutions;
 
         Task current;
         bool visitingConstant;
-
-        public Analyzer(SemanticModel model, IDictionary<string, string> substitutions)
+        AnalyzerResult result;
+        
+        public Analyzer(CSharpCompilation compilation, IDictionary<string, string> substitutions)
         {
-            this.model = model;
-            this.substitutions = new Dictionary<string, string>(substitutions, new CaseInsensitiveEqualityComparer());
+            tree = (CSharpSyntaxTree) compilation.SyntaxTrees.Single();
+            model = compilation.GetSemanticModel(tree);
+
+            this.substitutions = new Dictionary<string, string>(
+                substitutions, new CaseInsensitiveEqualityComparer());
+        }
+
+        public AnalyzerResult Analyze()
+        {
+            result = new AnalyzerResult();
+            tree.GetRoot().Accept(this);
+            return result;
         }
 
         public override void VisitMethodDeclaration(MethodDeclarationSyntax node)
         {
             var symbol = model.GetDeclaredSymbol(node);
 
-            if (!Task.IsAnnotated(symbol))
+            var isTask = IsTask(symbol);
+            var isStep = IsStep(symbol);
+
+            if (!isTask && !isStep)
             {
                 base.VisitMethodDeclaration(node);
                 return;
             }
 
-            current = Result.Find(symbol);
+            current = result.Find(symbol);
 
             if (current == null)
             {
-                current = new Task(symbol);
-                Result.Add(symbol, current);
+                current = new Task(symbol, isStep);
+                result.Add(symbol, current);
             }
 
             base.VisitMethodDeclaration(node);
             current = null;
         }
 
+        static bool IsTask(ISymbol symbol)
+        {
+            return symbol.GetAttributes().SingleOrDefault(x => x.AttributeClass.Name == "TaskAttribute") != null;
+        }     
+
+        static bool IsStep(ISymbol symbol)
+        {
+            return symbol.GetAttributes().SingleOrDefault(x => x.AttributeClass.Name == "StepAttribute") != null;
+        }     
+
         public override void VisitInvocationExpression(InvocationExpressionSyntax node)
         {
-            var symbol = model.GetSymbolInfo(node).Symbol as MethodSymbol;
+            var symbol = ModelExtensions.GetSymbolInfo(model, node).Symbol as IMethodSymbol;
             
             if (symbol == null)
                 return;
 
-            if (!Task.IsAnnotated(symbol))
+            if (!IsStep(symbol))
             {
                 base.VisitInvocationExpression(node);
                 return;
             }
 
-            var task = Result.Find(symbol);
+            var task = result.Find(symbol);
 
             if (task == null)
             {
-                task = new Task(symbol);                
-                Result.Add(symbol, task);
+                task = new Task(symbol, true);                
+                result.Add(symbol, task);
             }
             
-            Result.Add(node, new ProxyInvocation(task, node));
+            result.Add(node, new ProxyInvocation(task, node));
 
             if (current != null)
                 current.AddDependency(task);
@@ -80,14 +104,14 @@ namespace Nake.Magic
 
             foreach (var variable in node.Declaration.Variables)
             {
-                var symbol = (FieldSymbol) model.GetDeclaredSymbol(variable);
+                var symbol = (IFieldSymbol) ModelExtensions.GetDeclaredSymbol(model, variable);
 
                 var fullName = symbol.ToString();
                 if (!substitutions.ContainsKey(fullName))
                     continue;
 
                 if (FieldSubstitution.Qualifies(symbol))
-                    Result.Add(variable, new FieldSubstitution(variable, symbol, substitutions[fullName]));
+                    result.Add(variable, new FieldSubstitution(variable, symbol, substitutions[fullName]));
             }
 
             base.VisitFieldDeclaration(node);
@@ -121,7 +145,7 @@ namespace Nake.Magic
         public override void VisitLiteralExpression(LiteralExpressionSyntax node)
         {
             if (StringExpansion.Qualifies(node))
-                Result.Add(node, new StringExpansion(model, node, visitingConstant));
+                result.Add(node, new StringExpansion(model, node, visitingConstant));
             
             base.VisitLiteralExpression(node);
         }

@@ -1,23 +1,47 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
-using Roslyn.Compilers.Common;
-using Roslyn.Compilers.CSharp;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Nake.Magic
 {
-    class Rewriter : SyntaxRewriter
+    class Rewriter : CSharpSyntaxRewriter
     {
+        public readonly HashSet<EnvironmentVariable> Captured = new HashSet<EnvironmentVariable>();
+
+        readonly CSharpSyntaxTree tree;
         readonly SemanticModel model;
-        readonly AnalysisResult result;
+        readonly CSharpCompilation compilation;
+        readonly AnalyzerResult result;
         
         readonly HashSet<LiteralExpressionSyntax> skip  = new HashSet<LiteralExpressionSyntax>();
 
-        public Rewriter(SemanticModel model, AnalysisResult result)
+        public Rewriter(CSharpCompilation compilation, AnalyzerResult result)
         {
-            this.model = model;
+            tree = (CSharpSyntaxTree) compilation.SyntaxTrees.Single();
+            model = compilation.GetSemanticModel(tree);
+
+            this.compilation = compilation;
             this.result = result;
+        }
+
+        public CSharpCompilation Rewrite()
+        {
+            var newRoot = tree.GetRoot().Accept(this);
+            return compilation.ReplaceSyntaxTree(tree, CreateTree(newRoot));
+        }
+
+        SyntaxTree CreateTree(SyntaxNode root)
+        {
+            var options = new CSharpParseOptions(
+                documentationMode: DocumentationMode.None,
+                kind: SourceCodeKind.Script);
+
+            return CSharpSyntaxTree.Create((CompilationUnitSyntax) root, options, tree.FilePath, Encoding.UTF8);
         }
 
         public override SyntaxNode VisitInvocationExpression(InvocationExpressionSyntax node)
@@ -40,10 +64,14 @@ namespace Nake.Magic
                 return base.VisitLiteralExpression(node);
 
             var expansion = result.Find(node);
+            if (expansion == null)
+                return base.VisitLiteralExpression(node);
 
-            return expansion != null 
-                             ? expansion.Expand() 
-                             : base.VisitLiteralExpression(node);
+            var expanded = expansion.Expand();
+            foreach (var variable in expansion.Captured)
+                Captured.Add(variable);
+
+            return expanded;
         }
 
         public override SyntaxNode VisitVariableDeclarator(VariableDeclaratorSyntax node)
@@ -60,10 +88,12 @@ namespace Nake.Magic
             return skip.Contains(node);
         }
 
-        void SkipLiteralsWithinStringFormat(ExpressionSyntax node)
+        void SkipLiteralsWithinStringFormat(SyntaxNode node)
         {
-            var symbol = model.GetSpeculativeSymbolInfo(node.Span.Start, node,
-                SpeculativeBindingOption.BindAsExpression).Symbol as MethodSymbol;
+            const SpeculativeBindingOption options = SpeculativeBindingOption.BindAsExpression;
+
+            var symbol = model.GetSpeculativeSymbolInfo(node.Span.Start, node, options)
+                .Symbol as IMethodSymbol;
 
             if (symbol == null || (!symbol.ToString().StartsWith("string.Format(")))
                 return;
@@ -82,7 +112,7 @@ namespace Nake.Magic
             }
         }
 
-        public static IEnumerable<LiteralExpressionSyntax> GetExpansionQualifiedLiterals(SyntaxNode node)
+        static IEnumerable<LiteralExpressionSyntax> GetExpansionQualifiedLiterals(SyntaxNode node)
         {
             return node.DescendantNodes() 
                        .OfType<LiteralExpressionSyntax>()

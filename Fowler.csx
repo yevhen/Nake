@@ -1,48 +1,39 @@
-﻿#r "Tools\Nake\Meta.dll" 
+﻿using Nake;
+using Nake.Log;
 
-using Nake;
-using System;
-
-[Task] public static void Default()
-{
-	Compile();
-}
-
-/// <summary> 
-/// Take data configuration files and use them to generate the database structure and the code to access the database
-/// </summary>
-[Task] public static void CodeGen()
-{
-	Console.WriteLine("do code gen stuff");
-}
-
-/// <summary> 
 /// Compile the application code
-/// </summary>
-[Task] public static void Compile()
+[Step] void Default()
 {
-	CodeGen();
-
-	Console.WriteLine("do compile stuff");
+    Compile();
 }
 
-/// <summary> 
+/// Take data configuration files and use them to generate the database structure and the code to access the database
+[Step] void CodeGen()
+{
+    Message("do code gen stuff");
+}
+
+/// Compile the application code
+[Step] void Compile()
+{
+    CodeGen();
+
+    Message("do compile stuff");
+}
+
 /// Load test data into the database
-/// </summary>
-[Task] public static void DataLoad()
+[Step] void DataLoad()
 {
-	CodeGen();
+    CodeGen();
 
-	Console.WriteLine("do data load stuff");
+    Message("do data load stuff");
 }
 
-/// <summary> 
 /// Run the tests
-/// </summary>
-[Task] public static void Test()
+[Step] void Test()
 {
-	Compile();
-	DataLoad();
+    Compile();
+    DataLoad();
 
-	Console.WriteLine("run tests");
+    Message("run tests");
 }

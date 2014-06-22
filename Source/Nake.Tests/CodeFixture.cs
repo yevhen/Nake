@@ -1,6 +1,5 @@
 using System.Collections.Generic;
-
-using Nake.Magic;
+using System.Linq;
 
 using NUnit.Framework;
 
@@ -9,45 +8,33 @@ namespace Nake
     internal abstract class CodeFixture
     {
         [SetUp]
-        public virtual void SetUp()
+        public void SetUp()
         {
             TaskRegistry.Global = new TaskRegistry();
         }
 
-        [TearDown]
-        public virtual void TearDown()
+        protected static void Invoke(string taskName, params TaskArgument[] args)
         {
-            TaskRegistry.Invoker = (task, args) => task.Invoke(args);
+            TaskRegistry.Invoke(taskName, args);
         }
 
-        protected void Invoke(string code, string taskName)
+        protected static void Build(string code, Dictionary<string, string> substitutions = null)
         {
-            Build(code);
+            var engine = new Engine();
+            
+            var result = engine.Build(
+                code, substitutions ?? new Dictionary<string, string>(), false
+            );
 
-            Invoke(taskName);
+            TaskRegistry.Global = new TaskRegistry(result);
         }
 
-        protected void Invoke(string taskName, params TaskArgument[] args)
-        {
-            Find(taskName).Invoke(args);
-        }
-
-        protected void Build(string code, Dictionary<string, string> substitutions = null)
-        {
-            var script = Script.Build(code, substitutions ?? new Dictionary<string, string>(), false);
-
-            foreach (var task in script.Tasks)
-            {
-                TaskRegistry.Global.Register(task);    
-            }
-        }
-
-        protected IEnumerable<Task> Tasks
+        protected static IEnumerable<Task> Tasks
         {
             get { return TaskRegistry.Global.Tasks; }
         }
 
-        protected Task Find(string taskName)
+        protected static Task Find(string taskName)
         {
             return TaskRegistry.Global.Find(taskName);
         }

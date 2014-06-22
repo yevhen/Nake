@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
 
-using Roslyn.Compilers.CSharp;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Nake.Magic
 {
@@ -21,7 +23,7 @@ namespace Nake.Magic
             var replacement = string.Format(@"Nake.TaskRegistry.Invoke(""{0}"", {1})", 
                                               task.FullName, BuildArgumentString());
 
-            return Syntax.ParseExpression(replacement)
+            return SyntaxFactory.ParseExpression(replacement)
                          .WithLeadingTrivia(invocation.GetLeadingTrivia());
         }
 

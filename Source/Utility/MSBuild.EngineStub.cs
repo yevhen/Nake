@@ -8,7 +8,7 @@ namespace Nake
 {
     class MSBuildEngineStub : IBuildEngine
     {
-        public static readonly ConsoleLogger Logger = new ConsoleLogger(LoggerVerbosity.Normal);
+        static readonly ConsoleLogger Logger = new ConsoleLogger(LoggerVerbosity.Normal);
 
         public void LogErrorEvent(BuildErrorEventArgs e)
         {

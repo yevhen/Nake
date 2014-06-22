@@ -1,5 +1,7 @@
 ﻿using System;
 
+using Nake.Magic;
+
 namespace Nake
 {
     class NakeException : Exception
@@ -45,13 +47,17 @@ namespace Nake
 
     class TaskInvocationException : NakeException
     {
+        readonly Exception source;
+
         public TaskInvocationException(Task task, Exception source)
             : base(string.Format("'{0}' task failed. Error: '{1}'", task, source.Message), source)
-        {}
+        {
+            this.source = source;
+        }
 
         public Exception SourceException
         {
-            get { return InnerException.InnerException; }
+            get { return source; }
         }
     }
 
@@ -59,25 +65,29 @@ namespace Nake
     {
         public static DuplicateTaskException Create(Task existent, Task duplicate)
         {
-            var caseOnlyDifference = existent.DisplayName.ToLower() == duplicate.DisplayName.ToLower();
+            return Create(existent.Signature, duplicate.Signature);
+        }
+
+        public static DuplicateTaskException Create(TaskDeclaration existent, TaskDeclaration duplicate)
+        {
+            return Create(existent.Signature, duplicate.Signature);
+        }
+
+        static DuplicateTaskException Create(string existent, string duplicate)
+        {
+            var caseOnlyDifference = String.Equals(existent, duplicate, 
+                StringComparison.CurrentCultureIgnoreCase);
 
             if (caseOnlyDifference)
                 return new DuplicateTaskException(existent, duplicate,
                     "Task names are case-insensitive");
 
             return new DuplicateTaskException(existent, duplicate,
-                    "Overloads are not supported. Use optional parameters instead");
+                    "Overloads are not supported. Use optional parameters instead");            
         }
 
-        DuplicateTaskException(Task existent, Task duplicate, string reason)
+        DuplicateTaskException(string existent, string duplicate, string reason)
             : base("Duplicate task declaration: '{0}' and '{1}'. {2}", existent, duplicate, reason)
-        {}
-    }
-
-    class DuplicateDependencyCallException : NakeException
-    {
-        public DuplicateDependencyCallException(Task task, string prerequisite)
-            : base("Cannot add duplicate pre-requisite '{0}' to task '{1}'", prerequisite, task)
         {}
     }
 
@@ -102,20 +112,6 @@ namespace Nake
         {}
     }
 
-    class TaskPlacementViolationException : NakeException
-    {
-        public TaskPlacementViolationException(string method)
-            : base("Bad task method placement: '{0}'. Tasks may only be declared in public static class hierarchy", method)
-        {}
-    }
-
-    class InvalidXmlDocumentationException : NakeException
-    {
-        public InvalidXmlDocumentationException(string method)
-            : base("Task '{0}' has invalid xml documentation", method)
-        {}
-    }
-
     class ExpressionReturnTypeIsVoidException : NakeException
     {
         public ExpressionReturnTypeIsVoidException(string expression, string diagnostics)
@@ -134,13 +130,6 @@ namespace Nake
     {
         public ExpressionSyntaxException(string expression, string diagnostics)
             : base("{0}: error CSX0102: Expression {{{1}}}' has invalid syntax", diagnostics, expression)
-        {}
-    }
-    
-    class InlineEnvironmentVariableUndefinedException : NakeException
-    {
-        public InlineEnvironmentVariableUndefinedException(string variable, string diagnostics)
-            : base("{0}: error CSX0103: Environment variable '{1}' is undefined", diagnostics, variable)
         {}
     }
 }

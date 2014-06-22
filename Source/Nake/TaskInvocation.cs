@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -8,12 +9,14 @@ namespace Nake
 {
     class TaskInvocation
     {
+        readonly object script;
         readonly Task task;
         readonly MethodInfo method;
         readonly object[] values;
 
-        public TaskInvocation(Task task, MethodInfo method, IList<TaskArgument> arguments)
+        public TaskInvocation(object script, Task task, MethodInfo method, IList<TaskArgument> arguments)
         {
+            this.script = script;
             this.task = task;
             this.method = method;
 
@@ -78,8 +81,13 @@ namespace Nake
         {
             try
             {
+                object host = null;
+
+                if (!method.IsStatic)
+                    host = GetMethodHost();                    
+
                 method.Invoke(
-                    null, BindingFlags.OptionalParamBinding, null,
+                    host, BindingFlags.OptionalParamBinding, null,
                     values, CultureInfo.InvariantCulture);
             }
             catch (ArgumentException)
@@ -92,11 +100,17 @@ namespace Nake
             }
             catch (TargetInvocationException ex)
             {
-                throw new TaskInvocationException(task, ex);
+                throw new TaskInvocationException(task, ex.GetBaseException());
             }
         }
 
-        protected bool Equals(TaskInvocation other)
+        object GetMethodHost()
+        {
+            Debug.Assert(method.DeclaringType != null);
+            return task.IsGlobal ? script : Activator.CreateInstance(method.DeclaringType);
+        }
+
+        bool Equals(TaskInvocation other)
         {
             return !values.Where((value, index) => value != other.values[index]).Any();
         }

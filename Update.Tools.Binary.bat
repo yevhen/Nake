@@ -5,5 +5,5 @@ copy /Y Output\Meta.* Tools\Nake
 copy /Y Output\Nake.exe Tools\Nake
 copy /Y Output\Nake.exe.config Tools\Nake
 copy /Y Output\Nake.pdb Tools\Nake
-copy /Y Output\NuGet.Core.dll Tools\Nake
 copy /Y Output\GlobDir.dll Tools\Nake
+copy /Y Libraries\Roslyn.Private.Release.Build\*.dll Tools\Nake

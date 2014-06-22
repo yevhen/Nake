@@ -4,34 +4,40 @@ using System.Linq;
 
 namespace Nake
 {
-    public class Env
+    /// <summary>
+    /// Helper methods to deal with environment variables. Default level is Process.
+    /// </summary>
+    public static class Env
     {
-        public static readonly EnvironmentScope Process = new EnvironmentScope(EnvironmentVariableTarget.Process);
-        public static readonly EnvironmentScope User = new EnvironmentScope(EnvironmentVariableTarget.User);
-        public static readonly EnvironmentScope Machine = new EnvironmentScope(EnvironmentVariableTarget.Machine);
-        
-        public static readonly Indexer Var = new Indexer();
+        /// <summary>
+        /// An entry point for set of helper methods to deal with environment variables
+        /// </summary>
+        public static readonly Variables Var = new Variables();
 
-        public class Indexer
+        /// <summary>
+        /// An entry point for set of helper methods to deal with environment variables
+        /// </summary>
+        public class Variables : EnvironmentScope
         {
-            public string this[string name]
-            {
-                get { return Process.Var[name]; }
-                set { Process.Var[name] = value; }
-            }
-        }
+            /// <summary>
+            /// Allows to manipulate environment variables on the user-level
+            /// </summary>
+            public readonly EnvironmentScope User = new EnvironmentScope(EnvironmentVariableTarget.User);
 
-        public static bool Defined(string name)
-        {
-            return Process.Defined(name);
-        }
+            /// <summary>
+            /// Allows to manipulate environment variables on the machine-level
+            /// </summary>
+            public readonly EnvironmentScope Machine = new EnvironmentScope(EnvironmentVariableTarget.Machine);
 
-        public static string[] All()
-        {
-            return Process.All();
+            internal Variables()
+                : base(EnvironmentVariableTarget.Process)
+            {}
         }
     }
 
+    /// <summary>
+    /// Contains actual methods to deal with environment variables
+    /// </summary>
     public class EnvironmentScope
     {
         readonly EnvironmentVariableTarget target;
@@ -39,44 +45,46 @@ namespace Nake
         internal EnvironmentScope(EnvironmentVariableTarget target)
         {
             this.target = target;
-            Var = new Indexer(this);
         }
 
-        public readonly Indexer Var;
-
-        public class Indexer
+        /// <summary>
+        /// Gets or sets the envrionment variable with the specified name.
+        /// </summary>
+        /// <value> The string value. </value>
+        /// <param name="name">The variable name.</param>
+        /// <returns>Value or <c>null</c> if environment variable does not exists</returns>
+        public string this[string name]
         {
-            readonly EnvironmentScope scope;
-
-            internal Indexer(EnvironmentScope scope)
+            get
             {
-                this.scope = scope;
+                return Defined(name)
+                           ? Environment.GetEnvironmentVariable(name, target)
+                           : null;
             }
-
-            public string this[string name]
+            set
             {
-                get
-                {
-                    return scope.Defined(name)
-                        ? Environment.GetEnvironmentVariable(name, scope.target)
-                        : null;
-                }
-                set
-                {
-                    Environment.SetEnvironmentVariable(name, value, scope.target);
-                }
+                Environment.SetEnvironmentVariable(name, value, target);
             }
         }
 
+        /// <summary>
+        /// Checks whether there is an environment variable with the specified name is defined (exists).
+        /// </summary>
+        /// <param name="name">The name of variable.</param>
+        /// <returns><c>true</c> if defined, <c>false</c> otherwise</returns>
         public bool Defined(string name)
         {
             return Environment.GetEnvironmentVariable(name, target) != null;
         }
 
+        /// <summary>
+        /// Returns all environment varaibles as name=value pairs
+        /// </summary>
+        /// <returns>Array of environment variable pairs</returns>
         public string[] All()
         {
             return (from DictionaryEntry entry in Environment.GetEnvironmentVariables(target)
                     select entry.Key + "=" + entry.Value).ToArray();
-        }       
+        }
     }
 }

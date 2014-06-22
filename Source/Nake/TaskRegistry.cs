@@ -5,6 +5,8 @@ namespace Nake
 {
     public class TaskRegistry
     {
+        internal static TaskRegistry Global;
+
         public static void Invoke(string taskFullName, params TaskArgument[] arguments)
         {
             var task = Global.Find(taskFullName);
@@ -12,17 +14,24 @@ namespace Nake
             if (task == null)
                 throw new TaskNotFoundException(taskFullName);
 
-            Invoker(task, arguments);
+            task.Invoke(Global.script, arguments);
         }
 
-        internal static TaskRegistry Global = new TaskRegistry();
-        internal static Action<Task, TaskArgument[]> Invoker = (task, args) => task.Invoke(args);
-
         readonly Dictionary<string, Task> tasks = new Dictionary<string, Task>(new CaseInsensitiveEqualityComparer());
+        readonly object script;
 
-        internal void Register(Task task)
+        internal TaskRegistry()
+        {}
+
+        internal TaskRegistry(BuildResult result)
         {
-            tasks.Add(task.FullName, task);
+            script = Activator.CreateInstance(
+                result.Assembly.GetType(Task.ScriptClass), 
+                new object[] {null, null}
+            );
+
+            foreach (var task in result.Tasks)
+                tasks.Add(task.FullName, task);
         }
 
         internal Task Find(string taskFullName)

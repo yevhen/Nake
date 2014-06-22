@@ -5,9 +5,10 @@
     <version>$version$</version>
     <authors>Yevhen Bobrov</authors>
     <owners>Yevhen Bobrov</owners>
-    <licenseUrl>http://github.com/yevhen/Nake/blob/dev/LICENSE.md</licenseUrl>
+    <licenseUrl>http://github.com/yevhen/Nake/blob/master/LICENSE.md</licenseUrl>
     <projectUrl>http://github.com/yevhen/Nake</projectUrl>
-    <description>Write you build automation scripts in C# without paying the angle bracket tax</description>
+    <iconUrl>https://github.com/yevhen/Nake/raw/master/Logo.png</iconUrl>
+    <description>Magic script-based C# task runner with C# V6 support</description>
     <tags>roslyn csx script scriptcs nake build automation</tags>
   </metadata>
   <files>
@@ -18,8 +19,11 @@
     <file src="Output\Package\Release\Nake.exe.config" target="tools/net45" />
     <file src="Output\Package\Release\Meta.dll" target="tools/net45" />
     <file src="Output\Package\Release\Utility.dll" target="tools/net45" />
-    <file src="Output\Package\Release\NuGet.Core.dll" target="tools/net45" />
     <file src="Output\Package\Release\GlobDir.dll" target="tools/net45" />
+    <file src="Output\Package\Release\Microsoft.CodeAnalysis.dll" target="tools/net45" />
+    <file src="Output\Package\Release\Microsoft.CodeAnalysis.CSharp.dll" target="tools/net45" />
+    <file src="Output\Package\Release\System.Collections.Immutable.dll" target="tools/net45" />
+    <file src="Output\Package\Release\System.Reflection.Metadata.dll" target="tools/net45" />
     
     <file src="Build\NuGet\Nake.csx" target="sample" />
     <file src="Output\Package\Release\Nake.bat" target="sample" />	

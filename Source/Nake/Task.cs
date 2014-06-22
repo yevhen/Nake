@@ -1,85 +1,56 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
-using Roslyn.Compilers;
-using Roslyn.Compilers.CSharp;
+using Microsoft.CodeAnalysis;
+using Nake.Magic;
 
 namespace Nake
 {
     class Task
     {
-        const string ScriptClass = "Submission#0";
+        internal const string ScriptClass = "Script";
 
         readonly List<Task> dependencies = new List<Task>();
         readonly HashSet<TaskInvocation> invocations = new HashSet<TaskInvocation>();
 
-        readonly MethodSymbol symbol;
+        readonly string signature;
+        readonly bool step;
         MethodInfo reflected;
 
-        public Task(MethodSymbol symbol)
+        public Task(IMethodSymbol symbol, bool step)
         {
             CheckSignature(symbol);
-            CheckPlacement(symbol);
-            CheckSummary(symbol);
-
-            this.symbol = symbol;
+            signature = symbol.ToString();
+            this.step = step;
         }
 
-        static void CheckSignature(MethodSymbol symbol)
+        public Task(TaskDeclaration declaration)
         {
-            if (!symbol.IsStatic ||
-                !symbol.ReturnsVoid ||
-                 symbol.DeclaredAccessibility != Accessibility.Public ||
-                 symbol.IsGenericMethod ||
-                 symbol.Parameters.Any(p => p.RefKind != RefKind.None || !TypeConverter.IsSupported(p.Type)))
+            signature = declaration.Signature;
+            step = declaration.IsStep;
+        }
+
+        static void CheckSignature(IMethodSymbol symbol)
+        {
+            if (!symbol.ReturnsVoid ||                
+                symbol.IsGenericMethod ||
+                symbol.Parameters.Any(p => p.RefKind != RefKind.None || !TypeConverter.IsSupported(p.Type)))
                 throw new TaskSignatureViolationException(symbol.ToString());
-        }
+        }  
 
-        static void CheckPlacement(MethodSymbol symbol)
+        internal bool IsGlobal
         {
-            var parentType = symbol.ContainingType;
-            
-            while (parentType.Name != ScriptClass)
-            {
-                var isNamespace =
-                    parentType.IsStatic &&
-                    parentType.DeclaredAccessibility == Accessibility.Public;
-
-                if (!isNamespace)
-                    throw new TaskPlacementViolationException(symbol.ToString());
-
-                parentType = parentType.ContainingType;
-            }
+            get { return !FullName.Contains("."); }
         }
 
-        static void CheckSummary(MethodSymbol symbol)
-        {
-            if (symbol.GetDocumentationComment().HadXmlParseError)
-                throw new InvalidXmlDocumentationException(symbol.ToString());
-        }
-
-        public static bool IsAnnotated(MethodSymbol symbol)
-        {
-            return symbol.GetAttributes().SingleOrDefault(x => x.AttributeClass.Name == "TaskAttribute") != null;
-        }
-
-        public string Summary
-        {
-            get { return symbol.GetDocumentationComment().SummaryTextOpt ?? ""; }
-        }
-
-        public bool IsGlobal()
-        {
-            return !FullName.Contains(".");
-        }
-
-        public string Name
+        string Name
         {
             get
             {
-                return IsGlobal()
+                return IsGlobal
                         ? FullName
                         : FullName.Substring(FullName.LastIndexOf(".", StringComparison.Ordinal) + 1);
             }
@@ -87,32 +58,22 @@ namespace Nake
 
         public string FullName
         {
+            get { return Signature.Substring(0, Signature.IndexOf("(", StringComparison.Ordinal)); }
+        }
+
+        string DeclaringType
+        {
             get
             {
-                return DisplayName.Substring(0, DisplayName.IndexOf("(", StringComparison.Ordinal));
+                return !IsGlobal
+                        ? ScriptClass + "+" + FullName.Substring(0, FullName.LastIndexOf(".", StringComparison.Ordinal)).Replace(".", "+")
+                        : ScriptClass;
             }
         }
 
-        public string DeclaringType
+        public string Signature
         {
-            get
-            {                
-                if (IsGlobal())
-                    return ScriptClass;
-
-                return ScriptClass + "+" + FullName.Substring(0,
-                    FullName.LastIndexOf(".", StringComparison.Ordinal)).Replace(".", "+");
-            }
-        }
-
-        public string DisplayName
-        {
-            get { return symbol.ToString(); }
-        }
-
-        public bool HasRequiredParameters()
-        {
-            return symbol.Parameters.Any(x => !x.HasDefaultValue);
+            get { return signature; }
         }
 
         public void AddDependency(Task dependency)
@@ -139,23 +100,28 @@ namespace Nake
         public void Reflect(Assembly assembly)
         {
             reflected = assembly.GetType(DeclaringType)
-                .GetMethod(Name, BindingFlags.Static | BindingFlags.Public);
+                .GetMethod(Name, BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+
+            Debug.Assert(reflected != null);            
         }
 
-        public void Invoke(TaskArgument[] arguments)
+        public void Invoke(object script, TaskArgument[] arguments)
         {
-            var invocation = new TaskInvocation(this, reflected, arguments);
+            var invocation = new TaskInvocation(script, this, reflected, arguments);
 
-            var alreadyInvoked = !invocations.Add(invocation);
-            if (alreadyInvoked)
-                return;
+            if (step)
+            {
+                var alreadyInvoked = !invocations.Add(invocation);
+                if (alreadyInvoked)
+                    return;
+            }
 
             invocation.Invoke();
         }       
 
         public override string ToString()
         {
-            return DisplayName;
+            return Signature;
         }
     }
 }

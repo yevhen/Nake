@@ -12,9 +12,9 @@ namespace Nake
         {
             Assert.Throws<RecursiveTaskCallException>(() => Build(@"
             
-                [Task] public static void Task() 
+                [Step] void Step() 
                 {
-                    Task();
+                    Step();
                 }
 
             "));
@@ -25,14 +25,14 @@ namespace Nake
         {
             Assert.Throws<CyclicDependencyException>(() => Build(@"
             
-                [Task] public static void Task1() 
+                [Step] void Step1() 
                 {
-                    Task2();
+                    Step2();
                 }
 
-                [Task] public static void Task2() 
+                [Step] void Step2() 
                 {
-                    Task1();
+                    Step1();
                 }
 
             "));
@@ -43,19 +43,19 @@ namespace Nake
         {
             Assert.Throws<CyclicDependencyException>(() => Build(@"
             
-                [Task] public static void Task1() 
+                [Step] public static void Step1() 
                 {
-                    Task2();
+                    Step2();
                 }
 
-                [Task] public static void Task2() 
+                [Step] public static void Step2() 
                 {
-                    Task3();
+                    Step3();
                 }
 
-                [Task] public static void Task3() 
+                [Step] public static void Step3() 
                 {
-                    Task1();
+                    Step1();
                 }
 
             "));

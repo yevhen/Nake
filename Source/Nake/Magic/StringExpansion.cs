@@ -1,18 +1,21 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-using Roslyn.Compilers;
-using Roslyn.Compilers.Common;
-using Roslyn.Compilers.CSharp;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Nake.Magic
 {
     class StringExpansion
     {
+        public readonly HashSet<EnvironmentVariable> Captured = new HashSet<EnvironmentVariable>();
+
         public static bool Qualifies(LiteralExpressionSyntax node)
         {
-            return node.Kind == SyntaxKind.StringLiteralExpression;
+            return node.CSharpKind() == SyntaxKind.StringLiteralExpression;
         }
 
         static readonly Regex expressionPattern = new Regex(
@@ -44,8 +47,8 @@ namespace Nake.Magic
             var expanded   = ExpandExpressions(literal);
             var inlined    = InlineEnvironmentVariables(expanded);
             var final      = Quote(Unescape(inlined));
-                    
-            return Syntax.ParseExpression(final);
+
+            return SyntaxFactory.ParseExpression(final);
         }
 
         string ExpandExpressions(string token)
@@ -57,7 +60,7 @@ namespace Nake.Magic
             {
                 var expression = match.Groups["expression"].Value;
 
-                var syntax = Syntax.ParseExpression(expression);
+                var syntax = SyntaxFactory.ParseExpression(expression);
                 if (syntax.Span.Length != expression.Length)
                     throw new ExpressionSyntaxException(expression, LocationDiagnostics(match.Index));
 
@@ -77,7 +80,7 @@ namespace Nake.Magic
 
         string LocationDiagnostics(int matchPosition)
         {
-            var span = node.GetLocation().GetLineSpan(true);
+            var span = node.GetLocation().GetLineSpan();
 
             return string.Format(
                 "{0} ({1},{2})", 
@@ -86,20 +89,35 @@ namespace Nake.Magic
                 span.StartLinePosition.Character + 1 + matchPosition);
         }
 
-        static string InlineEnvironmentVariables(string token)
+        string InlineEnvironmentVariables(string token)
         {
             return environmentVariablePattern.Replace(token, match =>
             {
-                var variable = match.Groups["variable"].Value;
-                var value = Env.Var[variable] ?? "$" + variable + "$";
-
+                var name = match.Groups["variable"].Value;
+                var value = Env.Var[name] ?? "$" + name + "$";
+                Captured.Add(new EnvironmentVariable(name, value));
+                
                 return Verbatimize(value);
             });
         }
 
         static string Quote(string token)
         {
-            return string.Format(@"@""{0}""", token);
+            var quotation = IsQuoted(token) && !IsExpanded(token) 
+                            ? @"@{0}" 
+                            : @"@""{0}""";
+
+            return string.Format(quotation, token);
+        }
+
+        static bool IsQuoted(string token)
+        {
+            return token.StartsWith("\"") && token.EndsWith("\"");
+        }
+
+        static bool IsExpanded(string token)
+        {
+            return token.EndsWith("@\"");
         }
 
         static string Verbatimize(string token)
@@ -114,6 +132,29 @@ namespace Nake.Magic
             return !constant 
                     ? result.Replace("{{", "{").Replace("}}", "}") 
                     : result;
+        }
+    }
+
+    struct EnvironmentVariable
+    {
+        public readonly string Name;
+        public readonly string Value;
+
+        public EnvironmentVariable(string name, string value)
+        {
+            Name = name;
+            Value = value;
+        }
+
+        public override bool Equals(object obj)
+        {
+            var other = (EnvironmentVariable) obj;
+            return string.Equals(Name, other.Name);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked { return (Name.GetHashCode() * 397); }
         }
     }
 }

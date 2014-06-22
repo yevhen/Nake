@@ -1,200 +1,128 @@
 ## Nake
 
-Nake is a magic task runner tool for .NET. It was built by unicorns flying in a rainbows and it's well seasoned by lots of fairy dust. Nake is simply that build/deployment/ops automation tool you were dreaming of.
-
-Jokes aside, it's the only tool which can give you an imperative/functional convenience of Rake/MSBuild, but without forcing you (and your team) to learn yet another language and without pricking you eyes by hordes of angle brackets. 
-
-At last! Now you can automate your tasks by writing a 100% idiomatic C# code without any limitations (and with all the power of .NET framework) using a lightweight scripting approach. No projects, no pre-compilation, using any text editor. 
-
-Nake's DSL for defining tasks is uniquely minimal and it was carefully crafted to be a 100% IntelliSense compatible. And no worries, Nake has great MSBuild interoperability story, so you can easily import and execute any built-in or third-party MSBuild tasks.
-
-## Getting Started
+Nake is a magic task runner tool for .NET. It's a hybrid of Shovel and Rake. The DSL for defining tasks is uniquely minimal and it's just plain C# code! Nake is built on top of the latest Roslyn release so you can use all of the C# V6 features in you scripts and even more.
 
 ### How to install
 
-There multiple ways in which Nake could be installed. You can install it by using NuGet [package](https://www.nuget.org/packages/Nake), or you can install it by downloading a [standalone](https://github.com/yevhen/Nake/releases) executable from GitHub releases page, and of course you can always build it from sources. 
+There multiple ways in which Nake could be installed. You can install it by using NuGet [package](https://www.nuget.org/packages/Nake), or you can get it by downloading a [standalone](https://github.com/yevhen/Nake/releases) executable from GitHub releases page, and of course you can always build it from sources. 
 
 To install Nake via NuGet, run this command in NuGet package manager console:
 
-	PM> Install-Package Nake 
+	PM> Install-Package Nake
 
-#### IntelliSense and syntax highlighting
-
-You can install [Roslyn CTP](http://www.microsoft.com/en-us/download/details.aspx?id=34685) extension to get IntelliSense support in Visual Studio 2012. IntelliSense for other versions of Visual Studio is not available at the moment. 
-
-Syntax highlighting for *.csx* files is easy to get - it is just standard C# code, so just map *.csx* file extension in you favorite text editor to be recognized as C#.
-
-> NOTE: You might first need to install [VS 2012 SDK](http://www.microsoft.com/en-us/download/details.aspx?id=30668) for Roslyn CTP extension to be installed successfully
-
-### Writing your first task
-
-Open up you favorite text editor and enter the following code:
+## Scripting reference
 
 ```cs
-[Task] public static void Welcome()
+#r "System"                             // 
+#r "System.Core"	                    //   #reference assemblies from the GAC 
+#r "System.Data"	                    //    (these are referenced by default)
+#r "System.Xml"                         //
+#r "System.Xml.Linq"                    //
+
+#r "WindowsBase, Version=4.0.0.0 ..."   //  you can reference assembly by its full name
+#r "Packages\NUnit.2.6.2\nunit.dll"     //        or by using relative path
+#r "C:\Orleans\SDK\Orleans.dll"         //            or by absolute path
+
+#load "Other.csx"                       //      #load code from other script files
+#load "Build\Another.csx"               //  (both absolute and relative paths are fine)
+
+using System;                           //
+using System.IO;                        //      standard C# namespace imports
+using System.Linq;                      //     (these are imported by default)
+using System.Text;                      //  
+using System.Collections.Generic;       //  
+
+using System.IO.Path;                   //    C# V6 "using static members" feature 
+using System.Console;                   //      will make you scripts more terse
+
+WriteLine("Are you ready? Y/N:");       //      any code you put on the script level 
+if (ReadLine() == "N")                  //  will run before any of the tasks are executed
+    Exit("See you soon ...");           //      (useful for one-off initialization)
+
+var greeting = "Hello";                 //   you can override any script-level variables 
+var who = "world";                      //  with the values passed from the command line
+
+/// Prints greeting                     //  this F#-style summary will be shown in the task listing
+[Task] void Welcome()                   //  [Task] makes method runnable from the command line
+{                                       
+	WriteLine("{greeting},{who}!");     //  forget ugly string.Format and string concatenation 
+}                                       //  with built-in support for string interpolation
+
+[Task] void Tell(
+    string what = "Hello",              //     for parameterized tasks you can supply
+    string whom = "world",              //     arguments directly from the command line
+    int times = 1,                      //  (string, int and boolean arguments are supported) 
+    bool quiet = false                  //  + special switch syntax for booleans (eg, --quiet)
+)
 {
-	Console.WriteLine("Hello, world!");
-}
-```
-Save it to the root folder of your solution and give file *Nake.csx* name. Now you can invoke your task from command line by using Nake console application.
+    var emphasis = quiet ? "" : "!";
+    for (; times > 0; times--)
+	    WriteLine("{what},{whom}{emphasis}");
+}                                   
 
-> NOTE: If you installed Nake via NuGet package manager console in Visual Studio, during an installation a sample script (*Nake.csx*) was created in the root directory of your solution. You can use it as the starting point.
+[Step] void Clean()   			        //      Steps are Tasks with 'run once' semantics      
+{					                    //  (the foundation of any popular build automation tool)
+    Delete("{OutputPath}\*.*");	
+}                                   
 
-### Invoking task via command line
-
-To invoke a task from a command line you just need to pass it's name to the Nake's console application. Task names are case insensitive, so to invoke the task you've just created, simply execute the following in your favorite console:
-
-	Nake welcome
-
-You should see the following output:
-
-	Hello, world!
-
-Cool, ya? :grimacing: 
-
-That for sure will only work if you have *Nake.exe* somewhere in your path. That's not good as Nake should be used as local dependency. Assuming that you have installed it via NuGet, your actual path might look like the one below:
-
-	Packages\Nake.1.0.0.7\tools\net45\Nake.exe welcome
-
-That, without doubt, is tedious to enter every time you want to invoke a task, but there is nothing in the world that cannot be fixed with a duct tape and bit of cleverness. Let's create a simple batch file which will act as the proxy for running Nake. Create *Nake.bat* file in the root directory of your solution and put there the text below:
-
-	@ECHO OFF 
-	Packages\Nake.1.0.0.7\tools\net45\Nake.exe %*
-
-Now you have an easy (and recommended) way to launch Nake.
-
-> NOTE: If you installed Nake via NuGet package manager console in Visual Studio, during an installation a sample batch runner file (*Nake.bat*) was created in the root directory of your solution. if that didn't happen - check Nake *samples* directory inside respective package folder. 
-
-### Describing tasks
-
-Now if you invoke Nake with *-T* switch it should show you all tasks defined in the script. Nevertheless, running it for the script which we've just created will produce no output. Why is that? Well, that's because by default Nake won't list tasks that don't have descriptions.
-
-Now guess how can we give a meaningful descriptions to our tasks, which are simply methods? Right, you will just use standard XML documentation comments:  
-
-```cs
-/// <summary>
-/// This is a demo task
-/// </summary>
-[Task] public static void Welcome()
-{
-	Console.WriteLine("Hello, world!");
-}
-```
-
-Now if you again run Nake with the *-T* switch you should see the following output: 
-
-	C:\Demo>Nake -T
-	
-	Nake welcome  # This is a demo task
-
-
-### Passing arguments to a task
-
-With Nake, it's ridiculously easy to define task parameters and pass them to a task from a command line. 
-
-```cs
-
-[Task] public static void Welcome(string who)
-{
-	Console.WriteLine("Hello, {0}!", who);
-}
-```
-
-Now you can simply invoke it using the following command-line:
-
-	Nake welcome amigo
-
-That will print as expected:
-
-	Hello, amigo!
-
-Nake also supports optional parameters, so you can define the task above as follows:
-
-```cs
-[Task] public static void Welcome(string who = "baby", string greeting = "Hello")
-{
-	Console.WriteLine("{0}, {1}!", greeting, who);
-}
-```
-
-Invoking it with the following command line:
-
-	Nake welcome greeting: "Hasta la vista"
-
-Will produce the following output:
-
-	Hasta la vista, baby!
-
-> NOTE: At the moment Nake supports the following parameter types: bool, string and int. Support for *params* arrays and some other types is on a road-map.  Nevertheless, it's possible to code pretty much anything with just the types already supported by Nake.
-
-### Specifying prerequisite tasks (dependencies)
-
-Suppose we have the following build related tasks defined in a script:
-
-```cs
-[Task] public static void Clean()
-{
-	// here goes code, which cleans build output directory
+[Step] void Build(string cfg = "Debug")
+{					                    
+    Clean();                            //  unlike popular build automation tools, there is no any
+    -------                             //    special syntax to specify task (step) dependencies
+    MSBuild("Nake.sln", cfg);           //      (it's just plain old C# method invocation)
+}                                       
+                                       
+[Step] void Test()
+{					                    
+    Clean();                            //         you have complete control over decision,
+    Build();                            //     when and in what order dependent steps should run
+    -------                             //  (Nake will guarantee that any step will run only once)
+    NUnit("{OutputPath}\*.Tests.dll")   
 }
 
-[Task] public static void Build(string configuration = "Debug")
-{
-	// here goes code, which builds sources using given configuration
+[Step] void Publish(bool beta = false)
+{					                    
+    Test();                             //   sometimes, you need to execute the same step but with
+    Build("Release");                   //  different arguments. Unlike other build automation tools
+    ------                              //  there is no special syntax to force step to run again - 
+    Nuget("Nake.nuspec", beta)          //       you just invoke it with different arguments!
+}                                       
+
+var apiKey = "$NugetKey$";              //  $var$ is the shortcut syntax for getting 
+Push(apiKey, "{PackagePath}");          //      value of environment variable
+
+Write("$NakeStartupDirectory$");        //  these special environment variables
+Write("$NakeScriptDirectory$");         //   are automatically created by Nake
+
+Write("{{esc}}");                       //  will simply print {esc} (no string interpolation)
+Write("$$esc$$");                       //  will simply print $esc$ (no env variable inlining)
+
+class Azure                             //  namespace declarations cannot be used with scripts,
+{                                       //  but could be easily emulated with class declarations
+    class Queue                         //     and you can nest them infinitely as you like
+    {    
+        [Task] void Clean()             //     then from the command line you would invoke
+        {}                              //  this task by its full path (ie, azure.queue.clean)
+    }
+}
+
+[Task] void Default()                   //     running Nake without any options 
+{                                       //  will cause it to run the "default" task
+	Build();
 }
 ```
 
-We want to specify that the Clean() task should always be executed before the Build() task is executed. Regarding to this, we can say that the Clean() task is the *prerequisite* of the Build() task or that the Build() task is *dependent* on the Clean() task. 
-
-Now, how can we specify that relationship in Nake script? That Build() task is dependent on the Clean() task? Check out the following example:
-
-```cs
-[Task] public static void Clean()
-{
-	// here goes code, which cleans build output directory
-}
-
-[Task] public static void Build(string configuration = "Debug")
-{
-	Clean();
-
-	// here goes code, which builds sources using given configuration
-}
-```
-Yes, it's just a regular method call. There is no any special syntax in Nake for specifying prerequisites - you simply invoke one task from within another task using native C# language constructs. Everything is 100% statically bound. No strings whatsoever, and you can put task invocations in any place you want (so that you can easily replicate advanced MSBuild features like [Before/After targets](http://freetodev.wordpress.com/2009/06/24/msbuild-4-0-beforetargets-and-aftertargets/) :grin:). 
-
-##### How does it work?
-
-DOC: Describe how Nake is unique in its approach to specifying tasks and their prerequisites, and how it extends C# language semantics in order to implement dependency based style of computation ([link](http://martinfowler.com/articles/rake.html#DependencyBasedProgramming)), while still keeping its DSL (pure C#) rather imperative. Describe how Nake uses Roslyn's syntax re-writing features to rewrite task invocations.
-
-### Namespaces
-DOC
-
-## Other mind-blowing features (at a glance)
-
-#### String literal expansions
-DOC
-
-#### Command line overrides
-DOC 
-
-#### MSBuild interoperability
-DOC
-
-#### Powerful utility library
-DOC
-
-## Other useful features
-
-- **Cycle dependencies detection** - DOC
-- **Roslyn bootstrapping** - DOC
-
-## General scripting
-
-DOC: Point to relevant topics in scriptcs documentation
-
-## Working with command line
+## Command line reference
 
 General syntax is: `Nake [options ...]  [VAR=VALUE ...]  [task ...]`
+
+```cs
+> Nake -f "Nake.csx" Log=1 build        //   set Log environment variable to 1 and
+                                        //  then run Build() task from Nake.csx file 
+                                        
+> Nake Log=1 build                      //  equivalent to the above as Nake will automatically try 
+                                        //   to use Nake.csx file if present in current directory
+```
 
 Options:
 
@@ -202,91 +130,86 @@ Options:
 	   -v  --version          Display the program version and exit
 	   -q  --quiet            Do not echo informational messages to standard output
 	   -s  --silent           Same as --quiet but also suppresses user generated log messages
-	   -f  --nakefile FILE    Use FILE as the Nake project file
+	   -f  --nakefile FILE    Use FILE as Nake project file
 	   -d  --directory DIR    Use DIR as current directory
 	   -t  --trace            Enables task execution tracing and full stack traces in exception messages
 	       --debug            Enables full script debugging in Visual Studio
 	   -T  --tasks [PATTERN]  Display the tasks with descriptions matching optional PATTERN and exit
 
->NOTE: You can always get help for command line usage by running Nake with *-?* or *--help* switches.
+### Invoking tasks
 
-#### Setting environment variables
-
-You can set process-level environment variables by defining key/value pairs before task name:
-
-```
-Nake CpuCount=2 OutDir=C:\Temp scan 
-```
-
-#### Overriding constants
-
-An interesting feature of Nake, is that it allows you to override value of any public constant or public static property, by simply passing a corresponding key/value pair from a command line, like in previous example:
-
-```
-Nake CpuCount=2 OutDir=C:\Temp scan 
-```
-You can get these values using built-in utility class:
+General syntax for invoking tasks and passing arguments is similar to the normal C# method invocation syntax, except ` ` is used instead of `,` to separate task arguments, and `=` is used instead of `:` for specifying named argument values. Also, boolean arguments support special `--` switch syntax.
 
 ```cs
-var cpuCount = Env.Var["CpuCount"] ?? 1;
-var outDir = Env.Var["OutDir"] ?? "Output";
+> Nake build                            //  run Build task with default arg values
+> Nake build Release                    //  or with first positional argument set to 'Release'
+> Nake build cfg=Release                //  or with named argument 'cfg' set to 'Release'
+> Nake build Release outDir="C:\Temp"   //  you can mix positional and named arguments
+> Nake build ; test                     //  or invoke multiple tasks within a same session
+> Nake build `; test                    //  also escape ';' when running in PowerShell console 
+> Nake publish --beta                   //  invoke Publish task with 'beta' arg set to 'true'
 ```
-This is similar to MSBuild way of having overridable variables with fallback values. But in Nake, it is enough to just declare public constants or public static properties, and Nake will try to match property names with those coming from a command line, overriding those which match: 
+
+## Included utility reference
+
+Out-of-the box Nake includes a lot of useful convinient utility functions to help you with: 
+
+- running external tools, such as command-line commands or MSBuild
+- selecting and transforming file system paths (globber)
+- casual file system tasks, such as copying, moving, deleting files/folders 
+- logging messages to console
+- working with environment variables
+- controlling Nake's runner
+- etc
+
+Check out table below for reference on using utility library:
+
+| Class         						                    | Functions     					                    |
+|:----------------------------------------------------------|:------------------------------------------------------|
+| [Run](https://github.com/yevhen/Nake/wiki/Run)          	| Running external tools: Cmd, MSBuild              	|
+| [App](https://github.com/yevhen/Nake/wiki/App)           	| Controlling Nake's runner              		        |
+| [Log](https://github.com/yevhen/Nake/wiki/Log)          	| Logging messages to console              		        |
+| [Env](https://github.com/yevhen/Nake/wiki/Env)          	| Working with environment variables              	    |
+| [FS](https://github.com/yevhen/Nake/wiki/FS)            	| File-system tasks, such as cop/move/etc              	|
+| [FileSet](https://github.com/yevhen/Nake/wiki/FileSet)  	| File path selection and transformation (globber)      |
+| [Color](https://github.com/yevhen/Nake/wiki/Color)      	| Printing to console in color              		    |
+| [Location](https://github.com/yevhen/Nake/wiki/Location)	| Current directory and special paths (script, startup) |
+
+Also, see 'by use-case' reference on [wiki](https://github.com/yevhen/Nake/wiki).
+
+## Tips & tricks
 
 ```cs
-public const int CpuCount = 1;
-public static string OutDir = "Output";
+class Azure
+{                                       
+    StorageAccount account;
+    
+    static Azure()                      //  this will run once before any of the 
+    {                                   //  tasks in this namespace are executed
+        account = Init();               //  (useful for one-off initialization)
+    }
+}  
 ```
-Declaring constants could be more handy, as you can use them as default parameter values: 
-
-```cs
-[Task] public static void Clean(string dir = OutDir) { ... }
-```
-
-#### Passing arguments to tasks 
-
-Use space to separate arguments. Both positional and named arguments are supported. The command line syntax is the same as regular C# method calling syntax, except space is used as separator (instead of *,*):
-
-```
-Nake db.migrate MainDb version:10002 
-```
-> NOTE: Use double quotes, if the value you're passing contains colon *:* (ie *Nake clean dir:"C:\Temp"*). Also, don't forget to properly escape symbols, which have special meaning in your shell.  
-
-#### Calling multiple tasks 
-
-You can call multiple tasks, within one session, by simply separating them with semicolon *;*:
-
-```
-Nake clean;build;test 
-```
-> NOTE: In some shells, like PowerShell, semicolon (*;*) need to be escaped. For PowerShell it should be escaped with a backtick *`;*.
 
 ## Backlog
 
 - Running on Mono
-- Support for additional parameter types, such as *params*
-- Ask for required arguments, ala PowerShell
-- Interactive mode, task name tab completion
-- PowerShell hosting
-- On-demand script loader
-- Once Roslyn finally start respecting *#load* directive, move both Meta and Utility to *.csx* files, so global install is possible
+- Interactive mode
 
 ## Contributing
 
-**Bugs** - no need to ask anything, just fix it and do a pull request
-
-**Features** - ideally should be discussed via GitHub issues or Nake's discussion group to avoid duplicate work and to make sure that new stuff is still inline with original vision.
+Gimme your pull requests!
 
 ## Samples and Documentation
 
-Have a look at [Nake.csx](https://github.com/yevhen/Nake/blob/master/Nake.csx) or [Publish.csx](https://github.com/yevhen/Nake/blob/master/Publish.csx). Those are the Nake files used to build and publish Nake itself (ye, we're eating our own dog food). Also, additional samples can be contributed to samples [repository](https://github.com/yevhen/Nake-samples). Detailed documentation (soon) can be found on [wiki](https://github.com/yevhen/Nake/wiki). 
+Have a look at [Nake.csx](https://github.com/yevhen/Nake/blob/dev/Nake.csx) or [Publish.csx](https://github.com/yevhen/Nake/blob/dev/Publish.csx). Those are the Nake files used to build and publish Nake itself (ye, we're eating our own dog food). Also, additional samples can be contributed to samples [repository](https://github.com/yevhen/Nake-samples).
 
 ## Community
 
 General discussion group could be found [here](https://groups.google.com/forum/#!forum/naketool). Also, for news you can follow Nake's [official](https://twitter.com/NakeTool) twitter account (or [my](https://twitter.com/yevhen) account for that matter). The twitter's hashtag is `#naketool`.
 
 ## Credits
-- To all contributors (check out GitHub statistics)!
+- Thanks to everyone in the Roslyn compiler team for making this happen
 - Thanks to all members of the [scriptcs](https://github.com/scriptcs) team for lending me their script pre-processing code
 - Special thanks to [Anton Martynenko](https://twitter.com/aamartynenko) for giving me an idea and steering Nake's DSL in the right direction
 - Hugs and kisses to my lovely Valery for being so patient and supportive, and for feeding me food and beer, while I was sitting in my cage working on Nake, instead of spending that time with her

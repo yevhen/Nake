@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+
+using Nake.Magic;
 
 using NUnit.Framework;
 
@@ -14,13 +17,17 @@ namespace Nake
         {
             if (exceptionType != null)
             {
-                Assert.Throws(exceptionType, () => Build(code));
+                Assert.Throws(exceptionType, () => FindTaskDeclarations(code));
                 return;
             }
-            
-            Build(code);
 
-            Assert.That(Tasks.Single().Summary, Is.EqualTo(summary));
+            var tasks = FindTaskDeclarations(code);
+            Assert.That(tasks.Single().Summary, Is.EqualTo(summary));
+        }
+
+        static IEnumerable<TaskDeclaration> FindTaskDeclarations(string code)
+        {
+            return new TaskDeclarationScanner().Scan(code);
         }
 
         public object[][] TestCases()
@@ -33,20 +40,20 @@ namespace Nake
 
                 TaskDeclaration(
                     @"
-                    /// <summary>   </summary>
+                    /// 
                     [Task] public static void WhitespaceOnlyInSummary() {}", ""
                 ),
 
                 TaskDeclaration(
                     @"
-                    /// <summary> described in xml doc tag </summary>
-                    [Task] public static void ProperlyDescribed() {}", "described in xml doc tag"
+                    /// described in F#-style summary doc
+                    [Task] public static void ProperlyDescribed() {}", "described in F#-style summary doc"
                 ),
 
-                BadTaskDeclaration<InvalidXmlDocumentationException>(
+                TaskDeclaration(
                     @"
-                    /// <summary> described in xml doc tag
-                    [Task] public static void InvalidXmlDoc() {}"
+                    // described in simple comment style
+                    [Task] public static void InvalidXmlDoc() {}", ""
                 )
             };
         }
@@ -56,14 +63,6 @@ namespace Nake
             return new object[]
             {
                 code, summary, null
-            };
-        }
-
-        static object[] BadTaskDeclaration<TException>(string code) where TException : Exception
-        {
-            return new object[]
-            {
-                code, null, typeof(TException)
             };
         }
     }

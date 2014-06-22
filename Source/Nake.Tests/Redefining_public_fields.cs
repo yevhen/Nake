@@ -9,10 +9,12 @@ namespace Nake
     class Redefining_public_fields : CodeFixture
     {
         [Test]
-        public void Can_redefine_any_public_field_or_constant()
+        public void Can_redefine_any_script_level_var_any_public_field_or_constant()
         {
             Build(@"
                 
+                var scriptLevelVar = ""0"";                
+
                 public const string PublicConstField = ""0"";
                 public static string PublicStaticField = ""0"";
                 
@@ -24,8 +26,9 @@ namespace Nake
                     public static string PublicField = ""0"";
                 }          
 
-                [Task] public static void Test()
+                [Task] void Test()
                 {
+                    Env.Var[""ScriptLevelVar""]            = scriptLevelVar;
                     Env.Var[""PublicConstField""]          = PublicConstField;
                     Env.Var[""PublicStaticField""]         = PublicStaticField;
                     Env.Var[""PrivateConstField""]         = PrivateConstField;
@@ -35,6 +38,7 @@ namespace Nake
             ", 
 
             Substitute()
+                .Var("ScriptLevelVar",          "1")
                 .Var("PublicConstField",        "1")
                 .Var("PublicStaticField",       "1")
                 .Var("NestedClass.PublicField", "1")
@@ -44,11 +48,12 @@ namespace Nake
 
             Invoke("Test");
 
+            Assert.That(Env.Var["ScriptLevelVar"],          Is.EqualTo("1"));
             Assert.That(Env.Var["PublicConstField"],        Is.EqualTo("1"));
             Assert.That(Env.Var["PublicStaticField"],       Is.EqualTo("1"));
             Assert.That(Env.Var["NestedClass.PublicField"], Is.EqualTo("1"));
-            Assert.That(Env.Var["PrivateConstField"],       Is.EqualTo("0"));
-            Assert.That(Env.Var["PrivateStaticField"],      Is.EqualTo("0"));
+            Assert.That(Env.Var["PrivateConstField"],       Is.EqualTo("1"));
+            Assert.That(Env.Var["PrivateStaticField"],      Is.EqualTo("1"));
         }
 
         [Test]

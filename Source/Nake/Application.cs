@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 
 using Nake.Magic;
+using Nake.Scripting;
 
 namespace Nake
 {
@@ -19,6 +20,8 @@ namespace Nake
 
         public void Start()
         {
+            SetCurrentDirectory();
+
             if (options.ShowHelp)
                 ShowHelp();
 
@@ -34,24 +37,22 @@ namespace Nake
             if (options.TraceEnabled)
                 SetTrace();
 
-            Initialize();
+            var file   = Find();
+            var script = Preprocess(file);
+            
+            var code = script.Code();
+            var declarations = Scan(code);
 
             if (options.ShowTasks)
-                ShowTasks();
+                ShowTasks(declarations);
 
-            InvokeTasks();
-        }
-
-        void Initialize()
-        {
-            SetCurrentDirectory();
             OverrideEnvironmentVariables();
-            
-            var scriptFile = FindScriptFile();
-            DefineNakeEnvironmentVariables(scriptFile);
+            DefineNakeEnvironmentVariables(file);
 
-            var compilation = BuildScript(scriptFile);
-            RegisterTasks(compilation);
+            var result = Build(file, script, code, declarations);
+            Initialize(result);
+
+            Invoke();
         }
 
         void SetCurrentDirectory()
@@ -74,7 +75,7 @@ namespace Nake
             Env.Var["NakeStartupDirectory"] = Location.CurrentDirectory();
         }
 
-        FileInfo FindScriptFile()
+        FileInfo Find()
         {
             if (options.ScriptFile != null)
             {
@@ -96,9 +97,23 @@ namespace Nake
             return new FileInfo(defaultScriptFile);
         }
 
-        Script BuildScript(FileInfo scriptFile)
+        BuildResult Build(FileInfo file, PreprocessedScript script, string code, IEnumerable<TaskDeclaration> declarations)
         {
-            return Script.Build(scriptFile, VariableSubstitutions(), options.DebugScript);
+            var engine = new Engine(
+                script.References, 
+                script.AbsoluteReferences, 
+                script.Namespaces
+            );
+
+            var cachingEngine = new CachingEngine(
+                engine, file, declarations.Select(x => new Task(x)).ToArray()              
+            );
+
+            var result = cachingEngine.Build(
+                code, VariableSubstitutions(), options.DebugScript
+            );
+
+            return result;
         }
 
         Dictionary<string, string> VariableSubstitutions()
@@ -106,91 +121,91 @@ namespace Nake
             return options.Variables.ToDictionary(x => x.Name, x => x.Value);
         }
 
-        static void RegisterTasks(Script script)
+        static void Initialize(BuildResult result)
         {
-            var registry = TaskRegistry.Global;
-
-            foreach (var task in script.Tasks)
-            {
-                registry.Register(task);
-            }
+            TaskRegistry.Global = new TaskRegistry(result);
         }
 
-        public void ShowHelp()
+        static void ShowHelp()
         {
             Options.PrintUsage();
 
-            Exit.Ok();
+            App.Exit();
         }
-        
-        public void ShowVersion()
+
+        static void ShowVersion()
         {
             Log.Info(Assembly.GetExecutingAssembly().GetName().Version.ToString());
 
-            Exit.Ok();
+            App.Exit(); ;
         }
 
-        public void ShowTasks()
+        void ShowTasks(TaskDeclaration[] tasks)
         {
-            if (!TaskRegistry.Global.Tasks.Any())
+            if (!tasks.Any())
             {
                 Log.Info("Project defines 0 tasks");
-                Exit.Ok();
+                App.Exit();
             }
 
             var filter = options.ShowTasksFilter;
-
-            var tasks = TaskRegistry.Global.Tasks.Where(x => x.Summary != "").ToArray();
-            if (tasks.Length == 0)
-                Exit.Ok();
-
-            var maxTaskNameLength = tasks.Max(x => x.FullName.Length);
+            var breadth = tasks.Max(x => x.DisplayName.Length);
 
             tasks = tasks
-                .OrderBy(x => x.FullName)
-                .Where(x => filter == null || x.FullName.ToLower().Contains(filter.ToLower())).ToArray();
+                .OrderBy(x => x.DisplayName)
+                .Where(x => filter == null || 
+                            x.DisplayName.Contains(filter.ToLower()) || 
+                            x.Summary.Contains(filter.ToLower()))
+                .ToArray();
 
             Console.WriteLine();
 
-            foreach (var task in tasks)
-            {
-                if (string.IsNullOrEmpty(task.Summary))
-                    continue;
+            var @default = tasks.SingleOrDefault(x => x.DisplayName == "default");
+            if (@default != null)
+                PrintTask(@default, breadth, ConsoleColor.Cyan);
 
-                Console.Write(Runner.Label(options.RunnerName) + " ");
-
-                Console.ForegroundColor = ConsoleColor.DarkGreen;
-                Console.Write(task.FullName.ToLower().PadRight(maxTaskNameLength + 2));
-                
-                Console.ForegroundColor = ConsoleColor.DarkGray;
-                Console.Write("# " + task.Summary);
-
-                Console.ResetColor();
-                Console.WriteLine();
-            }
+            foreach (var task in tasks.Where(x => x.DisplayName != "default"))
+                PrintTask(task, breadth);
 
             Console.WriteLine();
-            Exit.Ok();
+            App.Exit();
         }
 
-        public void InvokeTasks()
+        void PrintTask(TaskDeclaration task, int breadth, ConsoleColor color = ConsoleColor.DarkGreen)
+        {
+            Console.Write(Runner.Label(options.RunnerName) + " ");
+
+            Console.ForegroundColor = color;
+            Console.Write(task.DisplayName.PadRight(breadth + 2));
+
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.Write("# " + task.Summary);
+
+            Console.ResetColor();
+            Console.WriteLine();
+        }
+
+        TaskDeclaration[] Scan(string code)
+        {
+            return new TaskDeclarationScanner().Scan(code, options.ShowTasks).ToArray();
+        }
+
+        static PreprocessedScript Preprocess(FileInfo file)
+        {
+            return new Preprocessor().Process(file);
+        }
+
+        void Invoke()
         {
             var tasks = options.Tasks;
-
+            
             if (tasks.Count == 0)
                 tasks.Add(Options.Task.Default);
 
             foreach (var task in tasks)
-            {
-                var found = TaskRegistry.Global.Find(task.Name);
-
-                if (found == null)
-                    throw new TaskNotFoundException(task.Name);
-
-                found.Invoke(task.Arguments);
-            }
+                TaskRegistry.Invoke(task.Name, task.Arguments);
         }
-
+        
         static void SetQuiet()
         {
             Env.Var["NakeQuietMode"] = "true";

@@ -12,7 +12,6 @@ namespace Nake
         {
             BreakInDebuggerIfRequested();
             ObserveUnhandledExceptions();
-            BootstrapRoslynIfNeccessary();
             StartApplication(args);
         }
 
@@ -29,7 +28,7 @@ namespace Nake
                 var e = (Exception) args.ExceptionObject;
 
                 Log.Error(e);
-                Exit.Fail(e);
+                App.Fail(e);
             };
 
             TaskScheduler.UnobservedTaskException += (sender, args) =>
@@ -40,15 +39,10 @@ namespace Nake
                 foreach (var inner in e.Flatten().InnerExceptions)
                     Log.Error(inner);
 
-                Exit.Fail(e);
+                App.Fail(e);
             };
         }
-
-        static void BootstrapRoslynIfNeccessary()
-        {
-            Roslyn.Bootstrap();
-        }
-
+    
         static void StartApplication(string[] args)
         {
             try
@@ -60,12 +54,12 @@ namespace Nake
             {
                 Log.Error(e.Message);
                 Options.PrintUsage();
-                Exit.Fail(e);
+                App.Fail(e);
             }
             catch (TaskInvocationException e)
             {
-                Log.Error(e.SourceException);
-                Exit.Fail(e);
+                Log.Error(e.GetBaseException());
+                App.Fail(e);
             }
         }
     }
