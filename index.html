@@ -4,277 +4,160 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <title>Nake by yevhen</title>
+
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script src="javascripts/main.js"></script>
-    <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+    <script src="javascripts/scale.fix.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
   </head>
   <body>
-
-      <header>
-        <h1>Nake</h1>
-        <p>Write you build automation scripts in C# without paying the angle bracket tax!</p>
-      </header>
-
-      <div id="banner">
-        <span id="logo"></span>
-
-        <a href="https://github.com/yevhen/Nake" class="button fork"><strong>View On GitHub</strong></a>
-        <div class="downloads">
-          <span>Downloads:</span>
-          <ul>
-            <li><a href="https://github.com/yevhen/Nake/zipball/master" class="button">ZIP</a></li>
-            <li><a href="https://github.com/yevhen/Nake/tarball/master" class="button">TAR</a></li>
-          </ul>
-        </div>
-      </div><!-- end banner -->
-
     <div class="wrapper">
-      <nav>
-        <ul></ul>
-      </nav>
+      <header>
+        <h1 class="header">Nake</h1>
+        <p class="header">Magic script-based C# task runner. C# V6 is supported!</p>
+
+        <ul>
+          <li class="download"><a class="buttons" href="https://github.com/yevhen/Nake/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/yevhen/Nake/tarball/master">Download TAR</a></li>
+          <li><a class="buttons github" href="https://github.com/yevhen/Nake">View On GitHub</a></li>
+        </ul>
+
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/yevhen">yevhen</a></p>
+
+
+      </header>
       <section>
         <h2>
 <a name="nake" class="anchor" href="#nake"><span class="octicon octicon-link"></span></a>Nake</h2>
 
-<p>Nake is a magic task runner tool for .NET. It was built by unicorns flying in a rainbows and it's well seasoned by lots of fairy dust. Nake is simply that build/deployment/ops automation tool you were dreaming of.</p>
-
-<p>Jokes aside, it's the only tool which can give you an imperative/functional convenience of Rake/MSBuild, but without forcing you (and your team) to learn yet another language and without pricking you eyes by hordes of angle brackets. </p>
-
-<p>At last! Now you can automate your tasks by writing a 100% idiomatic C# code without any limitations (and with all the power of .NET framework) using a lightweight scripting approach. No projects, no pre-compilation, using any text editor. </p>
-
-<p>Nake's DSL for defining tasks is uniquely minimal and it was carefully crafted to be a 100% IntelliSense compatible. And no worries, Nake has great MSBuild interoperability story, so you can easily import and execute any built-in or third-party MSBuild tasks.</p>
-
-<h2>
-<a name="getting-started" class="anchor" href="#getting-started"><span class="octicon octicon-link"></span></a>Getting Started</h2>
+<p>Nake is a magic task runner tool for .NET. It's a hybrid of Shovel and Rake. The DSL for defining tasks is uniquely minimal and it's just plain C# code! Nake is built on top of the latest Roslyn release so you can use all of the C# V6 features in you scripts and even more.</p>
 
 <h3>
 <a name="how-to-install" class="anchor" href="#how-to-install"><span class="octicon octicon-link"></span></a>How to install</h3>
 
-<p>There multiple ways in which Nake could be installed. You can install it by using NuGet <a href="https://www.nuget.org/packages/Nake">package</a>, or you can install it by downloading a <a href="https://github.com/yevhen/Nake/releases">standalone</a> executable from GitHub releases page, and of course you can always build it from sources. </p>
+<p>There multiple ways in which Nake could be installed. You can install it by using NuGet <a href="https://www.nuget.org/packages/Nake">package</a>, or you can get it by downloading a <a href="https://github.com/yevhen/Nake/releases">standalone</a> executable from GitHub releases page, and of course you can always build it from sources. </p>
 
 <p>To install Nake via NuGet, run this command in NuGet package manager console:</p>
 
-<pre><code>PM&gt; Install-Package Nake 
+<pre><code>PM&gt; Install-Package Nake
 </code></pre>
-
-<h4>
-<a name="intellisense-and-syntax-highlighting" class="anchor" href="#intellisense-and-syntax-highlighting"><span class="octicon octicon-link"></span></a>IntelliSense and syntax highlighting</h4>
-
-<p>You can install <a href="http://www.microsoft.com/en-us/download/details.aspx?id=34685">Roslyn CTP</a> extension to get IntelliSense support in Visual Studio 2012. IntelliSense for other versions of Visual Studio is not available at the moment. </p>
-
-<p>Syntax highlighting for <em>.csx</em> files is easy to get - it is just standard C# code, so just map <em>.csx</em> file extension in you favorite text editor to be recognized as C#.</p>
-
-<blockquote>
-<p>NOTE: You might first need to install <a href="http://www.microsoft.com/en-us/download/details.aspx?id=30668">VS 2012 SDK</a> for Roslyn CTP extension to be installed successfully</p>
-</blockquote>
-
-<h3>
-<a name="writing-your-first-task" class="anchor" href="#writing-your-first-task"><span class="octicon octicon-link"></span></a>Writing your first task</h3>
-
-<p>Open up you favorite text editor and enter the following code:</p>
-
-<div class="highlight highlight-cs"><pre><span class="na">[Task]</span> <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="n">Welcome</span><span class="p">()</span>
-<span class="p">{</span>
-    <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">"Hello, world!"</span><span class="p">);</span>
-<span class="p">}</span>
-</pre></div>
-
-<p>Save it to the root folder of your solution and give file <em>Nake.csx</em> name. Now you can invoke your task from command line by using Nake console application.</p>
-
-<blockquote>
-<p>NOTE: If you installed Nake via NuGet package manager console in Visual Studio, during an installation a sample script (<em>Nake.csx</em>) was created in the root directory of your solution. You can use it as the starting point.</p>
-</blockquote>
-
-<h3>
-<a name="invoking-task-via-command-line" class="anchor" href="#invoking-task-via-command-line"><span class="octicon octicon-link"></span></a>Invoking task via command line</h3>
-
-<p>To invoke a task from a command line you just need to pass it's name to the Nake's console application. Task names are case insensitive, so to invoke the task you've just created, simply execute the following in your favorite console:</p>
-
-<pre><code>Nake welcome
-</code></pre>
-
-<p>You should see the following output:</p>
-
-<pre><code>Hello, world!
-</code></pre>
-
-<p>Cool, ya? <img class="emoji" title=":grimacing:" alt=":grimacing:" src="https://github.global.ssl.fastly.net/images/icons/emoji/grimacing.png" height="20" width="20" align="absmiddle"></p>
-
-<p>That for sure will only work if you have <em>Nake.exe</em> somewhere in your path. That's not good as Nake should be used as local dependency. Assuming that you have installed it via NuGet, your actual path might look like the one below:</p>
-
-<pre><code>Packages\Nake.1.0.0.7\tools\net45\Nake.exe welcome
-</code></pre>
-
-<p>That, without doubt, is tedious to enter every time you want to invoke a task, but there is nothing in the world that cannot be fixed with a duct tape and bit of cleverness. Let's create a simple batch file which will act as the proxy for running Nake. Create <em>Nake.bat</em> file in the root directory of your solution and put there the text below:</p>
-
-<pre><code>@ECHO OFF 
-Packages\Nake.1.0.0.7\tools\net45\Nake.exe %*
-</code></pre>
-
-<p>Now you have an easy (and recommended) way to launch Nake.</p>
-
-<blockquote>
-<p>NOTE: If you installed Nake via NuGet package manager console in Visual Studio, during an installation a sample batch runner file (<em>Nake.bat</em>) was created in the root directory of your solution. if that didn't happen - check Nake <em>samples</em> directory inside respective package folder. </p>
-</blockquote>
-
-<h3>
-<a name="describing-tasks" class="anchor" href="#describing-tasks"><span class="octicon octicon-link"></span></a>Describing tasks</h3>
-
-<p>Now if you invoke Nake with <em>-T</em> switch it should show you all tasks defined in the script. Nevertheless, running it for the script which we've just created will produce no output. Why is that? Well, that's because by default Nake won't list tasks that don't have descriptions.</p>
-
-<p>Now guess how can we give a meaningful descriptions to our tasks, which are simply methods? Right, you will just use standard XML documentation comments:  </p>
-
-<div class="highlight highlight-cs"><pre><span class="c1">/// &lt;summary&gt;</span>
-<span class="c1">/// This is a demo task</span>
-<span class="c1">/// &lt;/summary&gt;</span>
-<span class="na">[Task]</span> <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="n">Welcome</span><span class="p">()</span>
-<span class="p">{</span>
-    <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">"Hello, world!"</span><span class="p">);</span>
-<span class="p">}</span>
-</pre></div>
-
-<p>Now if you again run Nake with the <em>-T</em> switch you should see the following output: </p>
-
-<pre><code>C:\Demo&gt;Nake -T
-
-Nake welcome  # This is a demo task
-</code></pre>
-
-<h3>
-<a name="passing-arguments-to-a-task" class="anchor" href="#passing-arguments-to-a-task"><span class="octicon octicon-link"></span></a>Passing arguments to a task</h3>
-
-<p>With Nake, it's ridiculously easy to define task parameters and pass them to a task from a command line. </p>
-
-<div class="highlight highlight-cs"><pre>
-<span class="na">[Task]</span> <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="n">Welcome</span><span class="p">(</span><span class="kt">string</span> <span class="n">who</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">"Hello, {0}!"</span><span class="p">,</span> <span class="n">who</span><span class="p">);</span>
-<span class="p">}</span>
-</pre></div>
-
-<p>Now you can simply invoke it using the following command-line:</p>
-
-<pre><code>Nake welcome amigo
-</code></pre>
-
-<p>That will print as expected:</p>
-
-<pre><code>Hello, amigo!
-</code></pre>
-
-<p>Nake also supports optional parameters, so you can define the task above as follows:</p>
-
-<div class="highlight highlight-cs"><pre><span class="na">[Task]</span> <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="n">Welcome</span><span class="p">(</span><span class="kt">string</span> <span class="n">who</span> <span class="p">=</span> <span class="s">"baby"</span><span class="p">,</span> <span class="kt">string</span> <span class="n">greeting</span> <span class="p">=</span> <span class="s">"Hello"</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">"{0}, {1}!"</span><span class="p">,</span> <span class="n">greeting</span><span class="p">,</span> <span class="n">who</span><span class="p">);</span>
-<span class="p">}</span>
-</pre></div>
-
-<p>Invoking it with the following command line:</p>
-
-<pre><code>Nake welcome greeting: "Hasta la vista"
-</code></pre>
-
-<p>Will produce the following output:</p>
-
-<pre><code>Hasta la vista, baby!
-</code></pre>
-
-<blockquote>
-<p>NOTE: At the moment Nake supports the following parameter types: bool, string and int. Support for <em>params</em> arrays and some other types is on a road-map.  Nevertheless, it's possible to code pretty much anything with just the types already supported by Nake.</p>
-</blockquote>
-
-<h3>
-<a name="specifying-prerequisite-tasks-dependencies" class="anchor" href="#specifying-prerequisite-tasks-dependencies"><span class="octicon octicon-link"></span></a>Specifying prerequisite tasks (dependencies)</h3>
-
-<p>Suppose we have the following build related tasks defined in a script:</p>
-
-<div class="highlight highlight-cs"><pre><span class="na">[Task]</span> <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="n">Clean</span><span class="p">()</span>
-<span class="p">{</span>
-    <span class="c1">// here goes code, which cleans build output directory</span>
-<span class="p">}</span>
-
-<span class="na">[Task]</span> <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="n">Build</span><span class="p">(</span><span class="kt">string</span> <span class="n">configuration</span> <span class="p">=</span> <span class="s">"Debug"</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="c1">// here goes code, which builds sources using given configuration</span>
-<span class="p">}</span>
-</pre></div>
-
-<p>We want to specify that the Clean() task should always be executed before the Build() task is executed. Regarding to this, we can say that the Clean() task is the <em>prerequisite</em> of the Build() task or that the Build() task is <em>dependent</em> on the Clean() task. </p>
-
-<p>Now, how can we specify that relationship in Nake script? That Build() task is dependent on the Clean() task? Check out the following example:</p>
-
-<div class="highlight highlight-cs"><pre><span class="na">[Task]</span> <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="n">Clean</span><span class="p">()</span>
-<span class="p">{</span>
-    <span class="c1">// here goes code, which cleans build output directory</span>
-<span class="p">}</span>
-
-<span class="na">[Task]</span> <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="n">Build</span><span class="p">(</span><span class="kt">string</span> <span class="n">configuration</span> <span class="p">=</span> <span class="s">"Debug"</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="n">Clean</span><span class="p">();</span>
-
-    <span class="c1">// here goes code, which builds sources using given configuration</span>
-<span class="p">}</span>
-</pre></div>
-
-<p>Yes, it's just a regular method call. There is no any special syntax in Nake for specifying prerequisites - you simply invoke one task from within another task using native C# language constructs. Everything is 100% statically bound. No strings whatsoever, and you can put task invocations in any place you want (so that you can easily replicate advanced MSBuild features like <a href="http://freetodev.wordpress.com/2009/06/24/msbuild-4-0-beforetargets-and-aftertargets/">Before/After targets</a> <img class="emoji" title=":grin:" alt=":grin:" src="https://github.global.ssl.fastly.net/images/icons/emoji/grin.png" height="20" width="20" align="absmiddle">). </p>
-
-<h5>
-<a name="how-does-it-work" class="anchor" href="#how-does-it-work"><span class="octicon octicon-link"></span></a>How does it work?</h5>
-
-<p>DOC: Describe how Nake is unique in its approach to specifying tasks and their prerequisites, and how it extends C# language semantics in order to implement dependency based style of computation (<a href="http://martinfowler.com/articles/rake.html#DependencyBasedProgramming">link</a>), while still keeping its DSL (pure C#) rather imperative. Describe how Nake uses Roslyn's syntax re-writing features to rewrite task invocations.</p>
-
-<h3>
-<a name="namespaces" class="anchor" href="#namespaces"><span class="octicon octicon-link"></span></a>Namespaces</h3>
-
-<p>DOC</p>
 
 <h2>
-<a name="other-mind-blowing-features-at-a-glance" class="anchor" href="#other-mind-blowing-features-at-a-glance"><span class="octicon octicon-link"></span></a>Other mind-blowing features (at a glance)</h2>
+<a name="scripting-reference" class="anchor" href="#scripting-reference"><span class="octicon octicon-link"></span></a>Scripting reference</h2>
 
-<h4>
-<a name="string-literal-expansions" class="anchor" href="#string-literal-expansions"><span class="octicon octicon-link"></span></a>String literal expansions</h4>
+<div class="highlight highlight-cs"><pre><span class="err">#</span><span class="n">r</span> <span class="s">"System"</span>                             <span class="c1">// </span>
+<span class="err">#</span><span class="n">r</span> <span class="s">"System.Core"</span>                        <span class="c1">//   #reference assemblies from the GAC </span>
+<span class="err">#</span><span class="n">r</span> <span class="s">"System.Data"</span>                        <span class="c1">//    (these are referenced by default)</span>
+<span class="err">#</span><span class="n">r</span> <span class="s">"System.Xml"</span>                         <span class="c1">//</span>
+<span class="err">#</span><span class="n">r</span> <span class="s">"System.Xml.Linq"</span>                    <span class="c1">//</span>
 
-<p>DOC</p>
+<span class="err">#</span><span class="n">r</span> <span class="s">"WindowsBase, Version=4.0.0.0 ..."</span>   <span class="c1">//  you can reference assembly by its full name</span>
+<span class="err">#</span><span class="n">r</span> <span class="s">"Packages\NUnit.2.6.2\nunit.dll"</span>     <span class="c1">//        or by using relative path</span>
+<span class="err">#</span><span class="n">r</span> <span class="s">"C:\Orleans\SDK\Orleans.dll"</span>         <span class="c1">//            or by absolute path</span>
 
-<h4>
-<a name="command-line-overrides" class="anchor" href="#command-line-overrides"><span class="octicon octicon-link"></span></a>Command line overrides</h4>
+<span class="err">#</span><span class="n">load</span> <span class="s">"Other.csx"</span>                       <span class="c1">//      #load code from other script files</span>
+<span class="err">#</span><span class="n">load</span> <span class="s">"Build\Another.csx"</span>               <span class="c1">//  (both absolute and relative paths are fine)</span>
 
-<p>DOC </p>
+<span class="k">using</span> <span class="nn">System</span><span class="p">;</span>                           <span class="c1">//</span>
+<span class="k">using</span> <span class="nn">System.IO</span><span class="p">;</span>                        <span class="c1">//      standard C# namespace imports</span>
+<span class="k">using</span> <span class="nn">System.Linq</span><span class="p">;</span>                      <span class="c1">//     (these are imported by default)</span>
+<span class="k">using</span> <span class="nn">System.Text</span><span class="p">;</span>                      <span class="c1">//  </span>
+<span class="k">using</span> <span class="nn">System.Collections.Generic</span><span class="p">;</span>       <span class="c1">//  </span>
 
-<h4>
-<a name="msbuild-interoperability" class="anchor" href="#msbuild-interoperability"><span class="octicon octicon-link"></span></a>MSBuild interoperability</h4>
+<span class="k">using</span> <span class="nn">System.IO.Path</span><span class="p">;</span>                   <span class="c1">//    C# V6 "using static members" feature </span>
+<span class="k">using</span> <span class="nn">System.Console</span><span class="p">;</span>                   <span class="c1">//      will make you scripts more terse</span>
 
-<p>DOC</p>
+<span class="n">WriteLine</span><span class="p">(</span><span class="s">"Are you ready? Y/N:"</span><span class="p">);</span>       <span class="c1">//      any code you put on the script level </span>
+<span class="k">if</span> <span class="p">(</span><span class="n">ReadLine</span><span class="p">()</span> <span class="p">==</span> <span class="s">"N"</span><span class="p">)</span>                  <span class="c1">//  will run before any of the tasks are executed</span>
+    <span class="n">Exit</span><span class="p">(</span><span class="s">"See you soon ..."</span><span class="p">);</span>           <span class="c1">//      (useful for one-off initialization)</span>
 
-<h4>
-<a name="powerful-utility-library" class="anchor" href="#powerful-utility-library"><span class="octicon octicon-link"></span></a>Powerful utility library</h4>
+<span class="kt">var</span> <span class="n">greeting</span> <span class="p">=</span> <span class="s">"Hello"</span><span class="p">;</span>                 <span class="c1">//   you can override any script-level variables </span>
+<span class="kt">var</span> <span class="n">who</span> <span class="p">=</span> <span class="s">"world"</span><span class="p">;</span>                      <span class="c1">//  with the values passed from the command line</span>
 
-<p>DOC</p>
+<span class="c1">/// Prints greeting                     //  this F#-style summary will be shown in the task listing</span>
+<span class="na">[Task]</span> <span class="k">void</span> <span class="n">Welcome</span><span class="p">()</span>                   <span class="c1">//  [Task] makes method runnable from the command line</span>
+<span class="p">{</span>                                       
+    <span class="n">WriteLine</span><span class="p">(</span><span class="s">"{greeting},{who}!"</span><span class="p">);</span>     <span class="c1">//  forget ugly string.Format and string concatenation </span>
+<span class="p">}</span>                                       <span class="c1">//  with built-in support for string interpolation</span>
+
+<span class="na">[Task]</span> <span class="k">void</span> <span class="n">Tell</span><span class="p">(</span>
+    <span class="kt">string</span> <span class="n">what</span> <span class="p">=</span> <span class="s">"Hello"</span><span class="p">,</span>              <span class="c1">//     for parameterized tasks you can supply</span>
+    <span class="kt">string</span> <span class="n">whom</span> <span class="p">=</span> <span class="s">"world"</span><span class="p">,</span>              <span class="c1">//     arguments directly from the command line</span>
+    <span class="kt">int</span> <span class="n">times</span> <span class="p">=</span> <span class="m">1</span><span class="p">,</span>                      <span class="c1">//  (string, int and boolean arguments are supported) </span>
+    <span class="kt">bool</span> <span class="n">quiet</span> <span class="p">=</span> <span class="k">false</span>                  <span class="c1">//  + special switch syntax for booleans (eg, --quiet)</span>
+<span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">var</span> <span class="n">emphasis</span> <span class="p">=</span> <span class="n">quiet</span> <span class="p">?</span> <span class="s">""</span> <span class="p">:</span> <span class="s">"!"</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(;</span> <span class="n">times</span> <span class="p">&gt;</span> <span class="m">0</span><span class="p">;</span> <span class="n">times</span><span class="p">--)</span>
+        <span class="n">WriteLine</span><span class="p">(</span><span class="s">"{what},{whom}{emphasis}"</span><span class="p">);</span>
+<span class="p">}</span>                                   
+
+<span class="na">[Step]</span> <span class="k">void</span> <span class="n">Clean</span><span class="p">()</span>                     <span class="c1">//      Steps are Tasks with 'run once' semantics      </span>
+<span class="p">{</span>                                       <span class="c1">//  (the foundation of any popular build automation tool)</span>
+    <span class="n">Delete</span><span class="p">(</span><span class="s">"{OutputPath}\*.*"</span><span class="p">);</span> 
+<span class="p">}</span>                                   
+
+<span class="na">[Step]</span> <span class="k">void</span> <span class="n">Build</span><span class="p">(</span><span class="kt">string</span> <span class="n">cfg</span> <span class="p">=</span> <span class="s">"Debug"</span><span class="p">)</span>
+<span class="p">{</span>                                       
+    <span class="n">Clean</span><span class="p">();</span>                            <span class="c1">//  unlike popular build automation tools, there is no any</span>
+    <span class="p">-------</span>                             <span class="c1">//    special syntax to specify task (step) dependencies</span>
+    <span class="n">MSBuild</span><span class="p">(</span><span class="s">"Nake.sln"</span><span class="p">,</span> <span class="n">cfg</span><span class="p">);</span>           <span class="c1">//      (it's just plain old C# method invocation)</span>
+<span class="p">}</span>                                       
+
+<span class="na">[Step]</span> <span class="k">void</span> <span class="n">Test</span><span class="p">()</span>
+<span class="p">{</span>                                       
+    <span class="n">Clean</span><span class="p">();</span>                            <span class="c1">//         you have complete control over decision,</span>
+    <span class="n">Build</span><span class="p">();</span>                            <span class="c1">//     when and in what order dependent steps should run</span>
+    <span class="p">-------</span>                             <span class="c1">//  (Nake will guarantee that any step will run only once)</span>
+    <span class="n">NUnit</span><span class="p">(</span><span class="s">"{OutputPath}\*.Tests.dll"</span><span class="p">)</span>   
+<span class="p">}</span>
+
+<span class="na">[Step]</span> <span class="k">void</span> <span class="n">Publish</span><span class="p">(</span><span class="kt">bool</span> <span class="n">beta</span> <span class="p">=</span> <span class="k">false</span><span class="p">)</span>
+<span class="p">{</span>                                       
+    <span class="n">Test</span><span class="p">();</span>                             <span class="c1">//   sometimes, you need to execute the same step but with</span>
+    <span class="n">Build</span><span class="p">(</span><span class="s">"Release"</span><span class="p">);</span>                   <span class="c1">//  different arguments. Unlike other build automation tools</span>
+    <span class="p">------</span>                              <span class="c1">//  there is no special syntax to force step to run again - </span>
+    <span class="n">Nuget</span><span class="p">(</span><span class="s">"Nake.nuspec"</span><span class="p">,</span> <span class="n">beta</span><span class="p">)</span>          <span class="c1">//       you just invoke it with different arguments!</span>
+<span class="p">}</span>                                       
+
+<span class="kt">var</span> <span class="n">apiKey</span> <span class="p">=</span> <span class="s">"$NugetKey$"</span><span class="p">;</span>              <span class="c1">//  $var$ is the shortcut syntax for getting </span>
+<span class="n">Push</span><span class="p">(</span><span class="n">apiKey</span><span class="p">,</span> <span class="s">"{PackagePath}"</span><span class="p">);</span>          <span class="c1">//      value of environment variable</span>
+
+<span class="n">Write</span><span class="p">(</span><span class="s">"$NakeStartupDirectory$"</span><span class="p">);</span>        <span class="c1">//  these special environment variables</span>
+<span class="n">Write</span><span class="p">(</span><span class="s">"$NakeScriptDirectory$"</span><span class="p">);</span>         <span class="c1">//   are automatically created by Nake</span>
+
+<span class="n">Write</span><span class="p">(</span><span class="s">"{{esc}}"</span><span class="p">);</span>                       <span class="c1">//  will simply print {esc} (no string interpolation)</span>
+<span class="n">Write</span><span class="p">(</span><span class="s">"$$esc$$"</span><span class="p">);</span>                       <span class="c1">//  will simply print $esc$ (no env variable inlining)</span>
+
+<span class="k">class</span> <span class="nc">Azure</span>                             <span class="c1">//  namespace declarations cannot be used with scripts,</span>
+<span class="p">{</span>                                       <span class="c1">//  but could be easily emulated with class declarations</span>
+    <span class="k">class</span> <span class="nc">Queue</span>                         <span class="c1">//     and you can nest them infinitely as you like</span>
+    <span class="p">{</span>    
+<span class="na">        [Task]</span> <span class="k">void</span> <span class="n">Clean</span><span class="p">()</span>             <span class="c1">//     then from the command line you would invoke</span>
+        <span class="p">{}</span>                              <span class="c1">//  this task by its full path (ie, azure.queue.clean)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="na">[Task]</span> <span class="k">void</span> <span class="n">Default</span><span class="p">()</span>                   <span class="c1">//     running Nake without any options </span>
+<span class="p">{</span>                                       <span class="c1">//  will cause it to run the "default" task</span>
+    <span class="n">Build</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
 
 <h2>
-<a name="other-useful-features" class="anchor" href="#other-useful-features"><span class="octicon octicon-link"></span></a>Other useful features</h2>
-
-<ul>
-<li>
-<strong>Cycle dependencies detection</strong> - DOC</li>
-<li>
-<strong>Roslyn bootstrapping</strong> - DOC</li>
-</ul><h2>
-<a name="general-scripting" class="anchor" href="#general-scripting"><span class="octicon octicon-link"></span></a>General scripting</h2>
-
-<p>DOC: Point to relevant topics in scriptcs documentation</p>
-
-<h2>
-<a name="working-with-command-line" class="anchor" href="#working-with-command-line"><span class="octicon octicon-link"></span></a>Working with command line</h2>
+<a name="command-line-reference" class="anchor" href="#command-line-reference"><span class="octicon octicon-link"></span></a>Command line reference</h2>
 
 <p>General syntax is: <code>Nake [options ...]  [VAR=VALUE ...]  [task ...]</code></p>
+
+<div class="highlight highlight-cs"><pre><span class="p">&gt;</span> <span class="n">Nake</span> <span class="p">-</span><span class="n">f</span> <span class="s">"Nake.csx"</span> <span class="n">Log</span><span class="p">=</span><span class="m">1</span> <span class="n">build</span>        <span class="c1">//   set Log environment variable to 1 and</span>
+                                        <span class="c1">//  then run Build() task from Nake.csx file </span>
+
+<span class="p">&gt;</span> <span class="n">Nake</span> <span class="n">Log</span><span class="p">=</span><span class="m">1</span> <span class="n">build</span>                      <span class="c1">//  equivalent to the above as Nake will automatically try </span>
+                                        <span class="c1">//   to use Nake.csx file if present in current directory</span>
+</pre></div>
 
 <p>Options:</p>
 
@@ -282,97 +165,112 @@ Nake welcome  # This is a demo task
    -v  --version          Display the program version and exit
    -q  --quiet            Do not echo informational messages to standard output
    -s  --silent           Same as --quiet but also suppresses user generated log messages
-   -f  --nakefile FILE    Use FILE as the Nake project file
+   -f  --nakefile FILE    Use FILE as Nake project file
    -d  --directory DIR    Use DIR as current directory
    -t  --trace            Enables task execution tracing and full stack traces in exception messages
        --debug            Enables full script debugging in Visual Studio
    -T  --tasks [PATTERN]  Display the tasks with descriptions matching optional PATTERN and exit
 </code></pre>
 
-<blockquote>
-<p>NOTE: You can always get help for command line usage by running Nake with <em>-?</em> or <em>--help</em> switches.</p>
-</blockquote>
+<h3>
+<a name="invoking-tasks" class="anchor" href="#invoking-tasks"><span class="octicon octicon-link"></span></a>Invoking tasks</h3>
 
-<h4>
-<a name="setting-environment-variables" class="anchor" href="#setting-environment-variables"><span class="octicon octicon-link"></span></a>Setting environment variables</h4>
+<p>General syntax for invoking tasks and passing arguments is similar to the normal C# method invocation syntax, except <code></code> is used instead of <code>,</code> to separate task arguments, and <code>=</code> is used instead of <code>:</code> for specifying named argument values. Also, boolean arguments support special <code>--</code> switch syntax.</p>
 
-<p>You can set process-level environment variables by defining key/value pairs before task name:</p>
-
-<pre><code>Nake CpuCount=2 OutDir=C:\Temp scan 
-</code></pre>
-
-<h4>
-<a name="overriding-constants" class="anchor" href="#overriding-constants"><span class="octicon octicon-link"></span></a>Overriding constants</h4>
-
-<p>An interesting feature of Nake, is that it allows you to override value of any public constant or public static property, by simply passing a corresponding key/value pair from a command line, like in previous example:</p>
-
-<pre><code>Nake CpuCount=2 OutDir=C:\Temp scan 
-</code></pre>
-
-<p>You can get these values using built-in utility class:</p>
-
-<div class="highlight highlight-cs"><pre><span class="kt">var</span> <span class="n">cpuCount</span> <span class="p">=</span> <span class="n">Env</span><span class="p">.</span><span class="n">Var</span><span class="p">[</span><span class="s">"CpuCount"</span><span class="p">]</span> <span class="p">??</span> <span class="m">1</span><span class="p">;</span>
-<span class="kt">var</span> <span class="n">outDir</span> <span class="p">=</span> <span class="n">Env</span><span class="p">.</span><span class="n">Var</span><span class="p">[</span><span class="s">"OutDir"</span><span class="p">]</span> <span class="p">??</span> <span class="s">"Output"</span><span class="p">;</span>
+<div class="highlight highlight-cs"><pre><span class="p">&gt;</span> <span class="n">Nake</span> <span class="n">build</span>                            <span class="c1">//  run Build task with default arg values</span>
+<span class="p">&gt;</span> <span class="n">Nake</span> <span class="n">build</span> <span class="n">Release</span>                    <span class="c1">//  or with first positional argument set to 'Release'</span>
+<span class="p">&gt;</span> <span class="n">Nake</span> <span class="n">build</span> <span class="n">cfg</span><span class="p">=</span><span class="n">Release</span>                <span class="c1">//  or with named argument 'cfg' set to 'Release'</span>
+<span class="p">&gt;</span> <span class="n">Nake</span> <span class="n">build</span> <span class="n">Release</span> <span class="n">outDir</span><span class="p">=</span><span class="s">"C:\Temp"</span>   <span class="c1">//  you can mix positional and named arguments</span>
+<span class="p">&gt;</span> <span class="n">Nake</span> <span class="n">build</span> <span class="p">;</span> <span class="n">test</span>                     <span class="c1">//  or invoke multiple tasks within a same session</span>
+<span class="p">&gt;</span> <span class="n">Nake</span> <span class="n">build</span> <span class="err">`</span><span class="p">;</span> <span class="n">test</span>                    <span class="c1">//  also escape ';' when running in PowerShell console </span>
+<span class="p">&gt;</span> <span class="n">Nake</span> <span class="n">publish</span> <span class="p">--</span><span class="n">beta</span>                   <span class="c1">//  invoke Publish task with 'beta' arg set to 'true'</span>
 </pre></div>
 
-<p>This is similar to MSBuild way of having overridable variables with fallback values. But in Nake, it is enough to just declare public constants or public static properties, and Nake will try to match property names with those coming from a command line, overriding those which match: </p>
+<h2>
+<a name="included-utility-reference" class="anchor" href="#included-utility-reference"><span class="octicon octicon-link"></span></a>Included utility reference</h2>
 
-<div class="highlight highlight-cs"><pre><span class="k">public</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">CpuCount</span> <span class="p">=</span> <span class="m">1</span><span class="p">;</span>
-<span class="k">public</span> <span class="k">static</span> <span class="kt">string</span> <span class="n">OutDir</span> <span class="p">=</span> <span class="s">"Output"</span><span class="p">;</span>
+<p>Out-of-the box Nake includes a lot of useful convinient utility functions to help you with: </p>
+
+<ul>
+<li>running external tools, such as command-line commands or MSBuild</li>
+<li>selecting and transforming file system paths (globber)</li>
+<li>casual file system tasks, such as copying, moving, deleting files/folders </li>
+<li>logging messages to console</li>
+<li>working with environment variables</li>
+<li>controlling Nake's runner</li>
+<li>etc</li>
+</ul><p>Check out table below for reference on using utility library:</p>
+
+<table>
+<thead><tr>
+<th align="left">Class</th>
+<th align="left">Functions</th>
+</tr></thead>
+<tbody>
+<tr>
+<td align="left"><a href="https://github.com/yevhen/Nake/wiki/Run">Run</a></td>
+<td align="left">Running external tools: Cmd, MSBuild</td>
+</tr>
+<tr>
+<td align="left"><a href="https://github.com/yevhen/Nake/wiki/App">App</a></td>
+<td align="left">Controlling Nake's runner</td>
+</tr>
+<tr>
+<td align="left"><a href="https://github.com/yevhen/Nake/wiki/Log">Log</a></td>
+<td align="left">Logging messages to console</td>
+</tr>
+<tr>
+<td align="left"><a href="https://github.com/yevhen/Nake/wiki/Env">Env</a></td>
+<td align="left">Working with environment variables</td>
+</tr>
+<tr>
+<td align="left"><a href="https://github.com/yevhen/Nake/wiki/FS">FS</a></td>
+<td align="left">File-system tasks, such as cop/move/etc</td>
+</tr>
+<tr>
+<td align="left"><a href="https://github.com/yevhen/Nake/wiki/FileSet">FileSet</a></td>
+<td align="left">File path selection and transformation (globber)</td>
+</tr>
+<tr>
+<td align="left"><a href="https://github.com/yevhen/Nake/wiki/Color">Color</a></td>
+<td align="left">Printing to console in color</td>
+</tr>
+<tr>
+<td align="left"><a href="https://github.com/yevhen/Nake/wiki/Location">Location</a></td>
+<td align="left">Current directory and special paths (script, startup)</td>
+</tr>
+</tbody>
+</table><p>Also, see 'by use-case' reference on <a href="https://github.com/yevhen/Nake/wiki">wiki</a>.</p>
+
+<h2>
+<a name="tips--tricks" class="anchor" href="#tips--tricks"><span class="octicon octicon-link"></span></a>Tips &amp; tricks</h2>
+
+<div class="highlight highlight-cs"><pre><span class="k">class</span> <span class="nc">Azure</span>
+<span class="p">{</span>                                       
+    <span class="n">StorageAccount</span> <span class="n">account</span><span class="p">;</span>
+
+    <span class="k">static</span> <span class="nf">Azure</span><span class="p">()</span>                      <span class="c1">//  this will run once before any of the </span>
+    <span class="p">{</span>                                   <span class="c1">//  tasks in this namespace are executed</span>
+        <span class="n">account</span> <span class="p">=</span> <span class="n">Init</span><span class="p">();</span>               <span class="c1">//  (useful for one-off initialization)</span>
+    <span class="p">}</span>
+<span class="p">}</span>  
 </pre></div>
-
-<p>Declaring constants could be more handy, as you can use them as default parameter values: </p>
-
-<div class="highlight highlight-cs"><pre><span class="na">[Task]</span> <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="n">Clean</span><span class="p">(</span><span class="kt">string</span> <span class="n">dir</span> <span class="p">=</span> <span class="n">OutDir</span><span class="p">)</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span>
-</pre></div>
-
-<h4>
-<a name="passing-arguments-to-tasks" class="anchor" href="#passing-arguments-to-tasks"><span class="octicon octicon-link"></span></a>Passing arguments to tasks</h4>
-
-<p>Use space to separate arguments. Both positional and named arguments are supported. The command line syntax is the same as regular C# method calling syntax, except space is used as separator (instead of <em>,</em>):</p>
-
-<pre><code>Nake db.migrate MainDb version:10002 
-</code></pre>
-
-<blockquote>
-<p>NOTE: Use double quotes, if the value you're passing contains colon <em>:</em> (ie <em>Nake clean dir:"C:\Temp"</em>). Also, don't forget to properly escape symbols, which have special meaning in your shell.  </p>
-</blockquote>
-
-<h4>
-<a name="calling-multiple-tasks" class="anchor" href="#calling-multiple-tasks"><span class="octicon octicon-link"></span></a>Calling multiple tasks</h4>
-
-<p>You can call multiple tasks, within one session, by simply separating them with semicolon <em>;</em>:</p>
-
-<pre><code>Nake clean;build;test 
-</code></pre>
-
-<blockquote>
-<p>NOTE: In some shells, like PowerShell, semicolon (<em>;</em>) need to be escaped. For PowerShell it should be escaped with a backtick <em>`;</em>.</p>
-</blockquote>
 
 <h2>
 <a name="backlog" class="anchor" href="#backlog"><span class="octicon octicon-link"></span></a>Backlog</h2>
 
 <ul>
 <li>Running on Mono</li>
-<li>Support for additional parameter types, such as <em>params</em>
-</li>
-<li>Ask for required arguments, ala PowerShell</li>
-<li>Interactive mode, task name tab completion</li>
-<li>PowerShell hosting</li>
-<li>On-demand script loader</li>
-<li>Once Roslyn finally start respecting <em>#load</em> directive, move both Meta and Utility to <em>.csx</em> files, so global install is possible</li>
+<li>Interactive mode</li>
 </ul><h2>
 <a name="contributing" class="anchor" href="#contributing"><span class="octicon octicon-link"></span></a>Contributing</h2>
 
-<p><strong>Bugs</strong> - no need to ask anything, just fix it and do a pull request</p>
-
-<p><strong>Features</strong> - ideally should be discussed via GitHub issues or Nake's discussion group to avoid duplicate work and to make sure that new stuff is still inline with original vision.</p>
+<p>Gimme your pull requests!</p>
 
 <h2>
 <a name="samples-and-documentation" class="anchor" href="#samples-and-documentation"><span class="octicon octicon-link"></span></a>Samples and Documentation</h2>
 
-<p>Have a look at <a href="https://github.com/yevhen/Nake/blob/master/Nake.csx">Nake.csx</a> or <a href="https://github.com/yevhen/Nake/blob/master/Publish.csx">Publish.csx</a>. Those are the Nake files used to build and publish Nake itself (ye, we're eating our own dog food). Also, additional samples can be contributed to samples <a href="https://github.com/yevhen/Nake-samples">repository</a>. Detailed documentation (soon) can be found on <a href="https://github.com/yevhen/Nake/wiki">wiki</a>. </p>
+<p>Have a look at <a href="https://github.com/yevhen/Nake/blob/dev/Nake.csx">Nake.csx</a> or <a href="https://github.com/yevhen/Nake/blob/dev/Publish.csx">Publish.csx</a>. Those are the Nake files used to build and publish Nake itself (ye, we're eating our own dog food). Also, additional samples can be contributed to samples <a href="https://github.com/yevhen/Nake-samples">repository</a>.</p>
 
 <h2>
 <a name="community" class="anchor" href="#community"><span class="octicon octicon-link"></span></a>Community</h2>
@@ -383,7 +281,7 @@ Nake welcome  # This is a demo task
 <a name="credits" class="anchor" href="#credits"><span class="octicon octicon-link"></span></a>Credits</h2>
 
 <ul>
-<li>To all contributors (check out GitHub statistics)!</li>
+<li>Thanks to everyone in the Roslyn compiler team for making this happen</li>
 <li>Thanks to all members of the <a href="https://github.com/scriptcs">scriptcs</a> team for lending me their script pre-processing code</li>
 <li>Special thanks to <a href="https://twitter.com/aamartynenko">Anton Martynenko</a> for giving me an idea and steering Nake's DSL in the right direction</li>
 <li>Hugs and kisses to my lovely Valery for being so patient and supportive, and for feeding me food and beer, while I was sitting in my cage working on Nake, instead of spending that time with her</li>
@@ -393,12 +291,11 @@ Nake welcome  # This is a demo task
 <p>Apache 2 License</p>
       </section>
       <footer>
-        <p>Project maintained by <a href="https://github.com/yevhen">yevhen</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></small></p>
+        <p><small>Hosted on <a href="http://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
       </footer>
     </div>
     <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-              <script type="text/javascript">
+		          <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
             document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
           </script>
