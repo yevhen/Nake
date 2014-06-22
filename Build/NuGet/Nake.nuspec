@@ -5,9 +5,10 @@
     <version>$version$</version>
     <authors>Yevhen Bobrov</authors>
     <owners>Yevhen Bobrov</owners>
-    <licenseUrl>http://github.com/yevhen/Nake/blob/dev/LICENSE.md</licenseUrl>
+    <licenseUrl>http://github.com/yevhen/Nake/blob/master/LICENSE.md</licenseUrl>
     <projectUrl>http://github.com/yevhen/Nake</projectUrl>
-    <description>Write you build automation scripts in C# without paying the angle bracket tax</description>
+    <iconUrl>https://github.com/yevhen/Nake/raw/master/Logo.png</iconUrl>
+    <description>Magic script-based C# task runner with C# V6 support</description>
     <tags>roslyn csx script scriptcs nake build automation</tags>
   </metadata>
   <files>

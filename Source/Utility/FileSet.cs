@@ -232,7 +232,7 @@ namespace Nake
         public string[] Mirror(string destination)
         {
             destination = Location.GetFullPath(destination);
-            return Transform(item => Path.Combine(destination, item.RecursivePath, item.FullName));
+            return Transform(item => Path.Combine(destination, item.RecursivePath, item.FileName));
         }
 
         /// <summary>
@@ -243,7 +243,7 @@ namespace Nake
         public string[] Flatten(string destination)
         {
             destination = Location.GetFullPath(destination);
-            return Transform(item => Path.Combine(destination, item.FullName));
+            return Transform(item => Path.Combine(destination, item.FileName));
         }
 
         /// <summary>
@@ -407,7 +407,7 @@ namespace Nake
             /// <summary>
             /// The full file name
             /// </summary>
-            public readonly string FullName;
+            public readonly string FileName;
 
             /// <summary>
             /// The file name
@@ -443,7 +443,7 @@ namespace Nake
                     ? Path.GetDirectoryName(FullPath.Remove(0, basePath.Length + 1)) 
                     : "";
 
-                FullName    = Path.GetFileName(fullPath);
+                FileName    = Path.GetFileName(fullPath);
                 Extension   = Path.GetExtension(fullPath);
                 Name        = Path.GetFileNameWithoutExtension(fullPath);
 
