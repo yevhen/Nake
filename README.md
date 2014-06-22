@@ -116,6 +116,14 @@ class Azure                             //  namespace declarations cannot be use
 
 General syntax is: `Nake [options ...]  [VAR=VALUE ...]  [task ...]`
 
+```cs
+> Nake -f "Nake.csx" Log=1 build        //   set Log environment variable to 1 and
+                                        //  then run Build() task from Nake.csx file 
+                                        
+> Nake Log=1 build                      //  equivalent to the above as Nake will automatically try 
+                                        //   to use Nake.csx file if present in current directory
+```
+
 Options:
 
 	   -?  --help             Display help message and exit
@@ -128,7 +136,46 @@ Options:
 	       --debug            Enables full script debugging in Visual Studio
 	   -T  --tasks [PATTERN]  Display the tasks with descriptions matching optional PATTERN and exit
 
+### Invoking tasks
+
+General syntax for invoking tasks and passing arguments is similar to the normal C# method invocation syntax, except ` ` is used instead of `,` to separate task arguments, and `=` is used instead of `:` for specifying named argument values. Also, boolean arguments support special `--` switch syntax.
+
+```cs
+> Nake build                            //  run Build task with default arg values
+> Nake build Release                    //  or with first positional argument set to 'Release'
+> Nake build cfg=Release                //  or with named argument 'cfg' set to 'Release'
+> Nake build Release outDir="C:\Temp"   //  you can mix positional and named arguments
+> Nake build ; test                     //  or invoke multiple tasks within a same session
+> Nake build `; test                    //  also escape ';' when running in PowerShell console 
+> Nake publish --beta                   //  invoke Publish task with 'beta' arg set to 'true'
+```
+
 ## Included utility reference
+
+Out-of-the box Nake includes a lot of useful convinient utility functions to help you with: 
+
+- running external tools, such as command-line commands or MSBuild
+- selecting and transforming file system paths (globber)
+- casual file system tasks, such as copying, moving, deleting files/folders 
+- logging messages to console
+- working with environment variables
+- controlling Nake's runner
+- etc
+
+Check out table below for reference on using utility library:
+
+| Class         						                    | Functions     					                    |
+|:----------------------------------------------------------|:------------------------------------------------------|
+| [Run](https://github.com/yevhen/Nake/wiki/Run)          	| Running external tools: Cmd, MSBuild              	|
+| [App](https://github.com/yevhen/Nake/wiki/App)           	| Controlling Nake's runner              		        |
+| [Log](https://github.com/yevhen/Nake/wiki/Log)          	| Logging messages to console              		        |
+| [Env](https://github.com/yevhen/Nake/wiki/Env)          	| Working with environment variables              	    |
+| [FS](https://github.com/yevhen/Nake/wiki/FS)            	| File-system tasks, such as cop/move/etc              	|
+| [FileSet](https://github.com/yevhen/Nake/wiki/FileSet)  	| File path selection and transformation (globber)      |
+| [Color](https://github.com/yevhen/Nake/wiki/Color)      	| Printing to console in color              		    |
+| [Location](https://github.com/yevhen/Nake/wiki/Location)	| Current directory and special paths (script, startup) |
+
+Also, see 'by use-case' reference on [wiki](https://github.com/yevhen/Nake/wiki).
 
 ## Tips & tricks
 
