@@ -68,7 +68,7 @@ var who = "world";                      //  with the values passed from the comm
 [Step] void Build(string cfg = "Debug")
 {					                    
     Clean();                            //  unlike popular build automation tools, there is no any
-    -------                             //    special syntax to specify task (step) dependencies
+    -------                             //  special syntax for specifying task (step) dependencies
     MSBuild("Nake.sln", cfg);           //      (it's just plain old C# method invocation)
 }                                       
                                        
@@ -170,7 +170,7 @@ Check out table below for reference on using utility library:
 | [App](https://github.com/yevhen/Nake/wiki/App)           	| Controlling Nake's runner              		        |
 | [Log](https://github.com/yevhen/Nake/wiki/Log)          	| Logging messages to console              		        |
 | [Env](https://github.com/yevhen/Nake/wiki/Env)          	| Working with environment variables              	    |
-| [FS](https://github.com/yevhen/Nake/wiki/FS)            	| File-system tasks, such as cop/move/etc              	|
+| [FS](https://github.com/yevhen/Nake/wiki/FS)            	| File-system tasks, such as copy/move/del/mkdir/etc    |
 | [FileSet](https://github.com/yevhen/Nake/wiki/FileSet)  	| File path selection and transformation (globber)      |
 | [Color](https://github.com/yevhen/Nake/wiki/Color)      	| Printing to console in color              		    |
 | [Location](https://github.com/yevhen/Nake/wiki/Location)	| Current directory and special paths (script, startup) |
