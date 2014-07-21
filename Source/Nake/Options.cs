@@ -75,6 +75,7 @@ namespace Nake
                 }),	
 				
 			new Switch("reset-cache", "Resets compilation output cache")
+                .Shortcut("r")
                 .OnMatch(options => options.ResetCache = true),	
         };
 
