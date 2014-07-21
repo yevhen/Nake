@@ -43,20 +43,43 @@ namespace Nake.Magic
         }
 
         public SyntaxNode Expand()
-        {                
-            var expanded   = ExpandExpressions(literal);
-            var inlined    = InlineEnvironmentVariables(expanded);
-            var final      = Quote(Unescape(inlined));
-
-            return SyntaxFactory.ParseExpression(final);
+        {
+            return constant 
+                    ? InterpolateConstant() 
+                    : InterpolateNonConstant();
         }
 
-        string ExpandExpressions(string token)
+        SyntaxNode InterpolateConstant()
         {
-            if (constant)
-                return token;
+            var inlined = InlineEnvironmentVariables(literal);
+            return Captured.Count == 0 ? node : CreateStringLiteral(inlined);
+        }
 
-            return expressionPattern.Replace(token, match =>
+        SyntaxNode InterpolateNonConstant()
+        {
+            string interpolated;
+
+            var expressions = InterpolateExpressions(literal, out interpolated);
+            var inlined = InlineEnvironmentVariables(interpolated);
+
+            if (expressions.Count == 0 && 
+                Captured.Count == 0)
+                return node;
+
+            if (expressions.Count == 0)
+                return CreateStringLiteral(inlined);
+
+            return SyntaxFactory.ParseExpression(
+                    string.Format(@"string.Format(""{0}"", {1})",
+                                    Unescape(inlined), string.Join(",", expressions)));
+        }
+
+        List<string> InterpolateExpressions(string token, out string interpolated)
+        {
+            var expressions = new List<string>();
+
+            var index = 0;
+            interpolated = expressionPattern.Replace(token, match =>
             {
                 var expression = match.Groups["expression"].Value;
 
@@ -74,8 +97,19 @@ namespace Nake.Magic
                 if (type.Type.SpecialType == SpecialType.System_Void)
                     throw new ExpressionReturnTypeIsVoidException(expression, LocationDiagnostics(match.Index));
 
-                return string.Format(@""" + ({0}) + @""", expression);
+                expressions.Add(string.Format("({0})", expression));
+                return string.Format("{{{0}}}", index++);
             });
+
+            return expressions;
+        }
+
+        SyntaxNode CreateStringLiteral(string text)
+        {
+            return SyntaxFactory.LiteralExpression(
+                SyntaxKind.StringLiteralExpression, 
+                SyntaxFactory.Literal(Unescape(text))
+            );
         }
 
         string LocationDiagnostics(int matchPosition)
@@ -99,25 +133,6 @@ namespace Nake.Magic
                 
                 return Verbatimize(value);
             });
-        }
-
-        static string Quote(string token)
-        {
-            var quotation = IsQuoted(token) && !IsExpanded(token) 
-                            ? @"@{0}" 
-                            : @"@""{0}""";
-
-            return string.Format(quotation, token);
-        }
-
-        static bool IsQuoted(string token)
-        {
-            return token.StartsWith("\"") && token.EndsWith("\"");
-        }
-
-        static bool IsExpanded(string token)
-        {
-            return token.EndsWith("@\"");
         }
 
         static string Verbatimize(string token)

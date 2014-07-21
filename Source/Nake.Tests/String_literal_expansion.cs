@@ -168,8 +168,6 @@ namespace Nake
                     Env.Var[""RootPathVerbatim""] = RootPathVerbatim;
                     Env.Var[""OutputPath""] = outputPath;
                     Env.Var[""OutputPathVerbatim""] = outputPathVerbatim;
-                    Env.Var[""Quotes""] = ""\""$var$\"""";
-                    Env.Var[""QuotesVerbatim""] = @""""""$var$"""""";
                 }
                              
             ");
@@ -180,6 +178,28 @@ namespace Nake
             Assert.That(Env.Var["RootPathVerbatim"], Is.EqualTo(@"C:\Tools\Nake\Root"));
             Assert.That(Env.Var["OutputPath"], Is.EqualTo(@"C:\Tools\Nake\Root\Output"));
             Assert.That(Env.Var["OutputPathVerbatim"], Is.EqualTo(@"C:\Tools\Nake\Root\Output"));
+        }
+        
+        [Test]
+        public void Quotes_are_respected_as_well()
+        {
+            Env.Var["var"] = @"C:\Tools\Nake";
+
+            Build(@"
+
+                [Task] 
+                public static void Expand()
+                {
+                    Env.Var[""Quotes""] = ""\""$var$\"""";
+                    Env.Var[""QuotesVerbatim""] = @""""""$var$"""""";
+                }
+                             
+            ");
+
+            Invoke("Expand");
+
+            Assert.That(Env.Var["Quotes"], Is.EqualTo(@"""C:\Tools\Nake"""));
+            Assert.That(Env.Var["QuotesVerbatim"], Is.EqualTo(@"""C:\Tools\Nake"""));
         }
 
         [Test]
