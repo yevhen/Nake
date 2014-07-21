@@ -21,26 +21,31 @@ namespace Nake
         /// <param name="workingDirectory">The working directory. Default is current directory</param>
         /// <param name="echoOff">if set to <c>true</c>disables echoing command output to std out</param>
         /// <param name="ignoreStdOutErrors">if set to <c>true</c> ignores errors logged to std out</param>
+        /// <param name="ignoreExitCode">if set to <c>true</c> ignores exit code</param>
+        /// <param name="disableStdOutLogging">if set to <c>true</c> completely disable any std out logging</param>
         /// <returns> Exit code </returns>
         /// <exception cref="System.ApplicationException">If command fails</exception>
         public static int Cmd(
-            string command,
+            string command, 
             string[] environmentVariables = null, 
-            string workingDirectory = null,
-            bool echoOff = true, 
-            bool ignoreStdOutErrors = true)
+            string workingDirectory = null, 
+            bool echoOff = true,
+            bool ignoreStdOutErrors = false, 
+            bool ignoreExitCode = false,
+            bool disableStdOutLogging = false)
         {
             var task = new Exec
-            {
+            {   
                 Command = command,
                 EchoOff = echoOff,
                 WorkingDirectory = workingDirectory ?? Location.CurrentDirectory(),
-                LogStandardErrorAsError = true,
+                LogStandardErrorAsError = !ignoreStdOutErrors,
+                IgnoreExitCode = ignoreExitCode,
                 EnvironmentVariables = environmentVariables ?? Env.Var.All(),
-                BuildEngine = new MSBuildEngineStub(),
+                BuildEngine = new MSBuildEngineStub(disableStdOutLogging),
             };
-
-            if (!task.Execute() || (task.Log.HasLoggedErrors && !ignoreStdOutErrors))
+            
+            if (!task.Execute() || task.Log.HasLoggedErrors)
                 throw new ApplicationException(string.Format("{0} failed", task.GetType()));
             
             return task.ExitCode;
@@ -115,11 +120,15 @@ namespace Nake
         /// <typeparam name="TTask">The type of the task.</typeparam>
         /// <param name="task">The task.</param>
         /// <param name="ignoreStdOutErrors">if set to <c>true</c> ignores errors logged to std out</param>
+        /// <param name="disableStdOutLogging">if set to <c>true</c> completely disable any std out logging</param>
         /// <returns>The executed task. Allows to get value of any OUT property</returns>
         /// <exception cref="System.ApplicationException">If tasks fails</exception>
-        public static TTask MSBuild<TTask>(TTask task, bool ignoreStdOutErrors = true) where TTask : Task
+        public static TTask MSBuild<TTask>(
+            TTask task, 
+            bool ignoreStdOutErrors = true,
+            bool disableStdOutLogging = false) where TTask : Task
         {
-            task.BuildEngine = new MSBuildEngineStub();
+            task.BuildEngine = new MSBuildEngineStub(disableStdOutLogging);
 
             if (!task.Execute() || (task.Log.HasLoggedErrors && !ignoreStdOutErrors))
                 throw new ApplicationException(string.Format("{0} failed", task.GetType()));
