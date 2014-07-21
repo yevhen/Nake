@@ -135,6 +135,8 @@ Options:
 	   -t  --trace            Enables task execution tracing and full stack traces in exception messages
 	       --debug            Enables full script debugging in Visual Studio
 	   -T  --tasks [PATTERN]  Display the tasks with descriptions matching optional PATTERN and exit
+	   	   --runner NAME      Use NAME as runner file name in task listing
+	   -r  --reset-cache      Resets compilation output cache
 
 ### Invoking tasks
 
