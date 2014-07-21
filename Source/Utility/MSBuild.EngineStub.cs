@@ -8,26 +8,31 @@ namespace Nake
 {
     class MSBuildEngineStub : IBuildEngine
     {
-        static readonly ConsoleLogger Logger = new ConsoleLogger(LoggerVerbosity.Normal);
+        readonly ConsoleLogger logger;
+
+        public MSBuildEngineStub(bool quiet = false)
+        {
+            logger = new ConsoleLogger(quiet ? LoggerVerbosity.Quiet : LoggerVerbosity.Normal);
+        }
 
         public void LogErrorEvent(BuildErrorEventArgs e)
         {
-            Logger.ErrorHandler(this, e);
+            logger.ErrorHandler(this, e);
         }
 
         public void LogWarningEvent(BuildWarningEventArgs e)
         {
-            Logger.WarningHandler(this, e);
+            logger.WarningHandler(this, e);
         }
 
         public void LogMessageEvent(BuildMessageEventArgs e)
         {
-            Logger.MessageHandler(this, e);
+            logger.MessageHandler(this, e);
         }
 
         public void LogCustomEvent(CustomBuildEventArgs e)
         {
-            Logger.CustomEventHandler(this, e);
+            logger.CustomEventHandler(this, e);
         }
 
         public bool BuildProjectFile(string projectFileName, string[] targetNames, IDictionary globalProperties, IDictionary targetOutputs)
