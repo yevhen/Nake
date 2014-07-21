@@ -11,7 +11,8 @@ namespace Nake
 
         public string RunnerName;
         public bool DebugScript;
-        
+        public bool ResetCache;
+
         public bool QuietMode;
         public bool SilentMode;
         public bool TraceEnabled;
@@ -21,7 +22,7 @@ namespace Nake
         
         public bool ShowTasks;
         public string ShowTasksFilter;
-
+        
         public readonly List<Variable> Variables = new List<Variable>();
         public readonly List<Task> Tasks = new List<Task>();
 
@@ -56,7 +57,6 @@ namespace Nake
                 .OnMatch((options, dir) => options.CurrentDirectory = dir),
 
             new Switch("runner NAME", "Use NAME as runner file name in task listing")
-                .Shortcut("r")
                 .OnMatch((options, name) => options.RunnerName = name),
 
             new Switch("trace", "Enables task execution tracing and full stack traces in exception messages")
@@ -72,7 +72,10 @@ namespace Nake
                 { 
                     options.ShowTasks = true;
                     options.ShowTasksFilter = filter;
-                }),										
+                }),	
+				
+			new Switch("reset-cache", "Resets compilation output cache")
+                .OnMatch(options => options.ResetCache = true),	
         };
 
         public static void PrintUsage()

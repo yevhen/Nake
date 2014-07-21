@@ -106,7 +106,7 @@ namespace Nake
             );
 
             var cachingEngine = new CachingEngine(
-                engine, file, declarations.Select(x => new Task(x)).ToArray()              
+                engine, file, declarations.Select(x => new Task(x)).ToArray(), options.ResetCache              
             );
 
             var result = cachingEngine.Build(

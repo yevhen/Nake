@@ -14,12 +14,14 @@ namespace Nake
         readonly Engine engine;
         readonly FileInfo script;
         readonly Task[] tasks;
+        readonly bool reset;
 
-        public CachingEngine(Engine engine, FileInfo script, Task[] tasks)
+        public CachingEngine(Engine engine, FileInfo script, Task[] tasks, bool reset)
         {
             this.engine = engine;
             this.script = script;
             this.tasks = tasks;
+            this.reset = reset;
         }
 
         public BuildResult Build(string code, IDictionary<string, string> substitutions, bool debug)
@@ -27,8 +29,11 @@ namespace Nake
             var key = new CacheKey(script, code, substitutions, debug);
 
             var cached = key.Find(tasks);
-            if (cached != null)
+            if (cached != null && !reset)
                 return cached;
+
+            if (reset)
+                key.Reset();
 
             var output = engine.Build(code, substitutions, debug);
             key.Store(output);
@@ -201,6 +206,11 @@ namespace Nake
         {
             if (result.SymbolBytes != null)
                 File.WriteAllBytes(PdbFile, result.SymbolBytes);
+        }
+
+        public void Reset()
+        {
+            Directory.Delete(CacheFolder, recursive: true);
         }
     }
 }
