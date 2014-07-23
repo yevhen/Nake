@@ -261,12 +261,38 @@ namespace Nake
         {
             Assert.Throws<ExpressionResolutionFailedException>(()=> Build(@"
                 
-                [Task] public static void Interpolate()
+                [Task] public static void Interpolate1()
                 {
                     Console.WriteLine(""{Task()}"");
                 }                    
                     
             "));
+        }        
+        
+        [Test]
+        public void Should_correctly_resolve_expression_when_used_as_argument_to_step()
+        {
+            Build(@"
+                
+                const string RootPath = ""$NakeScriptDirectory$"";
+                const string OutputPath = RootPath + @""\Output"";
+
+                [Task] void Interpolate2()
+                {
+                    var packagePath = OutputPath + @""\Package"";
+                    var releasePath = packagePath + @""\Release"";
+
+                    SomeStep(@""{packagePath}\Debug"");
+                }
+
+                [Step] void SomeStep(string path)
+                {
+                    Console.WriteLine(path);
+                }                      
+                    
+            ");
+
+            Assert.DoesNotThrow(() => Invoke("Interpolate2"));
         } 
 
         [Test]
