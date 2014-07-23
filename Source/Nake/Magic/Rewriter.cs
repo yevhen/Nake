@@ -108,7 +108,7 @@ namespace Nake.Magic
         {
             foreach (var literal in GetExpansionQualifiedLiterals(node))
             {
-                result.Add(literal, new StringExpansion(model, literal, false));
+                result.Add(literal, new StringInterpolation(model, literal, false));
             }
         }
 
@@ -116,7 +116,7 @@ namespace Nake.Magic
         {
             return node.DescendantNodes() 
                        .OfType<LiteralExpressionSyntax>()
-                       .Where(StringExpansion.Qualifies);
+                       .Where(StringInterpolation.Qualifies);
         }
     }
 }

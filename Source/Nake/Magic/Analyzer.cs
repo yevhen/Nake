@@ -144,8 +144,8 @@ namespace Nake.Magic
 
         public override void VisitLiteralExpression(LiteralExpressionSyntax node)
         {
-            if (StringExpansion.Qualifies(node))
-                result.Add(node, new StringExpansion(model, node, visitingConstant));
+            if (StringInterpolation.Qualifies(node))
+                result.Add(node, new StringInterpolation(model, node, visitingConstant));
             
             base.VisitLiteralExpression(node);
         }

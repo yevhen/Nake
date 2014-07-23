@@ -73,7 +73,7 @@
     <Compile Include="CodeFixture.cs" />
     <Compile Include="Options_parsing.cs" />
     <Compile Include="Redefining_public_fields.cs" />
-    <Compile Include="String_literal_expansion.cs" />
+    <Compile Include="String_interpolation.cs" />
     <Compile Include="What_considered_being_a_task.cs" />
     <Compile Include="Invoking_tasks.cs" />
     <Compile Include="Global_task_registry.cs" />
