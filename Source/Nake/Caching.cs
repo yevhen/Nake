@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -48,7 +49,8 @@ namespace Nake
 
         static CacheKey()
         {
-            rootCacheFolder = Path.Combine(Path.GetTempPath(), "Nake.2.0");
+            var version = Assembly.GetExecutingAssembly().GetName().Version;
+            rootCacheFolder = Path.Combine(Path.GetTempPath(), "Nake." + version);
         }
 
         readonly SHA1 sha1 = SHA1.Create();
