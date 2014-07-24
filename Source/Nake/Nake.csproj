@@ -75,7 +75,7 @@
     <Compile Include="Magic\FieldSubstitution.cs" />
     <Compile Include="Magic\ProxyInvocation.cs" />
     <Compile Include="Magic\Rewriter.cs" />
-    <Compile Include="Magic\StringExpansion.cs" />
+    <Compile Include="Magic\StringInterpolation.cs" />
     <Compile Include="Options.cs" />
     <Compile Include="Exceptions.cs" />
     <Compile Include="Program.cs" />

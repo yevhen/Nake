@@ -48,14 +48,13 @@ namespace Nake.Magic
         {
             SkipLiteralsWithinStringFormat(node);
 
+            var visited = (InvocationExpressionSyntax)
+                base.VisitInvocationExpression(node);
+            
             var invocation = result.Find(node);
-            if (invocation == null)
-                return base.VisitInvocationExpression(node);
-
-            var replacement = invocation.Replace();                
-            ReprocessStringLiterals(replacement);
-
-            return base.Visit(replacement);
+            return invocation != null 
+                              ? invocation.Replace(visited) 
+                              : visited;
         }
 
         public override SyntaxNode VisitLiteralExpression(LiteralExpressionSyntax node)
@@ -63,15 +62,15 @@ namespace Nake.Magic
             if (ShouldSkip(node))
                 return base.VisitLiteralExpression(node);
 
-            var expansion = result.Find(node);
-            if (expansion == null)
+            var interpolation = result.Find(node);
+            if (interpolation == null)
                 return base.VisitLiteralExpression(node);
 
-            var expanded = expansion.Expand();
-            foreach (var variable in expansion.Captured)
+            var interpolated = interpolation.Interpolate();
+            foreach (var variable in interpolation.Captured)
                 Captured.Add(variable);
 
-            return expanded;
+            return interpolated;
         }
 
         public override SyntaxNode VisitVariableDeclarator(VariableDeclaratorSyntax node)
@@ -104,19 +103,11 @@ namespace Nake.Magic
             }
         }
 
-        void ReprocessStringLiterals(SyntaxNode node)
-        {
-            foreach (var literal in GetExpansionQualifiedLiterals(node))
-            {
-                result.Add(literal, new StringExpansion(model, literal, false));
-            }
-        }
-
         static IEnumerable<LiteralExpressionSyntax> GetExpansionQualifiedLiterals(SyntaxNode node)
         {
             return node.DescendantNodes() 
                        .OfType<LiteralExpressionSyntax>()
-                       .Where(StringExpansion.Qualifies);
+                       .Where(StringInterpolation.Qualifies);
         }
     }
 }

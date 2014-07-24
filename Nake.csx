@@ -51,7 +51,7 @@ const string OutputPath = RootPath + @"\Output";
     var packagePath = OutputPath + @"\Package";
     var releasePath = packagePath + @"\Release";
 
-    Test(packagePath + @"\Debug");
+    Test(@"{packagePath}\Debug");
     Build("Release", releasePath);
 
     var version = FileVersionInfo
