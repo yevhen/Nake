@@ -274,7 +274,7 @@ namespace Nake
         {
             Build(@"
                 
-                const string RootPath = ""$NakeScriptDirectory$"";
+                const string RootPath = @""C:\Temp"";
                 const string OutputPath = RootPath + @""\Output"";
 
                 [Task] void Interpolate()
@@ -293,7 +293,7 @@ namespace Nake
             ");
 
             Assert.DoesNotThrow(() => Invoke("Interpolate"));
-            Assert.That(Env.Var["Result"], Is.EqualTo(@"$NakeScriptDirectory$\Output\Package\Debug"));
+            Assert.That(Env.Var["Result"], Is.EqualTo(@"C:\Temp\Output\Package\Debug"));
         } 
 
         [Test]
