@@ -16,6 +16,7 @@ namespace Nake.Magic
 
         Task current;
         bool visitingConstant;
+        bool visitingStringFormat;
         AnalyzerResult result;
         
         public Analyzer(CSharpCompilation compilation, IDictionary<string, string> substitutions)
@@ -72,30 +73,34 @@ namespace Nake.Magic
         public override void VisitInvocationExpression(InvocationExpressionSyntax node)
         {
             var symbol = ModelExtensions.GetSymbolInfo(model, node).Symbol as IMethodSymbol;
-            
-            if (symbol == null)
-                return;
 
-            if (!IsStep(symbol))
+            if (symbol != null)
             {
-                base.VisitInvocationExpression(node);
-                return;
+                visitingStringFormat = IsStringFormatInvocation(symbol);
+
+                if (IsStep(symbol))
+                {
+                    var task = result.Find(symbol);
+                    if (task == null)
+                    {
+                        task = new Task(symbol, true);
+                        result.Add(symbol, task);
+                    }
+
+                    result.Add(node, new ProxyInvocation(task));
+
+                    if (current != null)
+                        current.AddDependency(task);
+                }
             }
-
-            var task = result.Find(symbol);
-
-            if (task == null)
-            {
-                task = new Task(symbol, true);                
-                result.Add(symbol, task);
-            }
-            
-            result.Add(node, new ProxyInvocation(task));
-
-            if (current != null)
-                current.AddDependency(task);
 
             base.VisitInvocationExpression(node);
+            visitingStringFormat = false;
+        }
+
+        static bool IsStringFormatInvocation(IMethodSymbol symbol)
+        {
+            return symbol.ToString().StartsWith("string.Format(");
         }
 
         public override void VisitFieldDeclaration(FieldDeclarationSyntax node)
@@ -144,7 +149,7 @@ namespace Nake.Magic
 
         public override void VisitLiteralExpression(LiteralExpressionSyntax node)
         {
-            if (StringInterpolation.Qualifies(node))
+            if (!visitingStringFormat && StringInterpolation.Qualifies(node))
                 result.Add(node, new StringInterpolation(model, node, visitingConstant));
             
             base.VisitLiteralExpression(node);

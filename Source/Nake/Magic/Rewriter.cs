@@ -18,8 +18,6 @@ namespace Nake.Magic
         readonly CSharpCompilation compilation;
         readonly AnalyzerResult result;
         
-        readonly HashSet<LiteralExpressionSyntax> skip  = new HashSet<LiteralExpressionSyntax>();
-
         public Rewriter(CSharpCompilation compilation, AnalyzerResult result)
         {
             tree = (CSharpSyntaxTree) compilation.SyntaxTrees.Single();
@@ -46,8 +44,6 @@ namespace Nake.Magic
 
         public override SyntaxNode VisitInvocationExpression(InvocationExpressionSyntax node)
         {
-            SkipLiteralsWithinStringFormat(node);
-
             var visited = (InvocationExpressionSyntax)
                 base.VisitInvocationExpression(node);
             
@@ -59,9 +55,6 @@ namespace Nake.Magic
 
         public override SyntaxNode VisitLiteralExpression(LiteralExpressionSyntax node)
         {
-            if (ShouldSkip(node))
-                return base.VisitLiteralExpression(node);
-
             var interpolation = result.Find(node);
             if (interpolation == null)
                 return base.VisitLiteralExpression(node);
@@ -80,34 +73,6 @@ namespace Nake.Magic
             return substitution != null 
                                 ? substitution.Substitute() 
                                 : base.VisitVariableDeclarator(node);
-        }
-
-        bool ShouldSkip(LiteralExpressionSyntax node)
-        {
-            return skip.Contains(node);
-        }
-
-        void SkipLiteralsWithinStringFormat(SyntaxNode node)
-        {
-            const SpeculativeBindingOption options = SpeculativeBindingOption.BindAsExpression;
-
-            var symbol = model.GetSpeculativeSymbolInfo(node.Span.Start, node, options)
-                .Symbol as IMethodSymbol;
-
-            if (symbol == null || (!symbol.ToString().StartsWith("string.Format(")))
-                return;
-
-            foreach (var literal in GetExpansionQualifiedLiterals(node))
-            {
-                skip.Add(literal);
-            }
-        }
-
-        static IEnumerable<LiteralExpressionSyntax> GetExpansionQualifiedLiterals(SyntaxNode node)
-        {
-            return node.DescendantNodes() 
-                       .OfType<LiteralExpressionSyntax>()
-                       .Where(StringInterpolation.Qualifies);
         }
     }
 }
