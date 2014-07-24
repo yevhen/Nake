@@ -10,24 +10,22 @@ namespace Nake.Magic
     class ProxyInvocation
     {
         readonly Task task;
-        readonly InvocationExpressionSyntax invocation;
 
-        public ProxyInvocation(Task task, InvocationExpressionSyntax invocation)
+        public ProxyInvocation(Task task)
         {
             this.task = task;
-            this.invocation = invocation;
         }
 
-        public ExpressionSyntax Replace()
+        public ExpressionSyntax Replace(InvocationExpressionSyntax invocation)
         {
-            var replacement = string.Format(@"Nake.TaskRegistry.Invoke(""{0}"", {1})", 
-                                              task.FullName, BuildArgumentString());
+            var replacement = string.Format(@"Nake.TaskRegistry.Invoke(""{0}"", {1})",
+                                              task.FullName, BuildArgumentString(invocation));
 
             return SyntaxFactory.ParseExpression(replacement)
                          .WithLeadingTrivia(invocation.GetLeadingTrivia());
         }
 
-        string BuildArgumentString()
+        static string BuildArgumentString(InvocationExpressionSyntax invocation)
         {
             var arguments = invocation.ArgumentList.Arguments;
 

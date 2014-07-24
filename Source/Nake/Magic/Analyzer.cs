@@ -90,7 +90,7 @@ namespace Nake.Magic
                 result.Add(symbol, task);
             }
             
-            result.Add(node, new ProxyInvocation(task, node));
+            result.Add(node, new ProxyInvocation(task));
 
             if (current != null)
                 current.AddDependency(task);

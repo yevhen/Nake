@@ -42,7 +42,7 @@ namespace Nake.Magic
             literal  = node.Token.ValueText;
         }
 
-        public SyntaxNode Expand()
+        public SyntaxNode Interpolate()
         {
             return constant 
                     ? InterpolateConstant() 

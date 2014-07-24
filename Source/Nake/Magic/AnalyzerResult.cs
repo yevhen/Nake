@@ -14,7 +14,7 @@ namespace Nake.Magic
         
         readonly IDictionary<InvocationExpressionSyntax, ProxyInvocation> invocations = new Dictionary<InvocationExpressionSyntax, ProxyInvocation>();
         readonly IDictionary<VariableDeclaratorSyntax, FieldSubstitution> substitutions = new Dictionary<VariableDeclaratorSyntax, FieldSubstitution>();
-        readonly IDictionary<LiteralExpressionSyntax, StringInterpolation> expansions = new Dictionary<LiteralExpressionSyntax, StringInterpolation>();        
+        readonly IDictionary<LiteralExpressionSyntax, StringInterpolation> interpolations = new Dictionary<LiteralExpressionSyntax, StringInterpolation>();        
         
         public IEnumerable<Task> Tasks
         {
@@ -58,12 +58,12 @@ namespace Nake.Magic
 
         public void Add(LiteralExpressionSyntax node, StringInterpolation interpolation)
         {
-            expansions.Add(node, interpolation);
+            interpolations.Add(node, interpolation);
         }
         
         public StringInterpolation Find(LiteralExpressionSyntax node)
         {
-            return expansions.Find(node);
+            return interpolations.Find(node);
         }
     }
 }

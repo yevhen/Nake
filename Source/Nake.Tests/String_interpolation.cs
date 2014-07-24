@@ -97,7 +97,7 @@ namespace Nake
                 {}
                     
                 [Task] 
-                public static void Expand(string optionalParameterDefaultValue = ""{expr}"")
+                public static void Interpolate(string optionalParameterDefaultValue = ""{expr}"")
                 {
                     const string localConst = ""{expr}"";
 
@@ -137,7 +137,7 @@ namespace Nake
                     
             ");
 
-            var exception = Assert.Throws<TaskInvocationException>(()=> Invoke("Expand"));
+            var exception = Assert.Throws<TaskInvocationException>(() => Invoke("Interpolate"));
             Assert.That(exception.SourceException.GetType() == typeof(FormatException));
         } 
         
@@ -151,7 +151,7 @@ namespace Nake
                 const string fieldConst = ""$var$"";
                     
                 [Task] 
-                public static void Expand(string optionalParameterDefaultValue = ""$var$"")
+                public static void Interpolate(string optionalParameterDefaultValue = ""$var$"")
                 {
                     const string localConst = ""$var$"";
 
@@ -277,7 +277,7 @@ namespace Nake
                 const string RootPath = ""$NakeScriptDirectory$"";
                 const string OutputPath = RootPath + @""\Output"";
 
-                [Task] void Interpolate2()
+                [Task] void Interpolate()
                 {
                     var packagePath = OutputPath + @""\Package"";
                     var releasePath = packagePath + @""\Release"";
@@ -287,12 +287,13 @@ namespace Nake
 
                 [Step] void SomeStep(string path)
                 {
-                    Console.WriteLine(path);
+                    Env.Var[""Result""] = path;
                 }                      
                     
             ");
 
-            Assert.DoesNotThrow(() => Invoke("Interpolate2"));
+            Assert.DoesNotThrow(() => Invoke("Interpolate"));
+            Assert.That(Env.Var["Result"], Is.EqualTo(@"$NakeScriptDirectory$\Output\Package\Debug"));
         } 
 
         [Test]
