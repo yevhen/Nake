@@ -4,6 +4,7 @@
 using Nake;
 using Nake.FS;
 using Nake.Log;
+using Nake.Env;
 using Nake.Run;
 
 using System.IO;
@@ -13,6 +14,8 @@ using System.Diagnostics;
 
 const string RootPath = "$NakeScriptDirectory$";
 const string OutputPath = RootPath + @"\Output";
+
+var MSBuildExe = @"$ProgramFiles(x86)$\MSBuild\12.0\Bin\MSBuild.exe";
 
 /// Builds sources in debug mode 
 [Task] void Default()
@@ -32,8 +35,8 @@ const string OutputPath = RootPath + @"\Output";
 {
     Clean(outDir);
 
-    MSBuild("Nake.sln", 
-            "Configuration={config};OutDir={outDir};ReferencePath={outDir}");
+    Exec(MSBuildExe, 
+        "Nake.sln /p:Configuration={config};OutDir={outDir};ReferencePath={outDir} /m");
 }
 
 /// Runs unit tests 
@@ -64,8 +67,8 @@ const string OutputPath = RootPath + @"\Output";
         @"Packages\Nake.{version}\tools\net45\Nake.exe %*"
     );
     
-    MSBuild(@"Source\Utility\Utility.shfbproj", 
-             "OutputPath={releasePath};SourcePath={releasePath}");
+    Exec(MSBuildExe, 
+        @"Source\Utility\Utility.shfbproj /p:OutputPath={releasePath};SourcePath={releasePath}");
 
     Cmd(@"Tools\Nuget.exe pack Build\NuGet\Nake.nuspec -Version {version} " +
          "-OutputDirectory {packagePath} -BasePath {RootPath} -NoPackageAnalysis");

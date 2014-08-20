@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 using Microsoft.Build.Tasks;
-using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
 namespace Nake
@@ -52,66 +51,37 @@ namespace Nake
         }
 
         /// <summary>
-        /// Runs MSBuild tool
+        /// Executes the specified file with given argument string.
         /// </summary>
-        /// <param name="solutionOrSingleProject">The solution or single project.</param>
-        /// <param name="properties">The properties to pass.</param>
-        /// <param name="targets">The targets to execute.</param>
-        /// <param name="buildInParallel">if set to <c>true</c> will build projects in parallel.</param>
-        /// <param name="maxDegreeOfParallelism">The maximum degree of parallelism.</param>
-        /// <param name="toolsVersion">The tools version.</param>
-        /// <param name="verbosity">The log verbosity.</param>
-        public static void MSBuild(
-            string solutionOrSingleProject,
-            string properties = null,
-            string targets = null,
-            bool buildInParallel = true,
-            int? maxDegreeOfParallelism = null,
-            string toolsVersion = "4.0",
-            MSBuildVerbosity verbosity = null)
+        /// <param name="fileName">Name of the executable file.</param>
+        /// <param name="arguments">The arguments.</param>
+        /// <param name="workingDirectory">The working directory. Default is current directory</param>
+        /// <param name="ignoreExitCode">if set to <c>true</c> ignores exit code</param>
+        /// <returns> Exit code </returns>
+        public static int Exec(
+            string fileName, 
+            string arguments, 
+            string workingDirectory = null, 
+            bool ignoreExitCode = false)
         {
-            MSBuild(new FileSet {solutionOrSingleProject}, 
-                properties, targets, 
-                buildInParallel, maxDegreeOfParallelism, 
-                toolsVersion, verbosity);
-        }
+            var info = new ProcessStartInfo(fileName, arguments)
+            {
+                WorkingDirectory = workingDirectory ?? Location.CurrentDirectory(),
+                UseShellExecute = false,
+            };
 
-        /// <summary>
-        /// Runs MSBuild tool
-        /// </summary>
-        /// <param name="projects">The set of projects.</param>
-        /// <param name="properties">The properties to pass.</param>
-        /// <param name="targets">The targets to execute.</param>
-        /// <param name="buildInParallel">if set to <c>true</c> will build projects in parallel.</param>
-        /// <param name="maxDegreeOfParallelism">The maximum degree of parallelism.</param>
-        /// <param name="toolsVersion">The tools version.</param>
-        /// <param name="verbosity">The log verbosity.</param>
-        public static void MSBuild(
-            FileSet projects, 
-            string properties = null, 
-            string targets = null, 
-            bool buildInParallel = true,
-            int? maxDegreeOfParallelism = null,
-            string toolsVersion = "4.0", 
-            MSBuildVerbosity verbosity = null)
-        {
-            MSBuildTool.Build(projects,
-                SplitProperties(properties ?? ""), SplitTargets(targets ?? ""),
-                buildInParallel, maxDegreeOfParallelism ?? Environment.ProcessorCount,
-                toolsVersion, verbosity != null ? verbosity.Level : LoggerVerbosity.Normal);
-        }
+            using (var process = new Process())
+            {
+                process.StartInfo = info;
+                
+                process.Start();
+                process.WaitForExit();
 
-        static Dictionary<string, string> SplitProperties(string properties)
-        {
-            return properties
-                    .Split(new[] { ";" }, StringSplitOptions.RemoveEmptyEntries)
-                    .Select(x => new { key = x.Split('=')[0], value = x.Split('=')[1] })
-                    .ToDictionary(x => x.key, x => x.value);
-        }
+                if (process.ExitCode != 0 && !ignoreExitCode)
+                    throw new ApplicationException(string.Format("Process exited with code {0}", process.ExitCode));
 
-        static string[] SplitTargets(string targets)
-        {
-            return targets.Split(new[]{';'}, StringSplitOptions.RemoveEmptyEntries);
+                return process.ExitCode;
+            }
         }
 
         /// <summary>
@@ -134,44 +104,6 @@ namespace Nake
                 throw new ApplicationException(string.Format("{0} failed", task.GetType()));
 
             return task;
-        }
-    }
-
-    /// <summary>
-    /// The MSBuild logger verbosity
-    /// </summary>
-    public class MSBuildVerbosity
-    {
-        internal readonly LoggerVerbosity Level;
-
-        /// <summary>
-        /// Detailed verbosity, which displays errors, warnings, messages with high or normal importance, all status events, and a build summary.
-        /// </summary>
-        public static readonly MSBuildVerbosity Detailed = new MSBuildVerbosity(LoggerVerbosity.Detailed);
-
-        /// <summary>
-        /// Diagnostic verbosity, which displays all errors, warnings, messages, status events, and a build summary.
-        /// </summary>
-        public static readonly MSBuildVerbosity Diagnostic = new MSBuildVerbosity(LoggerVerbosity.Diagnostic);
-
-        /// <summary>
-        /// Minimal verbosity, which displays errors, warnings, messages with high importance, and a build summary.
-        /// </summary>
-        public static readonly MSBuildVerbosity Minimal = new MSBuildVerbosity(LoggerVerbosity.Minimal);
-
-        /// <summary>
-        /// Normal verbosity, which displays errors, warnings, messages with high importance, some status events, and a build summary.
-        /// </summary>
-        public static readonly MSBuildVerbosity Normal = new MSBuildVerbosity(LoggerVerbosity.Normal);
-
-        /// <summary>
-        /// Quiet verbosity, which displays a build summary.
-        /// </summary>
-        public static readonly MSBuildVerbosity Quiet = new MSBuildVerbosity(LoggerVerbosity.Quiet);
-
-        MSBuildVerbosity(LoggerVerbosity level)
-        {
-            Level = level;
         }
     }
 }
