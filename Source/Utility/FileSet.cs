@@ -271,7 +271,16 @@ namespace Nake
         }
 
         /// <summary>
-        /// Performs an implicit conversion from strign array to <see cref="FileSet"/>.
+        /// Performs conversion from file set to array of <see cref="ITaskItem"/>.
+        /// </summary>
+        /// <returns> The sequence of MSBuild task items </returns>
+        public ITaskItem[] AsTaskItems()
+        {
+            return ((IEnumerable<string>)this).AsTaskItems();
+        }
+
+        /// <summary>
+        /// Performs an implicit conversion from string array to <see cref="FileSet"/>.
         /// </summary>
         /// <param name="arg">The argument.</param>
         /// <returns>
@@ -303,23 +312,25 @@ namespace Nake
         }
 
         /// <summary>
-        /// Performs an implicit conversion from file set to array of <see cref="ITaskItem"/>.
+        /// Returns a string that represents the current object.
         /// </summary>
-        /// <param name="arg">The argument.</param>
-        /// <returns> The sequence of MSBuild task items </returns>
-        public static implicit operator ITaskItem[](FileSet arg)
+        /// <returns>
+        /// A string that represents the current object.
+        /// </returns>
+        /// <filterpriority>2</filterpriority>
+        public override string ToString()
         {
-            return arg.ToArray().AsTaskItems();
-        }
-
+            return ToString(" ");
+        }        
+        
         /// <summary>
-        /// Performs an implicit conversion from file set to string.
+        /// Returns a string of resolved concatenated file paths using given separator.
         /// </summary>
-        /// <param name="arg">The argument.</param>
-        /// <returns>  The string with space separated list of resolved file set paths </returns>
-        public static implicit operator string(FileSet arg)
+        /// <param name="separator">Path separator</param>
+        /// <returns>  The string with resolved file set paths separated by given  separator </returns>
+        public string ToString(string separator)
         {
-            return string.Join(" ", arg);
+            return string.Join(separator, this); ;
         }
 
         class Inclusion
