@@ -297,7 +297,7 @@ namespace Nake
         } 
 
         [Test]
-        public void Should_return_original_environment_variable_token_if_inlined_environment_variable_is_undefined()
+        public void Should_inline_UNDEFINED_value_if_inlined_environment_variable_is_undefined()
         {
             Build(@"
                 
@@ -310,7 +310,7 @@ namespace Nake
             
             Invoke("Interpolate");
             
-            Assert.That(Env.Var["Result"], Is.EqualTo(@"$undefined$"));
+            Assert.That(Env.Var["Result"], Is.EqualTo("?UNDEFINED?"));
         } 
     }
 }
