@@ -93,7 +93,7 @@ namespace Nake
         /// <param name="disableStdOutLogging">if set to <c>true</c> completely disable any std out logging</param>
         /// <returns>The executed task. Allows to get value of any OUT property</returns>
         /// <exception cref="System.ApplicationException">If tasks fails</exception>
-        public static TTask MSBuild<TTask>(
+        public static TTask Exec<TTask>(
             TTask task, 
             bool ignoreStdOutErrors = true,
             bool disableStdOutLogging = false) where TTask : Task

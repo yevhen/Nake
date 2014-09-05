@@ -42,7 +42,7 @@ namespace Nake
         public static void Fail(string message = null)
         {
             if (message != null)
-                Log.Message(message);
+                Log.Error(message);
 
             Terminator(-1, message, null);
         }
