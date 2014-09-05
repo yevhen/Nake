@@ -132,6 +132,35 @@ namespace Nake
                 new TaskArgument("100"),
                 new TaskArgument("arg4", "1")
             );
+        }        
+        
+        [Test]
+        public void Invoking_task_with_enum_parameter()
+        {
+            Build(@"
+            
+            enum Days {Sat, Sun, Mon, Tue, Wed, Thu, Fri};
+
+            [Task] void Task(Days days) {}
+            
+            ");
+
+            Assert.Throws<TaskArgumentException>(() => Invoke("Task",
+                new TaskArgument("Rishon")
+            ), 
+            "Unknown enum member");
+
+            Invoke("Task",
+                new TaskArgument("Days.Mon")
+            );
+            
+            Invoke("Task",
+                new TaskArgument("mon")
+            );
+
+            Invoke("Task",
+                new TaskArgument("days", "Mon")
+            );
         }
 
         [Test]

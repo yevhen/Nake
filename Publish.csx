@@ -56,13 +56,15 @@ Func<string> ArchiveFile = () => OutputPath + @"\{Version()}.zip";
 }
 
 /// Publishes standalone version to GitHub releases
-[Step] void Standalone(bool beta, string description = null)
+[Step] void Standalone(ReleaseType releaseType, string description = null)
 {
     Zip();
 
-    string release = CreateRelease(beta, description);
+    string release = CreateRelease(releaseType == ReleaseType.Beta, description);
     Upload(release, ArchiveFile(), "application/zip");
 }
+
+enum ReleaseType {Beta, Release}
 
 string CreateRelease(bool beta, string description)
 {

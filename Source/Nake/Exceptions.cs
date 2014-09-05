@@ -108,7 +108,7 @@ namespace Nake
     class TaskSignatureViolationException : NakeException
     {
         public TaskSignatureViolationException(string method)
-            : base("Bad task method signature: '{0}'. Should be public static void non-generic, have no out or ref parameters and all parameters should be either bool, int or string", method)
+            : base("Bad task method signature: '{0}'. Should be public static void non-generic, have no out or ref parameters and all parameters should be either bool, int, string or enum type", method)
         {}
     }
 

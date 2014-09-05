@@ -87,7 +87,16 @@ namespace Nake
                         int p0, bool p1, string p3    
                     ){}"
                 ),
-  
+
+                TaskDeclaration(
+                    @"                    
+                    enum Days {Sat, Sun, Mon, Tue, Wed, Thu, Fri};
+                    
+                    [Task] void EnumsCouldBeUsedAsParameters(
+                        Days days
+                    ){}"
+                ),
+
                 BadTaskDeclaration<TaskSignatureViolationException>(
                     @"[Task] void HasIncompatibleParam(object o) {}"
                 ),

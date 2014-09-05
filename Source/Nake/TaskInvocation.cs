@@ -71,6 +71,10 @@ namespace Nake
             {
                 throw new TaskArgumentException(task, parameter.Name, position, e.Message);
             }
+            catch (ArgumentException e)
+            {
+                throw new TaskArgumentException(task, parameter.Name, position, e.Message);
+            }
             catch (OverflowException e)
             {
                 throw new TaskArgumentException(task, parameter.Name, position, e.Message);

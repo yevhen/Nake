@@ -14,7 +14,7 @@ namespace Nake
 
         public static bool IsSupported(ITypeSymbol type)
         {
-            return type.IsBoolean() || type.IsInteger() || type.IsString();
+            return type.IsBoolean() || type.IsInteger() || type.IsString() || type.IsEnum();
         }
     }
 
@@ -33,6 +33,11 @@ namespace Nake
         public static bool IsInteger(this ITypeSymbol type)
         {
             return FullName(type) == "System.Int32";
+        }        
+        
+        public static bool IsEnum(this ITypeSymbol type)
+        {
+            return type.TypeKind == TypeKind.Enum;
         }
 
         static string FullName(ISymbol type)

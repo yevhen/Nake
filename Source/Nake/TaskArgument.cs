@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 namespace Nake
 {
@@ -31,6 +32,24 @@ namespace Nake
         }
 
         public object Convert(Type conversionType)
+        {
+            return conversionType.IsEnum 
+                    ? ConvertEnumValue(conversionType) 
+                    : ConvertSimpleValue(conversionType);
+        }
+
+        object ConvertEnumValue(Type enumType)
+        {
+            var parts = Value.ToString().Split('.');
+
+            var value = parts.Length == 1 
+                ? parts[0] 
+                : parts[1];
+
+            return Enum.Parse(enumType, value, true);
+        }
+
+        object ConvertSimpleValue(Type conversionType)
         {
             return TypeConverter.Convert(Value, conversionType);
         }
