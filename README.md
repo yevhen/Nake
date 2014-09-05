@@ -51,13 +51,14 @@ var who = "world";                      //  with the values passed from the comm
 [Task] void Tell(
     string what = "Hello",              //     for parameterized tasks you can supply
     string whom = "world",              //     arguments directly from the command line
-    int times = 1,                      //  (string, int and boolean arguments are supported) 
+    int times = 1,                      //          (string, int, boolean and 
+    DayOfWeek when,                     //         enum arguments are supported)
     bool quiet = false                  //  + special switch syntax for booleans (eg, --quiet)
 )
 {
     var emphasis = quiet ? "" : "!";
     for (; times > 0; times--)
-	    WriteLine("{what},{whom}{emphasis}");
+	    WriteLine("{what}, {whom} on {when}{emphasis}");
 }                                   
 
 [Step] void Clean()   			        //      Steps are Tasks with 'run once' semantics      
