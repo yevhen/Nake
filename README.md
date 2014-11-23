@@ -205,7 +205,7 @@ Gimme your pull requests!
 
 ## Samples and Documentation
 
-Have a look at [Nake.csx](https://github.com/yevhen/Nake/blob/dev/Nake.csx) or [Publish.csx](https://github.com/yevhen/Nake/blob/dev/Publish.csx). Those are the Nake files used to build and publish Nake itself (ye, we're eating our own dog food). Also, additional samples can be contributed to samples [repository](https://github.com/yevhen/Nake-samples).
+Have a look at [Nake.csx](https://github.com/yevhen/Nake/blob/master/Nake.csx) or [Publish.csx](https://github.com/yevhen/Nake/blob//master/Publish.csx). Those are the Nake files used to build and publish Nake itself (ye, we're eating our own dog food). Also, additional samples can be contributed to samples [repository](https://github.com/yevhen/Nake-samples).
 
 ## Community
 
