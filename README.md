@@ -14,8 +14,8 @@ To install Nake via NuGet, run this command in NuGet package manager console:
 
 ```cs
 #r "System"                         // 
-#r "System.Core"	                //   #reference assemblies from the GAC 
-#r "System.Data"	                //    (these are referenced by default)
+#r "System.Core"                    //   #reference assemblies from the GAC 
+#r "System.Data"                    //    (these are referenced by default)
 #r "System.Xml"                     //
 #r "System.Xml.Linq"                //
 
@@ -42,10 +42,10 @@ if (ReadLine() == "N")              //  will run before any of the tasks are exe
 var greeting = "Hello";             //   you can override any script-level variables 
 var who = "world";                  //  with the values passed from the command line
 
-/// Prints greeting                 //  this F#-style summary will be shown in the task listing
+/// Prints greeting                 //  this F#-style summary is shown in the task listing
 [Task] void Welcome()               //  [Task] makes method runnable from the command line
 {                                       
-	WriteLine("{greeting},{who}!"); //  forget ugly string.Format and string concatenation 
+    WriteLine("{greeting},{who}!"); //  forget ugly string.Format & string concatenation 
 }                                   //  with built-in support for string interpolation
 
 [Task] void Tell(
@@ -53,7 +53,7 @@ var who = "world";                  //  with the values passed from the command 
     string whom = "world",          //     arguments directly from the command line
     int times = 1,                  //          (string, int, boolean and 
     DayOfWeek when,                 //         enum arguments are supported)
-    bool quiet = false              //  + special switch syntax for booleans (eg, --quiet)
+    bool quiet = false              //  + switch-like syntax for booleans (eg, --quiet)
 )
 {
     var emphasis = quiet ? "" : "!";
@@ -61,23 +61,23 @@ var who = "world";                  //  with the values passed from the command 
 	    WriteLine("{what}, {whom} on {when}{emphasis}");
 }                                   
 
-[Step] void Clean()   			    //      Steps are Tasks with 'run once' semantics      
-{					                //  (the foundation of any popular build automation tool)
+[Step] void Clean()   			    //  Steps are Tasks with 'run once' semantics      
+{					                //  (foundation of any build automation tool)
     Delete("{OutputPath}\*.*");	
 }                                   
 
 [Step] void Build(string cfg = "Debug")
 {					                    
-    Clean();                        //  unlike popular build automation tools, there is no any
-    -------                         //  special syntax for specifying task (step) dependencies
-    MSBuild("Nake.sln", cfg);       //      (it's just plain old C# method invocation)
+    Clean();                        //  unlike popular tools, there is no special syntax
+    -------                         //     for specifying task (step) dependencies
+    MSBuild("Nake.sln", cfg);       //    (it's just plain old C# method invocation)
 }                                       
                                        
 [Step] void Test()
 {					                    
-    Clean();                        //         you have complete control over decision,
-    Build();                        //     when and in what order dependent steps should run
-    -------                         //  (Nake will guarantee that any step will run only once)
+    Clean();                        //     you have complete control over decision,
+    Build();                        //  when and in what order dependent steps should run
+    -------                         //  (and Nake guarantees that step will run only once)
     NUnit("{OutputPath}\*.Tests.dll")   
 }
 
@@ -144,13 +144,13 @@ Options:
 General syntax for invoking tasks and passing arguments is similar to the normal C# method invocation syntax, except ` ` is used instead of `,` to separate task arguments, and `=` is used instead of `:` for specifying named argument values. Also, boolean arguments support special `--` switch syntax.
 
 ```cs
-> Nake build                        //  run Build task with default arg values
-> Nake build Release                //  or with first positional argument set to 'Release'
-> Nake build cfg=Release            //  or with named argument 'cfg' set to 'Release'
-> Nake build Release outDir="C:\"   //  you can mix positional and named arguments
-> Nake build ; test                 //  or invoke multiple tasks within a same session
-> Nake build `; test                //  also escape ';' when running in PowerShell console 
-> Nake publish --beta               //  invoke Publish task with 'beta' arg set to 'true'
+> Nake build                          //  run Build task with default arg values
+> Nake build Release                  //  or with first positional argument set to 'Release'
+> Nake build cfg=Release              //  or with named argument 'cfg' set to 'Release'
+> Nake build Release outDir="C:\Tmp"  //  you can mix positional and named arguments
+> Nake build ; test                   //  or invoke multiple tasks within a same session
+> Nake build `; test                  //  also escape ';' when running in PowerShell console 
+> Nake publish --beta                 //  invoke Publish task with 'beta' arg set to 'true'
 ```
 
 ## Included utility reference
