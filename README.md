@@ -13,47 +13,47 @@ To install Nake via NuGet, run this command in NuGet package manager console:
 ## Scripting reference
 
 ```cs
-#r "System"                             // 
-#r "System.Core"	                    //   #reference assemblies from the GAC 
-#r "System.Data"	                    //    (these are referenced by default)
-#r "System.Xml"                         //
-#r "System.Xml.Linq"                    //
+#r "System"                         // 
+#r "System.Core"	                //   #reference assemblies from the GAC 
+#r "System.Data"	                //    (these are referenced by default)
+#r "System.Xml"                     //
+#r "System.Xml.Linq"                //
 
-#r "WindowsBase, Version=4.0.0.0 ..."   //  you can reference assembly by its full name
-#r "Packages\NUnit.2.6.2\nunit.dll"     //        or by using relative path
-#r "C:\Orleans\SDK\Orleans.dll"         //            or by absolute path
+#r "WindowsBase, Version=4.0..."    //  you can reference assembly by its full name
+#r "Packages\NUnit.2.6.2\nunit.dll" //        or by using relative path
+#r "C:\Orleans\SDK\Orleans.dll"     //            or by absolute path
 
-#load "Other.csx"                       //      #load code from other script files
-#load "Build\Another.csx"               //  (both absolute and relative paths are fine)
+#load "Other.csx"                   //      #load code from other script files
+#load "Build\Another.csx"           //  (both absolute and relative paths are fine)
 
-using System;                           //
-using System.IO;                        //      standard C# namespace imports
-using System.Linq;                      //     (these are imported by default)
-using System.Text;                      //  
-using System.Collections.Generic;       //  
+using System;                       //
+using System.IO;                    //      standard C# namespace imports
+using System.Linq;                  //     (these are imported by default)
+using System.Text;                  //  
+using System.Collections.Generic;   //  
 
-using System.IO.Path;                   //    C# V6 "using static members" feature 
-using System.Console;                   //      will make you scripts more terse
+using System.IO.Path;               //    C# V6 "using static members" feature 
+using System.Console;               //      will make you scripts more terse
 
-WriteLine("Are you ready? Y/N:");       //      any code you put on the script level 
-if (ReadLine() == "N")                  //  will run before any of the tasks are executed
-    Exit("See you soon ...");           //      (useful for one-off initialization)
+WriteLine("Are you ready? Y/N:");   //      any code you put on the script level 
+if (ReadLine() == "N")              //  will run before any of the tasks are executed
+    Exit("See you soon ...");       //      (useful for one-off initialization)
 
-var greeting = "Hello";                 //   you can override any script-level variables 
-var who = "world";                      //  with the values passed from the command line
+var greeting = "Hello";             //   you can override any script-level variables 
+var who = "world";                  //  with the values passed from the command line
 
-/// Prints greeting                     //  this F#-style summary will be shown in the task listing
-[Task] void Welcome()                   //  [Task] makes method runnable from the command line
+/// Prints greeting                 //  this F#-style summary will be shown in the task listing
+[Task] void Welcome()               //  [Task] makes method runnable from the command line
 {                                       
-	WriteLine("{greeting},{who}!");     //  forget ugly string.Format and string concatenation 
-}                                       //  with built-in support for string interpolation
+	WriteLine("{greeting},{who}!"); //  forget ugly string.Format and string concatenation 
+}                                   //  with built-in support for string interpolation
 
 [Task] void Tell(
-    string what = "Hello",              //     for parameterized tasks you can supply
-    string whom = "world",              //     arguments directly from the command line
-    int times = 1,                      //          (string, int, boolean and 
-    DayOfWeek when,                     //         enum arguments are supported)
-    bool quiet = false                  //  + special switch syntax for booleans (eg, --quiet)
+    string what = "Hello",          //     for parameterized tasks you can supply
+    string whom = "world",          //     arguments directly from the command line
+    int times = 1,                  //          (string, int, boolean and 
+    DayOfWeek when,                 //         enum arguments are supported)
+    bool quiet = false              //  + special switch syntax for booleans (eg, --quiet)
 )
 {
     var emphasis = quiet ? "" : "!";
@@ -61,54 +61,54 @@ var who = "world";                      //  with the values passed from the comm
 	    WriteLine("{what}, {whom} on {when}{emphasis}");
 }                                   
 
-[Step] void Clean()   			        //      Steps are Tasks with 'run once' semantics      
-{					                    //  (the foundation of any popular build automation tool)
+[Step] void Clean()   			    //      Steps are Tasks with 'run once' semantics      
+{					                //  (the foundation of any popular build automation tool)
     Delete("{OutputPath}\*.*");	
 }                                   
 
 [Step] void Build(string cfg = "Debug")
 {					                    
-    Clean();                            //  unlike popular build automation tools, there is no any
-    -------                             //  special syntax for specifying task (step) dependencies
-    MSBuild("Nake.sln", cfg);           //      (it's just plain old C# method invocation)
+    Clean();                        //  unlike popular build automation tools, there is no any
+    -------                         //  special syntax for specifying task (step) dependencies
+    MSBuild("Nake.sln", cfg);       //      (it's just plain old C# method invocation)
 }                                       
                                        
 [Step] void Test()
 {					                    
-    Clean();                            //         you have complete control over decision,
-    Build();                            //     when and in what order dependent steps should run
-    -------                             //  (Nake will guarantee that any step will run only once)
+    Clean();                        //         you have complete control over decision,
+    Build();                        //     when and in what order dependent steps should run
+    -------                         //  (Nake will guarantee that any step will run only once)
     NUnit("{OutputPath}\*.Tests.dll")   
 }
 
 [Step] void Publish(bool beta = false)
 {					                    
-    Test();                             //   sometimes, you need to execute the same step but with
-    Build("Release");                   //  different arguments. Unlike other build automation tools
-    ------                              //  there is no special syntax to force step to run again - 
-    Nuget("Nake.nuspec", beta)          //       you just invoke it with different arguments!
+    Test();                         //   sometimes, you need to execute the same step but with
+    Build("Release");               //  different arguments. Unlike other build automation tools
+    ------                          //  there is no special syntax to force step to run again - 
+    Nuget("Nake.nuspec", beta)      //       you just invoke it with different arguments!
 }                                       
 
-var apiKey = "$NugetKey$";              //  $var$ is the shortcut syntax for getting 
-Push(apiKey, "{PackagePath}");          //      value of environment variable
+var apiKey = "$NugetKey$";          //  $var$ is the shortcut syntax for getting 
+Push(apiKey, "{PackagePath}");      //      value of environment variable
 
-Write("$NakeStartupDirectory$");        //  these special environment variables
-Write("$NakeScriptDirectory$");         //   are automatically created by Nake
+Write("$NakeStartupDirectory$");    //  these special environment variables
+Write("$NakeScriptDirectory$");     //   are automatically created by Nake
 
-Write("{{esc}}");                       //  will simply print {esc} (no string interpolation)
-Write("$$esc$$");                       //  will simply print $esc$ (no env variable inlining)
+Write("{{esc}}");                   //  will simply print {esc} (no string interpolation)
+Write("$$esc$$");                   //  will simply print $esc$ (no env variable inlining)
 
-class Azure                             //  namespace declarations cannot be used with scripts,
-{                                       //  but could be easily emulated with class declarations
-    class Queue                         //     and you can nest them infinitely as you like
+class Azure                         //  namespace declarations cannot be used with scripts,
+{                                   //  but could be easily emulated with class declarations
+    class Queue                     //     and you can nest them infinitely as you like
     {    
-        [Task] void Clean()             //     then from the command line you would invoke
-        {}                              //  this task by its full path (ie, azure.queue.clean)
+        [Task] void Clean()         //     then from the command line you would invoke
+        {}                          //  this task by its full path (ie, azure.queue.clean)
     }
 }
 
-[Task] void Default()                   //     running Nake without any options 
-{                                       //  will cause it to run the "default" task
+[Task] void Default()               //     running Nake without any options 
+{                                   //  will cause it to run the "default" task
 	Build();
 }
 ```
@@ -118,11 +118,11 @@ class Azure                             //  namespace declarations cannot be use
 General syntax is: `Nake [options ...]  [VAR=VALUE ...]  [task ...]`
 
 ```cs
-> Nake -f "Nake.csx" Log=1 build        //   set Log environment variable to 1 and
-                                        //  then run Build() task from Nake.csx file 
+> Nake -f "Nake.csx" Log=1 build    //   set Log environment variable to 1 and
+                                    //  then run Build() task from Nake.csx file 
                                         
-> Nake Log=1 build                      //  equivalent to the above as Nake will automatically try 
-                                        //   to use Nake.csx file if present in current directory
+> Nake Log=1 build                  //  equivalent to the above as Nake will automatically try 
+                                    //   to use Nake.csx file if present in current directory
 ```
 
 Options:
@@ -144,13 +144,13 @@ Options:
 General syntax for invoking tasks and passing arguments is similar to the normal C# method invocation syntax, except ` ` is used instead of `,` to separate task arguments, and `=` is used instead of `:` for specifying named argument values. Also, boolean arguments support special `--` switch syntax.
 
 ```cs
-> Nake build                            //  run Build task with default arg values
-> Nake build Release                    //  or with first positional argument set to 'Release'
-> Nake build cfg=Release                //  or with named argument 'cfg' set to 'Release'
-> Nake build Release outDir="C:\Temp"   //  you can mix positional and named arguments
-> Nake build ; test                     //  or invoke multiple tasks within a same session
-> Nake build `; test                    //  also escape ';' when running in PowerShell console 
-> Nake publish --beta                   //  invoke Publish task with 'beta' arg set to 'true'
+> Nake build                        //  run Build task with default arg values
+> Nake build Release                //  or with first positional argument set to 'Release'
+> Nake build cfg=Release            //  or with named argument 'cfg' set to 'Release'
+> Nake build Release outDir="C:\"   //  you can mix positional and named arguments
+> Nake build ; test                 //  or invoke multiple tasks within a same session
+> Nake build `; test                //  also escape ';' when running in PowerShell console 
+> Nake publish --beta               //  invoke Publish task with 'beta' arg set to 'true'
 ```
 
 ## Included utility reference
@@ -187,9 +187,9 @@ class Azure
 {                                       
     StorageAccount account;
     
-    static Azure()                      //  this will run once before any of the 
-    {                                   //  tasks in this namespace are executed
-        account = Init();               //  (useful for one-off initialization)
+    static Azure()                  //  this will run once before any of the 
+    {                               //  tasks in this namespace are executed
+        account = Init();           //  (useful for one-off initialization)
     }
 }  
 ```
