@@ -42,11 +42,11 @@ if (ReadLine() == "N")              //  will run before any of the tasks are exe
 var greeting = "Hello";             //   you can override any script-level variables 
 var who = "world";                  //  with the values passed from the command line
 
-/// Prints greeting                 //  this F#-style summary is shown in the task listing
-[Task] void Welcome()               //  [Task] makes method runnable from the command line
+/// Prints greeting                 //  this F#-style summary is shown in task listing
+[Task] void Welcome()               //  [Task] makes method runnable from command line
 {                                       
     WriteLine("{greeting},{who}!"); //  forget ugly string.Format & string concatenation 
-}                                   //  with built-in support for string interpolation
+}                                   //   with built-in support for string interpolation
 
 [Task] void Tell(
     string what = "Hello",          //     for parameterized tasks you can supply
@@ -77,7 +77,7 @@ var who = "world";                  //  with the values passed from the command 
 {					                    
     Clean();                        //     you have complete control over decision,
     Build();                        //  when and in what order dependent steps should run
-    -------                         //  (and Nake guarantees that step will run only once)
+    -------                         //      (and Nake makes sure of run-once behavior)
     NUnit("{OutputPath}\*.Tests.dll")   
 }
 
