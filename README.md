@@ -86,8 +86,8 @@ var who = "world";                  //  with the values passed from the command 
 [Step] void Publish(bool beta = false)
 {					                    
     Test();                         //   sometimes, you need to execute the same step but with
-    Build("Release");               //  different arguments. Unlike other build automation tools
-    ------                          //  there is no special syntax to force step to run again - 
+    Build("Release");               //  different args. Unlike other build automation tools
+    ------                          //  there is no special syntax to force step to run again, 
     Nuget("Nake.nuspec", beta)      //       you just invoke it with different arguments!
 }                                       
 
@@ -135,9 +135,9 @@ Options:
 	   -s  --silent           Same as --quiet but also suppresses user generated log messages
 	   -f  --nakefile FILE    Use FILE as Nake project file
 	   -d  --directory DIR    Use DIR as current directory
-	   -t  --trace            Enables task execution tracing and full stack traces in exception messages
+	   -t  --trace            Enables full stack traces in error reporting + task execution trace
 	       --debug            Enables full script debugging in Visual Studio
-	   -T  --tasks [PATTERN]  Display the tasks with descriptions matching optional PATTERN and exit
+	   -T  --tasks [PATTERN]  Display tasks with descriptions matching optional PATTERN and exit
 	   	   --runner NAME      Use NAME as runner file name in task listing
 	   -r  --reset-cache      Resets compilation output cache
 
