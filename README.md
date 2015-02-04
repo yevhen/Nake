@@ -63,8 +63,8 @@ var who = "world";                  //  with the values passed from the command 
 	    WriteLine("{what}, {whom} on {when}{emphasis}");
 }                                   
 
-[Step] void Clean()   			    //  Steps are Tasks with 'run once' semantics      
-{					                //  (foundation of any build automation tool)
+[Step] void Clean()   			    //     Steps are Tasks with 'run once' semantics      
+{					                //     (foundation of any build automation tool)
     Delete("{OutputPath}\*.*");	
 }                                   
 
@@ -91,11 +91,11 @@ var who = "world";                  //  with the values passed from the command 
     Nuget("Nake.nuspec", beta)      //       you just invoke it with different arguments!
 }                                       
 
-var apiKey = "$NugetKey$";          //  $var$ is the shortcut syntax for getting 
-Push(apiKey, "{PackagePath}");      //      value of environment variable
+var apiKey = "$NugetKey$";          //      $var$ is the shortcut syntax for getting 
+Push(apiKey, "{PackagePath}");      //          value of environment variable
 
-Write("$NakeStartupDirectory$");    //  these special environment variables
-Write("$NakeScriptDirectory$");     //   are automatically created by Nake
+Write("$NakeStartupDirectory$");    //       these special environment variables
+Write("$NakeScriptDirectory$");     //        are automatically created by Nake
 
 Write("{{esc}}");                   //  will simply print {esc} (no string interpolation)
 Write("$$esc$$");                   //  will simply print $esc$ (no env variable inlining)
@@ -109,8 +109,8 @@ class Azure                         //  namespace declarations cannot be used wi
     }
 }
 
-[Task] void Default()               //     running Nake without any options 
-{                                   //  will cause it to run the "default" task
+[Task] void Default()               //          running Nake without any options 
+{                                   //       will cause it to run the "default" task
 	Build();
 }
 ```
@@ -120,8 +120,8 @@ class Azure                         //  namespace declarations cannot be used wi
 General syntax is: `Nake [options ...]  [VAR=VALUE ...]  [task ...]`
 
 ```cs
-> Nake -f "Nake.csx" Log=1 build    //   set Log environment variable to 1 and
-                                    //  then run Build() task from Nake.csx file 
+> Nake -f "Nake.csx" Log=1 build    //       set Log environment variable to 1 and
+                                    //      then run Build() task from Nake.csx file 
                                         
 > Nake Log=1 build                  //  equivalent to the above as Nake will automatically try 
                                     //   to use Nake.csx file if present in current directory
