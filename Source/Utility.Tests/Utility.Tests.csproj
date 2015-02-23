@@ -53,6 +53,7 @@
     <Compile Include="FileSetExtensionsFixture.cs" />
     <Compile Include="FileSetFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RunFixture.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Packages.config" />

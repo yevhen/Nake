@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Linq;
 
 using Microsoft.Build.Tasks;
 using Microsoft.Build.Utilities;
@@ -39,11 +38,12 @@ namespace Nake
                 EchoOff = echoOff,
                 WorkingDirectory = workingDirectory ?? Location.CurrentDirectory(),
                 LogStandardErrorAsError = !ignoreStdOutErrors,
+                IgnoreStandardErrorWarningFormat = ignoreStdOutErrors,
                 IgnoreExitCode = ignoreExitCode,
                 EnvironmentVariables = environmentVariables ?? Env.Var.All(),
                 BuildEngine = new MSBuildEngineStub(disableStdOutLogging),
             };
-            
+
             if (!task.Execute() || task.Log.HasLoggedErrors)
                 throw new ApplicationException(string.Format("{0} failed", task.GetType()));
             
