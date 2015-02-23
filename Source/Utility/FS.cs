@@ -8,7 +8,7 @@ using MSBuildTask = Microsoft.Build.Utilities.Task;
 namespace Nake
 {
     /// <summary>
-    /// File-system convinience methods
+    /// File-system convenience methods
     /// </summary>
     public static class FS
     {
@@ -72,7 +72,7 @@ namespace Nake
             bool overwriteReadOnlyFiles = false, 
             bool skipUnchangedFiles = true)
         {
-            Copy(new FileSet(sourceFiles).ToArray(), destinationFolder, overwriteReadOnlyFiles, skipUnchangedFiles);
+            Copy(new FileSet().Add(sourceFiles).ToArray(), destinationFolder, overwriteReadOnlyFiles, skipUnchangedFiles);
         }
 
         /// <summary>
@@ -124,7 +124,7 @@ namespace Nake
             string destinationFolder, 
             bool overwriteReadOnlyFiles = false)
         {
-            Move(new FileSet(sourceFiles).ToArray(), destinationFolder, overwriteReadOnlyFiles);
+            Move(new FileSet().Add(sourceFiles).ToArray(), destinationFolder, overwriteReadOnlyFiles);
         }
 
         /// <summary>
