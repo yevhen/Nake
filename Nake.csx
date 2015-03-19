@@ -27,7 +27,7 @@ var MSBuildExe = @"$ProgramFiles(x86)$\MSBuild\12.0\Bin\MSBuild.exe";
 [Step] void Clean(string path = OutputPath)
 {
     Delete(@"{path}\*.*|-:*.vshost.exe");
-    RemoveDir(@"**\bin|**\obj|{path}\*|-:*.vshost.exe");    
+    RemoveDir(@"**\bin|**\obj|{path}\*");    
 }
 
 /// Builds sources using specified configuration and output path
