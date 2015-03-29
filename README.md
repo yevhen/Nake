@@ -2,9 +2,9 @@
 
 Nake is a magic task runner tool for .NET. It's a hybrid of Shovel and Rake. The DSL for defining tasks is uniquely minimal and it's just plain C# code! Nake is built on top of the latest Roslyn release so you can use all of the C# V6 features in you scripts and even more.
 
-### How to install
-
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/yevhen/Nake?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+### How to install
 
 There multiple ways in which Nake could be installed. You can install it by using NuGet [package](https://www.nuget.org/packages/Nake), or you can get it by downloading a [standalone](https://github.com/yevhen/Nake/releases) executable from GitHub releases page, and of course you can always build it from sources. 
 
