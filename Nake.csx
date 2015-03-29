@@ -77,8 +77,10 @@ var AppVeyor = Var["APPVEYOR"] == "True";
         @"Packages\Nake.{version}\tools\net45\Nake.exe %*"
     );
     
-    Exec(MSBuildExe, 
-        @"Source\Utility\Utility.shfbproj /p:OutputPath={releasePath};SourcePath={releasePath}");
+    if (AppVeyor)
+    	File.WriteAllText(@"{releasePath}\Utility.chm", "NOP");
+    else
+    	Exec(MSBuildExe, @"Source\Utility\Utility.shfbproj /p:OutputPath={releasePath};SourcePath={releasePath}");    	
 
     Cmd(@"Tools\Nuget.exe pack Build\NuGet\Nake.nuspec -Version {version} " +
          "-OutputDirectory {packagePath} -BasePath {RootPath} -NoPackageAnalysis");
