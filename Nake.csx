@@ -8,6 +8,7 @@ using Nake.Env;
 using Nake.Run;
 
 using System.IO;
+using System.Net;
 using System.Linq;
 using System.Xml.Linq;
 using System.Diagnostics;
@@ -16,6 +17,7 @@ const string RootPath = "$NakeScriptDirectory$";
 const string OutputPath = RootPath + @"\Output";
 
 var MSBuildExe = @"$ProgramFiles(x86)$\MSBuild\12.0\Bin\MSBuild.exe";
+var AppVeyor = Var["APPVEYOR"] == "True";
 
 /// Builds sources in debug mode 
 [Task] void Default()
@@ -45,7 +47,13 @@ var MSBuildExe = @"$ProgramFiles(x86)$\MSBuild\12.0\Bin\MSBuild.exe";
     Build("Debug", outputPath);
 
     var tests = new FileSet{@"{outputPath}\*.Tests.dll"}.ToString(" ");
-    Cmd(@"Packages\NUnit.Runners.2.6.2\tools\nunit-console.exe /framework:net-4.0 /noshadow /nologo {tests}");
+    var results = @"{outputPath}\nunit-test-results.xml";
+
+    Cmd(@"Packages\NUnit.Runners.2.6.2\tools\nunit-console.exe " + 
+    	@"/xml:{results} /framework:net-4.0 /noshadow /nologo {tests}");
+
+    if (AppVeyor)
+    	new WebClient().UploadFile("https://ci.appveyor.com/api/testresults/nunit/$APPVEYOR_JOB_ID$", results);
 }
 
 /// Builds official NuGet package 
@@ -57,9 +65,11 @@ var MSBuildExe = @"$ProgramFiles(x86)$\MSBuild\12.0\Bin\MSBuild.exe";
     Test(@"{packagePath}\Debug");
     Build("Release", releasePath);
 
-    var version = FileVersionInfo
-        .GetVersionInfo(@"{releasePath}\Nake.exe")
-        .ProductVersion;
+    var version = AppVeyor 
+    	? "$APPVEYOR_BUILD_VERSION$" 
+    	: FileVersionInfo
+        	.GetVersionInfo(@"{releasePath}\Nake.exe")
+        	.ProductVersion;
 
     File.WriteAllText(
         @"{releasePath}\Nake.bat",
