@@ -398,7 +398,7 @@ namespace Nake
 
                         if (arg.Contains("="))
                         {
-                            var parts = arg.Split(new[] {"="}, StringSplitOptions.RemoveEmptyEntries);
+                            var parts = arg.Split('=');
                             
                             if (parts.Length > 1)
                             {
