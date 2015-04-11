@@ -35,9 +35,14 @@ namespace Nake
 
         static void CheckSignature(IMethodSymbol symbol)
         {
+            bool hasDuplicateParameters = symbol.Parameters
+                .GroupBy(p => p.Name, StringComparer.OrdinalIgnoreCase)
+                .Any(p => p.Count() > 1);
+
             if (!symbol.ReturnsVoid ||                
                 symbol.IsGenericMethod ||
-                symbol.Parameters.Any(p => p.RefKind != RefKind.None || !TypeConverter.IsSupported(p.Type)))
+                symbol.Parameters.Any(p => p.RefKind != RefKind.None || !TypeConverter.IsSupported(p.Type)) ||
+                hasDuplicateParameters)
                 throw new TaskSignatureViolationException(symbol.ToString());
         }  
 
