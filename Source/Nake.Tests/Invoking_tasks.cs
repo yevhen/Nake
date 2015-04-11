@@ -184,5 +184,22 @@ namespace Nake
 
             Assert.That(int.Parse(Env.Var["counter"]), Is.EqualTo(2));
         }
+
+        [Test]
+        public void Parameter_names_are_case_insensitive()
+        {
+            Build(@"  
+                [Task] void Task(string paramValue) 
+                {
+                     Env.Var[""paramValue""] = paramValue;
+                }
+            ");
+
+            Invoke("Task", new TaskArgument("paramvalue", "lowercase"));
+            Assert.That(Env.Var["paramValue"], Is.EqualTo("lowercase"));
+
+            Invoke("Task", new TaskArgument("paramValue", "camelCase"));
+            Assert.That(Env.Var["paramValue"], Is.EqualTo("camelCase"));
+        }
     }
 }

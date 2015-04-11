@@ -54,7 +54,7 @@ namespace Nake
 
         ParameterInfo GetParameterByName(string name)
         {
-            return method.GetParameters().SingleOrDefault(x => x.Name == name);
+            return method.GetParameters().SingleOrDefault(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
         }
 
         object Convert(TaskArgument arg, int position, ParameterInfo parameter)

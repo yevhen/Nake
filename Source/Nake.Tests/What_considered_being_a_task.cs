@@ -116,6 +116,10 @@ namespace Nake
                 BadTaskDeclaration<TaskSignatureViolationException>(
                     @"[Task] public static void HasRefParameters(ref int p) {}"
                 ),
+
+                BadTaskDeclaration<TaskSignatureViolationException>(
+                    @"[Task] void DuplicateParams(int p, int P) {}"
+                )
             };
         }
 
