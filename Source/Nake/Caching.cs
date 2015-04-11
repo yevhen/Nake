@@ -110,7 +110,21 @@ namespace Nake
 
         string StringHash(string s)
         {
-            return Convert.ToBase64String(sha1.ComputeHash(Encoding.UTF8.GetBytes(s)));
+            var hash = Convert.ToBase64String(sha1.ComputeHash(Encoding.UTF8.GetBytes(s)));
+            return EnsureSafePath(hash);
+        }
+
+        string EnsureSafePath(string s)
+        {
+            // Hashed value is used as a directory name.
+            // According to http://en.wikipedia.org/wiki/Base64 Base64 could contain '/' symbol.
+            // It breaks Path.Combine(temp, hash) sematics. 
+            // E.g Path.Combine("c:\temp\nake", "/somebase64string") would produce '/somebase64string'
+            // which is not quite expected.
+            // Workaround it by replacing dangerous character with '_' symbol.
+            // It's used in some alternative Base64 implementations:
+            // http://en.wikipedia.org/wiki/Base64#Variants_summary_table
+            return s.Replace(@"/", "_");
         }
 
         public BuildResult Find(Task[] tasks)
