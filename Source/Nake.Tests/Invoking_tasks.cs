@@ -188,6 +188,9 @@ namespace Nake
         [Test]
         public void Parameter_names_are_case_insensitive()
         {
+            Assert.Throws<TaskSignatureViolationException>(() => Build(
+                "[Task] void Task(string paramValue, string paramvalue){}"));
+
             Build(@"  
                 [Task] void Task(string paramValue) 
                 {

@@ -12,9 +12,6 @@
     <tags>roslyn csx script scriptcs nake build automation</tags>
   </metadata>
   <files>
-    <file src="Tools\NuGet.exe" target="tools" />
-    <file src="Build\NuGet\Init.ps1" target="tools" />
-
     <file src="Output\Package\Release\Nake.exe" target="tools/net45" />
     <file src="Output\Package\Release\Nake.exe.config" target="tools/net45" />
     <file src="Output\Package\Release\Meta.dll" target="tools/net45" />
@@ -27,7 +24,7 @@
     <file src="Output\Package\Release\System.Collections.Immutable.dll" target="tools/net45" />
     <file src="Output\Package\Release\System.Reflection.Metadata.dll" target="tools/net45" />
     
-    <file src="Build\NuGet\Nake.csx" target="sample" />
-    <file src="Output\Package\Release\Nake.bat" target="sample" />	
+    <file src="Build\NuGet\Nake.csx" target="content" />
+    <file src="Output\Package\Release\Nake.bat" target="content" />	
   </files>
 </package>
