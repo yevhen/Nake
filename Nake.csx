@@ -65,11 +65,9 @@ var AppVeyor = Var["APPVEYOR"] == "True";
     Test(@"{packagePath}\Debug");
     Build("Release", releasePath);
 
-    var version = AppVeyor 
-    	? "$APPVEYOR_BUILD_VERSION$" 
-    	: FileVersionInfo
-        	.GetVersionInfo(@"{releasePath}\Nake.exe")
-        	.ProductVersion;
+    var version = FileVersionInfo
+        .GetVersionInfo(@"{releasePath}\Nake.exe")
+        .ProductVersion;
 
     File.WriteAllText(
         @"{releasePath}\Nake.bat",
