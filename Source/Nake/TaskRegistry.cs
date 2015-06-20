@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Reflection;
 
 namespace Nake
 {
@@ -25,13 +27,26 @@ namespace Nake
 
         internal TaskRegistry(BuildResult result)
         {
-            script = Activator.CreateInstance(
-                result.Assembly.GetType(Task.ScriptClass), 
-                new object[] {null, null}
-            );
+            script = CreateScriptInstance(result.Assembly);
 
             foreach (var task in result.Tasks)
                 tasks.Add(task.FullName, task);
+        }
+
+        static object CreateScriptInstance(Assembly assembly)
+        {
+            var ctor = assembly.GetType(Task.ScriptClass).GetConstructor(new[]
+            {
+                typeof(object[]),
+                typeof(object).MakeByRefType()
+            });
+
+            Debug.Assert(ctor != null);
+
+            var submissionStates = new object[2];
+            submissionStates[0] = new object();
+
+            return ctor.Invoke(new[] {submissionStates, new object()});
         }
 
         internal Task Find(string taskFullName)

@@ -21,7 +21,7 @@ namespace Nake.Magic
         public Rewriter(CSharpCompilation compilation, AnalyzerResult result)
         {
             tree = (CSharpSyntaxTree) compilation.SyntaxTrees.Single();
-            model = compilation.GetSemanticModel(tree);
+            model = compilation.GetSemanticModel(tree, ignoreAccessibility: true);
 
             this.compilation = compilation;
             this.result = result;

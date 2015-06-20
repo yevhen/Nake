@@ -111,7 +111,8 @@ namespace Nake
                 return;
 
             var errors = result.Diagnostics
-                .WhereAsArray(x => x.Severity == DiagnosticSeverity.Error);
+                .Where(x => x.Severity == DiagnosticSeverity.Error)
+                .ToArray();
 
             if (errors.Any())
                 throw new NakeException("Compilation failed!\r\n\r\n" +

@@ -15,7 +15,7 @@ namespace Nake.Magic
 
         public static bool Qualifies(LiteralExpressionSyntax node)
         {
-            return node.CSharpKind() == SyntaxKind.StringLiteralExpression;
+            return node.Kind() == SyntaxKind.StringLiteralExpression;
         }
 
         static readonly Regex expressionPattern = new Regex(

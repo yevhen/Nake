@@ -22,7 +22,7 @@ namespace Nake.Magic
         public Analyzer(CSharpCompilation compilation, IDictionary<string, string> substitutions)
         {
             tree = (CSharpSyntaxTree) compilation.SyntaxTrees.Single();
-            model = compilation.GetSemanticModel(tree);
+            model = compilation.GetSemanticModel(tree, ignoreAccessibility: false);
 
             this.substitutions = new Dictionary<string, string>(
                 substitutions, new CaseInsensitiveEqualityComparer());

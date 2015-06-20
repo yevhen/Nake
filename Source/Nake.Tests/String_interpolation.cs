@@ -67,6 +67,23 @@ namespace Nake
         }
 
         [Test]
+        public void Native_interpolation_syntax()
+        {
+            Build(@"
+                    
+                [Task] public static void Interpolate()
+                {
+                    Env.Var[""Expression""] = $""{2 + 2}"";
+                }
+                    
+            ");
+
+            Invoke("Interpolate");
+
+            Assert.That(Env.Var["Expression"], Is.EqualTo("4"));
+        }
+
+        [Test]
         public void Multiple_expressions_in_single_literal()
         {
             Build(@"

@@ -19,11 +19,8 @@ namespace Nake.Scripting
         {
             AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
             {
-                var assemblyName = new AssemblyName(args.Name);
-                if (assemblyName.Name == "Roslyn.Scripting")
-                    return RoslynScriptingAssembly.Load();
-
-                var reference = references.Find(assemblyName.Name);
+                var reference = references.Find(new AssemblyName(args.Name).Name);
+                
                 return reference != null 
                         ? Assembly.LoadFrom(reference.FullPath) 
                         : null;

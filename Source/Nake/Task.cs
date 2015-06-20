@@ -11,7 +11,7 @@ namespace Nake
 {
     class Task
     {
-        internal const string ScriptClass = "Script";
+        internal const string ScriptClass = "Submission#0";
 
         readonly List<Task> dependencies = new List<Task>();
         readonly HashSet<TaskInvocation> invocations = new HashSet<TaskInvocation>();

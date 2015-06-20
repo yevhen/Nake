@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <doc>
   <assembly>
     <name>System.Collections.Immutable</name>
   </assembly>
   <members>
     <member name="T:System.Collections.Immutable.IImmutableDictionary`2">
-      <summary>Represents an immutable collection of key/value pairs.</summary>
+      <summary>Represents an immutable collection of key/value pairs.NuGet package: System.Collections.Immutable (about immutable collections and how to install)</summary>
       <typeparam name="TKey">The type of keys in the dictionary.</typeparam>
       <typeparam name="TValue">The type of values in the dictionary.</typeparam>
     </member>
@@ -59,7 +59,7 @@
       <param name="actualKey">The matching key located in the dictionary if found, or <paramref name="equalkey" /> if no match is found.</param>
     </member>
     <member name="T:System.Collections.Immutable.IImmutableList`1">
-      <summary>Represents a list of elements that cannot be modified.</summary>
+      <summary>Represents a list of elements that cannot be modified.NuGet package: System.Collections.Immutable (about immutable collections and how to install)</summary>
       <typeparam name="T">The type of elements in the list.</typeparam>
     </member>
     <member name="M:System.Collections.Immutable.IImmutableList`1.Add(`0)">
@@ -148,7 +148,7 @@
       <param name="value">The element to replace the old element with.</param>
     </member>
     <member name="T:System.Collections.Immutable.IImmutableQueue`1">
-      <summary>Represents an immutable first-in, first-out collection of objects.</summary>
+      <summary>Represents an immutable first-in, first-out collection of objects.NuGet package: System.Collections.Immutable (about immutable collections and how to install)</summary>
       <typeparam name="T">The type of elements in the queue.</typeparam>
     </member>
     <member name="M:System.Collections.Immutable.IImmutableQueue`1.Clear">
@@ -173,7 +173,7 @@
       <returns>The element at the beginning of the queue.</returns>
     </member>
     <member name="T:System.Collections.Immutable.IImmutableSet`1">
-      <summary>Represents a set of elements that can only be modified by creating a new instance of the set.</summary>
+      <summary>Represents a set of elements that can only be modified by creating a new instance of the set.NuGet package: System.Collections.Immutable (about immutable collections and how to install)</summary>
       <typeparam name="T">The type of element stored in the set.</typeparam>
     </member>
     <member name="M:System.Collections.Immutable.IImmutableSet`1.Add(`0)">
@@ -252,7 +252,7 @@
       <param name="other">The collection to add elements from.</param>
     </member>
     <member name="T:System.Collections.Immutable.IImmutableStack`1">
-      <summary>Represents an immutable last-in-first-out (LIFO) collection.</summary>
+      <summary>Represents an immutable last-in-first-out (LIFO) collection.NuGet package: System.Collections.Immutable (about immutable collections and how to install)</summary>
       <typeparam name="T">The type of elements in the stack.</typeparam>
     </member>
     <member name="M:System.Collections.Immutable.IImmutableStack`1.Clear">
@@ -277,40 +277,49 @@
       <param name="value">The element to push onto the stack.</param>
     </member>
     <member name="T:System.Collections.Immutable.ImmutableArray">
-      <summary>Provides methods for creating an array that is immutable; meaning it cannot be changed once it is created.The APIs for immutable collections aren't part of the core class library distributed with the .NET Framework; they're available via NuGet. To install these APIs, open your project in Visual Studio, and then choose Manage NuGet Packages from the Project menu. (Optionally, in the drop-down list box in the middle pane, choose Include Prerelease; this option will give you access to new prerelease versions of the immutable classes, as they become available.) In the right pane, search online for the Microsoft.Immutable.Collections (Microsoft.Bcl.Immutable) package. See the introduction to immutable collections for general information, and read about other .NET Framework NuGet packages.</summary>
+      <summary>Provides methods for creating an array that is immutable; meaning it cannot be changed once it is created.NuGet package: System.Collections.Immutable (about immutable collections and how to install)</summary>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray.BinarySearch``1(System.Collections.Immutable.ImmutableArray{``0},System.Int32,System.Int32,``0)">
-      <summary>Searches a sorted immutable array for a specified element and returns the zero-based index of the element.</summary>
-      <returns>The zero-based index of item in the sorted <see cref="T:System.Collections.Immutable.ImmutableArray" />, if <paramref name="value" /> is found; otherwise, a negative number which is the bitwise complement of the index of the first element that is larger than value. If value is not found and value is greater than any of the elements in array, a negative number which is the bitwise complement of the index of the last element plus 1.</returns>
+      <summary>Searches a sorted immutable array for a specified element and returns the zero-based index of the element, if it’s found.</summary>
+      <returns>The zero-based index of the item in the array, if item is found; otherwise, a negative number that is the bitwise complement of the index of the next element that is larger than <paramref name="value" /> or, if there is no larger element, the bitwise complement of <see cref="P:System.Collections.Generic.ICollection`1.Count" />.</returns>
       <param name="array">The sorted array to search.</param>
       <param name="index">The starting index of the range to search.</param>
       <param name="length">The length of the range to search.</param>
       <param name="value">The object to search for.</param>
       <typeparam name="T">The type of element stored in the array.</typeparam>
+      <exception cref="T:System.InvalidOperationException">
+        <paramref name="value" /> does not implement <see cref="T:System.IComparable" /> or the search encounters an element that does not implement <see cref="T:System.IComparable" />.</exception>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray.BinarySearch``1(System.Collections.Immutable.ImmutableArray{``0},System.Int32,System.Int32,``0,System.Collections.Generic.IComparer{``0})">
       <summary>Searches a sorted immutable array for a specified element and returns the zero-based index of the element.</summary>
-      <returns>The zero-based index of item in the sorted <see cref="T:System.Collections.Immutable.ImmutableArray" />, if <paramref name="value" /> is found; otherwise, a negative number which is the bitwise complement of the index of the first element that is larger than value. If value is not found and value is greater than any of the elements in array, a negative number which is the bitwise complement of the index of the last element plus 1.</returns>
+      <returns>The zero-based index of the item in the array, if item is found; otherwise, a negative number that is the bitwise complement of the index of the next element that is larger than <paramref name="value" /> or, if there is no larger element, the bitwise complement of <see cref="P:System.Collections.Generic.ICollection`1.Count" />.</returns>
       <param name="array">The sorted array to search.</param>
       <param name="index">The starting index of the range to search.</param>
       <param name="length">The length of the range to search.</param>
       <param name="value">The object to search for.</param>
-      <param name="comparer">The comparer to use when comparing elements for equality or null to use the <see cref="T:System.Collections.Generic.IComparer`1" /> implementation of each element.</param>
+      <param name="comparer">The comparer to use when comparing elements for equality or null to use the default comparer.</param>
       <typeparam name="T">The type of element stored in the array.</typeparam>
+      <exception cref="T:System.InvalidOperationException">
+        <paramref name="comparer" /> is null and <paramref name="value" /> does not implement <see cref="T:System.IComparable" /> or the search encounters an element that does not implement <see cref="T:System.IComparable" />.</exception>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray.BinarySearch``1(System.Collections.Immutable.ImmutableArray{``0},``0)">
-      <summary>Searches a sorted immutable array for a specified element and returns the zero-based index of the element.</summary>
-      <returns>The zero-based index of item in the sorted <see cref="T:System.Collections.Immutable.ImmutableArray" />, if <paramref name="value" /> is found; otherwise, a negative number which is the bitwise complement of the index of the first element that is larger than value. If value is not found and value is greater than any of the elements in array, a negative number which is the bitwise complement of the index of the last element plus 1.</returns>
+      <summary>Searches the sorted immutable array for a specified element using the default comparer and returns the zero-based index of the element, if it’s found.</summary>
+      <returns>The zero-based index of the item in the array, if item is found; otherwise, a negative number that is the bitwise complement of the index of the next element that is larger than <paramref name="value" /> or, if there is no larger element, the bitwise complement of <see cref="P:System.Collections.Generic.ICollection`1.Count" />.</returns>
       <param name="array">The sorted array to search.</param>
       <param name="value">The object to search for.</param>
       <typeparam name="T">The type of element stored in the array.</typeparam>
+      <exception cref="T:System.InvalidOperationException">
+        <paramref name="value" /> does not implement <see cref="T:System.IComparable" /> or the search encounters an element that does not implement <see cref="T:System.IComparable" />.</exception>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray.BinarySearch``1(System.Collections.Immutable.ImmutableArray{``0},``0,System.Collections.Generic.IComparer{``0})">
-      <summary>Searches a sorted immutable array for a specified element and returns the zero-based index of the element.</summary>
-      <returns>The zero-based index of item in the sorted <see cref="T:System.Collections.Immutable.ImmutableArray" />, if <paramref name="value" /> is found; otherwise, a negative number which is the bitwise complement of the index of the first element that is larger than value. If value is not found and value is greater than any of the elements in array, a negative number which is the bitwise complement of the index of the last element plus 1.</returns>
+      <summary>Searches a sorted immutable array for a specified element and returns the zero-based index of the element, if it’s found.</summary>
+      <returns>The zero-based index of the item in the array, if item is found; otherwise, a negative number that is the bitwise complement of the index of the next element that is larger than <paramref name="value" /> or, if there is no larger element, the bitwise complement of <see cref="P:System.Collections.Generic.ICollection`1.Count" />.</returns>
       <param name="array">The sorted array to search.</param>
       <param name="value">The object to search for.</param>
+      <param name="comparer">The comparer implementation to use when comparing elements, or null to use the default comparer.</param>
       <typeparam name="T">The type of element stored in the array.</typeparam>
+      <exception cref="T:System.InvalidOperationException">
+        <paramref name="comparer" /> is null and <paramref name="value" /> does not implement <see cref="T:System.IComparable" /> or the search encounters an element that does not implement <see cref="T:System.IComparable" />.</exception>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray.Create``1">
       <summary>Creates an empty immutable array.</summary>
@@ -318,24 +327,31 @@
       <typeparam name="T">The type of elements stored in the array.</typeparam>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray.Create``1(System.Collections.Immutable.ImmutableArray{``0},System.Int32,System.Int32)">
-      <summary>Creates an immutable array with specified objects from another immutable array.</summary>
-      <returns>Returns An immutable array that contains the specified objects from the source array.</returns>
+      <summary>Creates an immutable array with the specified objects from another immutable array.</summary>
+      <returns>An immutable array that contains the specified objects from the source array.</returns>
       <param name="items">The source array of objects.</param>
       <param name="start">The index of the first element to copy from <paramref name="items" />.</param>
       <param name="length">The number of elements from <paramref name="items" /> to include in this immutable array.</param>
       <typeparam name="T">The type of elements stored in the array.</typeparam>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray.Create``2(System.Collections.Immutable.ImmutableArray{``1})">
-      <returns>Returns <see cref="T:System.Collections.Immutable.ImmutableArray`1" />.</returns>
-      <typeparam name="T"></typeparam>
-      <typeparam name="TDerived"></typeparam>
+      <summary>Initializes a new instance of the <see cref="T:System.Collections.Immutable.ImmutableArray" /> from the contents of the specified array, using a covariant static cast to reuse the existing array.</summary>
+      <returns>An <see cref="T:System.Collections.Immutable.ImmutableArray`1" /> that contains elements of type <paramref name="T" />, cast up from type <paramref name="TDerived" />. </returns>
+      <param name="items">The array to initialize the array with. No copy is made.</param>
+      <typeparam name="T">The type of the elements in the array.</typeparam>
+      <typeparam name="TDerived">The type derived from T that will be cast to type T and stored in the array.</typeparam>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray.Create``1(System.IntPtr,System.Int32)">
-      <typeparam name="T"></typeparam>
+      <summary>Creates an  <see cref="T:System.Collections.Immutable.ImmutableArray" /> with the specified blittable elements from another array.</summary>
+      <returns>A new immutable array containing the specified blittable elements from the source array.</returns>
+      <param name="source">The array to initialize the array with.</param>
+      <param name="length">The number of elements from the source array to include in the resulting array.</param>
+      <typeparam name="T">The type of elements in the array. This type must be blittable, meaning the type does not require conversion when passed between managed or unmanaged code.</typeparam>
+      <exception cref="T:System.ArgumentException">If the type <paramref name="T" /> is not a blittable type.</exception>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray.Create``1(``0)">
       <summary>Creates an immutable array that contains the specified object.</summary>
-      <returns>Returns An immutable array that contains the specified object.</returns>
+      <returns>Returns an immutable array that contains the specified object.</returns>
       <param name="item">The object to store in the array.</param>
       <typeparam name="T">The type of elements stored in the array.</typeparam>
     </member>
@@ -378,27 +394,30 @@
       <typeparam name="T">The type of elements stored in the array.</typeparam>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray.CreateBuilder``1">
-      <summary>Creates a mutable array accessor that can be converted to an <see cref="T:System.Collections.Immutable.ImmutableArray" /> without allocating new memory.</summary>
-      <returns>A mutable array accessor of the specified type that can be efficiently converted to an immutable array.</returns>
+      <summary>Creates a mutable array that can be converted to an <see cref="T:System.Collections.Immutable.ImmutableArray" /> without allocating new memory.</summary>
+      <returns>A mutable array of the specified type that can be efficiently converted to an immutable array.</returns>
       <typeparam name="T"> The type of elements stored in the builder.</typeparam>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray.CreateBuilder``1(System.Int32)">
-      <summary>Creates a mutable array accessor that can be converted to an <see cref="T:System.Collections.Immutable.ImmutableArray" /> without allocating new memory.</summary>
-      <returns>A mutable array accessor of the specified type that can be efficiently converted to an immutable array.</returns>
+      <summary>Creates a mutable array that can be converted to an <see cref="T:System.Collections.Immutable.ImmutableArray" /> without allocating new memory.</summary>
+      <returns>A mutable array of the specified type that can be efficiently converted to an immutable array.</returns>
       <param name="initialCapacity">The initial capacity of the builder.</param>
       <typeparam name="T">The type of elements stored in the builder.</typeparam>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray.CreateRange``1(System.Collections.Generic.IEnumerable{``0})">
-      <typeparam name="T"></typeparam>
+      <summary>Creates a new <see cref="T:System.Collections.Immutable.ImmutableArray`1" /> populated with the specified items.</summary>
+      <returns>An immutable array that contains the specified items.</returns>
+      <param name="items">The elements to add to the array.</param>
+      <typeparam name="T">The type of element stored in the array.</typeparam>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray.ToImmutableArray``1(System.Collections.Generic.IEnumerable{``0})">
-      <summary>Enumerates the specified collection once and creates an immutable array from the collection.</summary>
+      <summary>Creates an immutable array from the specified collection.</summary>
       <returns>An immutable array that contains the specified collection of objects.</returns>
       <param name="items">The collection of objects to copy to the immutable array.</param>
-      <typeparam name="TSource">The type of objects contained in the collection.</typeparam>
+      <typeparam name="TSource">The type of elements contained in <paramref name="items" />.</typeparam>
     </member>
     <member name="T:System.Collections.Immutable.ImmutableArray`1">
-      <summary>A readonly array with O(1) indexable lookup time.</summary>
+      <summary>Represents an array that is immutable; meaning it cannot be changed once it is created.</summary>
       <typeparam name="T">The type of element stored by the array.</typeparam>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.Add(`0)">
@@ -407,12 +426,12 @@
       <param name="item">The item to be added to the end of the array.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.AddRange(System.Collections.Generic.IEnumerable{`0})">
-      <summary>Adds the elements in the specified collection to the end of the array.</summary>
+      <summary>Returns a copy of the original array with the specified elements added to the end of the array.</summary>
       <returns>A new array with the elements added.</returns>
       <param name="items">The elements to add to the array.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.AddRange(System.Collections.Immutable.ImmutableArray{`0})">
-      <summary>Adds the elements in the specified array to the end of this array.</summary>
+      <summary>Returns a copy of the original array with the specified elements added to the end of the array.</summary>
       <returns>A new array with the elements added.</returns>
       <param name="items">The elements to add to the array.</param>
     </member>
@@ -423,52 +442,100 @@
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.Clear">
       <summary>Returns an array with all the elements removed.</summary>
-      <returns>
-        <see cref="Anarraywithalloftheelementsremoved." />
-      </returns>
+      <returns>An array with all of the elements removed.</returns>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.Contains(`0)">
-      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+      <summary>Determines whether the specified item exists in the array.</summary>
+      <returns>true if the specified item was found in the array; otherwise false.</returns>
+      <param name="item">The item to search for.</param>
     </member>
-    <member name="M:System.Collections.Immutable.ImmutableArray`1.CopyTo(System.Int32,`0[],System.Int32,System.Int32)"></member>
-    <member name="M:System.Collections.Immutable.ImmutableArray`1.CopyTo(`0[])"></member>
-    <member name="M:System.Collections.Immutable.ImmutableArray`1.CopyTo(`0[],System.Int32)"></member>
-    <member name="F:System.Collections.Immutable.ImmutableArray`1.Empty"></member>
+    <member name="M:System.Collections.Immutable.ImmutableArray`1.CopyTo(System.Int32,`0[],System.Int32,System.Int32)">
+      <summary>Copies the specified items in this array to the specified array at the specified starting index.</summary>
+      <param name="sourceIndex">The index of this array where copying begins.</param>
+      <param name="destination">The array to copy to.</param>
+      <param name="destinationIndex">The index in <paramref name="array" />  where copying begins.</param>
+      <param name="length">The number of elements to copy from this array.</param>
+    </member>
+    <member name="M:System.Collections.Immutable.ImmutableArray`1.CopyTo(`0[])">
+      <summary>Copies the contents of this array to the specified array.</summary>
+      <param name="destination">The array to copy to.</param>
+    </member>
+    <member name="M:System.Collections.Immutable.ImmutableArray`1.CopyTo(`0[],System.Int32)">
+      <summary>Copies the contents of this array to the specified array starting at the specified destination index.</summary>
+      <param name="destination">The array to copy to.</param>
+      <param name="destinationIndex">The index in <paramref name="array" />  where copying begins.</param>
+    </member>
+    <member name="F:System.Collections.Immutable.ImmutableArray`1.Empty">
+      <summary>Gets an empty immutable array.</summary>
+    </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.Equals(System.Collections.Immutable.ImmutableArray{`0})">
-      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+      <summary>Indicates whether specified array is equal to this array. </summary>
+      <returns>true if <paramref name="other" /> is equal to this array; otherwise, false.</returns>
+      <param name="other">An object to compare with this object.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.Equals(System.Object)">
-      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+      <summary>Determines if this array is equal to the specified object.</summary>
+      <returns>true if this array is equal to <paramref name="obj" />; otherwise, false.</returns>
+      <param name="obj">The <see cref="T:System.Object" /> to compare with this array.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.GetEnumerator">
-      <returns>Returns <see cref="T:System.Collections.Immutable.ImmutableArray`1.Enumerator" />.</returns>
+      <summary>Returns an enumerator that iterates through the contents of the array.</summary>
+      <returns>An enumerator.</returns>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.GetHashCode">
-      <returns>Returns <see cref="T:System.Int32" />.</returns>
+      <summary>Returns a hash code for this instance.</summary>
+      <returns>A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.</returns>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.IndexOf(`0)">
-      <returns>Returns <see cref="T:System.Int32" />.</returns>
+      <summary>Searches the array for the specified item.</summary>
+      <returns>The zero-based index position of the item if it is found, or -1 if it is not.</returns>
+      <param name="item">The item to search for.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.IndexOf(`0,System.Int32)">
-      <returns>Returns <see cref="T:System.Int32" />.</returns>
+      <summary>Searches the array for the specified item.</summary>
+      <returns>The zero-based index position of the item if it is found, or -1 if it is not.</returns>
+      <param name="item">The item to search for.</param>
+      <param name="startIndex">The index at which to begin the search.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.IndexOf(`0,System.Int32,System.Collections.Generic.IEqualityComparer{`0})">
-      <returns>Returns <see cref="T:System.Int32" />.</returns>
+      <summary>Searches the array for the specified item.</summary>
+      <returns>The zero-based index position of the item if it is found, or -1 if it is not.</returns>
+      <param name="item">The item to search for.</param>
+      <param name="startIndex">The index at which to begin the search.</param>
+      <param name="equalityComparer">The equality comparer to use in the search.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.IndexOf(`0,System.Int32,System.Int32)">
-      <returns>Returns <see cref="T:System.Int32" />.</returns>
+      <summary>Searches the array for the specified item.</summary>
+      <returns>The zero-based index position of the item if it is found, or -1 if it is not.</returns>
+      <param name="item">The item to search for.</param>
+      <param name="startIndex">The index at which to begin the search.</param>
+      <param name="count">The number of elements to search.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.IndexOf(`0,System.Int32,System.Int32,System.Collections.Generic.IEqualityComparer{`0})">
-      <returns>Returns <see cref="T:System.Int32" />.</returns>
+      <summary>Searches the array for the specified item.</summary>
+      <returns>The zero-based index position of the item if it is found, or -1 if it is not.</returns>
+      <param name="item">The item to search for.</param>
+      <param name="startIndex">The index at which to begin the search.</param>
+      <param name="count">The number of elements to search.</param>
+      <param name="equalityComparer">The equality comparer to use in the search.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.Insert(System.Int32,`0)">
-      <returns>Returns <see cref="T:System.Collections.Immutable.ImmutableArray`1" />.</returns>
+      <summary>Returns a new array with the specified value inserted at the specified position.</summary>
+      <returns>A new array with the item inserted at the specified index.</returns>
+      <param name="index">The 0-based index into the array at which the new item should be added.</param>
+      <param name="item">The item to insert at the start of the array.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.InsertRange(System.Int32,System.Collections.Generic.IEnumerable{`0})">
-      <returns>Returns <see cref="T:System.Collections.Immutable.ImmutableArray`1" />.</returns>
+      <summary>Inserts the specified values at the specified index.</summary>
+      <returns>A new immutable array with the items inserted at the specified index.</returns>
+      <param name="index">The index at which to insert the value.</param>
+      <param name="items">The elements to insert.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.InsertRange(System.Int32,System.Collections.Immutable.ImmutableArray{`0})">
-      <returns>Returns <see cref="T:System.Collections.Immutable.ImmutableArray`1" />.</returns>
+      <summary>Inserts the specified values at the specified index.</summary>
+      <returns>A new immutable array with the items inserted at the specified index.</returns>
+      <param name="index">The index at which to insert the value.</param>
+      <param name="items">The elements to insert.</param>
     </member>
     <member name="P:System.Collections.Immutable.ImmutableArray`1.IsDefault">
       <summary>Gets a value indicating whether this array was declared but not initialized.</summary>
@@ -476,11 +543,11 @@
     </member>
     <member name="P:System.Collections.Immutable.ImmutableArray`1.IsDefaultOrEmpty">
       <summary>Gets a value indicating whether this <see cref="T:System.Collections.Immutable.ImmutableArray`1" /> is empty or is not initialized.</summary>
-      <returns>true to indicate the <see cref="T:System.Collections.Immutable.ImmutableArray`1" /> is null or empty; otherwise, false.</returns>
+      <returns>true to indicate the <see cref="T:System.Collections.Immutable.ImmutableArray`1" /> is null or <see cref="F:System.Collections.Immutable.ImmutableArray`1.Empty" />; otherwise, false.</returns>
     </member>
     <member name="P:System.Collections.Immutable.ImmutableArray`1.IsEmpty">
       <summary>Gets a value indicating whether this <see cref="T:System.Collections.Immutable.ImmutableArray`1" /> is empty.</summary>
-      <returns>true to indicate the <see cref="T:System.Collections.Immutable.ImmutableArray`1" /> is null or empty; otherwise, false.</returns>
+      <returns>true to indicate the <see cref="T:System.Collections.Immutable.ImmutableArray`1" /> is empty; otherwise, false.</returns>
     </member>
     <member name="P:System.Collections.Immutable.ImmutableArray`1.Item(System.Int32)">
       <summary>Gets the element at the specified index in the immutable array.</summary>
@@ -488,82 +555,159 @@
       <param name="index">The zero-based index of the element to get.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.LastIndexOf(`0)">
-      <returns>Returns <see cref="T:System.Int32" />.</returns>
+      <summary>Searches the array for the specified item; starting at the end of the array.</summary>
+      <returns>The 0-based index into the array where the item was found; or -1 if it could not be found.</returns>
+      <param name="item">The item to search for.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.LastIndexOf(`0,System.Int32)">
-      <returns>Returns <see cref="T:System.Int32" />.</returns>
+      <summary>Searches the array for the specified item; starting at the end of the array.</summary>
+      <returns>The 0-based index into the array where the item was found; or -1 if it could not be found.</returns>
+      <param name="item">The item to search for.</param>
+      <param name="startIndex">The index at which to begin the search.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.LastIndexOf(`0,System.Int32,System.Int32)">
-      <returns>Returns <see cref="T:System.Int32" />.</returns>
+      <summary>Searches the array for the specified item; starting at the end of the array.</summary>
+      <returns>The 0-based index into the array where the item was found; or -1 if it could not be found.</returns>
+      <param name="item">The item to search for.</param>
+      <param name="startIndex">The index at which to begin the search.</param>
+      <param name="count">The number of elements to search.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.LastIndexOf(`0,System.Int32,System.Int32,System.Collections.Generic.IEqualityComparer{`0})">
-      <returns>Returns <see cref="T:System.Int32" />.</returns>
+      <summary>Searches the array for the specified item; starting at the end of the array.</summary>
+      <returns>The 0-based index into the array where the item was found; or -1 if it could not be found.</returns>
+      <param name="item">The item to search for.</param>
+      <param name="startIndex">The index at which to begin the search.</param>
+      <param name="count">The number of elements to search.</param>
+      <param name="equalityComparer">The equality comparer to use in the search.</param>
     </member>
     <member name="P:System.Collections.Immutable.ImmutableArray`1.Length">
       <summary>Gets the number of elements in the array.</summary>
       <returns>The number of elements in the array</returns>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.OfType``1">
-      <returns>Returns <see cref="T:System.Collections.Generic.IEnumerable`1" />.</returns>
-      <typeparam name="TResult"></typeparam>
+      <summary>Filters the elements of this array to those assignable to the specified type.</summary>
+      <returns>An <see cref="T:System.Collections.IEnumerable" /> that contains elements from the input sequence of type of <paramref name="TResult" />.</returns>
+      <typeparam name="TResult">The type to filter the elements of the sequence on.</typeparam>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.op_Equality(System.Collections.Immutable.ImmutableArray{`0},System.Collections.Immutable.ImmutableArray{`0})">
-      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+      <summary>Returns a value that indicates if two arrays are equal.</summary>
+      <returns>true if the arrays are equal; otherwise, false.</returns>
+      <param name="left">The array to the left of the operator.</param>
+      <param name="right">The array to the right of the operator.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.op_Equality(System.Nullable{System.Collections.Immutable.ImmutableArray{`0}},System.Nullable{System.Collections.Immutable.ImmutableArray{`0}})">
-      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+      <summary>Returns a value that indicates if two arrays are equal.</summary>
+      <returns>true if the arrays are equal; otherwise, false.</returns>
+      <param name="left">The array to the left of the operator.</param>
+      <param name="right">The array to the right of the operator.</param>
     </member>
-    <member name="M:System.Collections.Immutable.ImmutableArray`1.op_Inequality(System.Collections.Immutable.ImmutableArray{`0},System.Collections.Immutable.ImmutableArray{`0})"></member>
+    <member name="M:System.Collections.Immutable.ImmutableArray`1.op_Inequality(System.Collections.Immutable.ImmutableArray{`0},System.Collections.Immutable.ImmutableArray{`0})">
+      <summary>Returns a value that indicates whether two arrays are not equal.</summary>
+      <returns>true if the arrays are not equal; otherwise, false.</returns>
+      <param name="left">The array to the left of the operator.</param>
+      <param name="right">The array to the right of the operator.</param>
+    </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.op_Inequality(System.Nullable{System.Collections.Immutable.ImmutableArray{`0}},System.Nullable{System.Collections.Immutable.ImmutableArray{`0}})">
-      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+      <summary>Checks for inequality between two array.</summary>
+      <returns>true if the two arrays are not equal; otherwise, false.</returns>
+      <param name="left">The object to the left of the operator.</param>
+      <param name="right">The object to the right of the operator.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.Remove(`0)">
-      <returns>Returns <see cref="T:System.Collections.Immutable.ImmutableArray`1" />.</returns>
+      <summary>Returns an array with the first occurrence of the specified element removed from the array. If no match is found, the current array is returned.</summary>
+      <returns>A new array with the item removed.</returns>
+      <param name="item">The item to remove.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.Remove(`0,System.Collections.Generic.IEqualityComparer{`0})">
-      <returns>Returns <see cref="T:System.Collections.Immutable.ImmutableArray`1" />.</returns>
+      <summary>Returns an array with the first occurrence of the specified element removed from the array. If no match is found, the current array is returned.</summary>
+      <returns>A new array with the specified item removed.</returns>
+      <param name="item">The item to remove.</param>
+      <param name="equalityComparer">The equality comparer to use in the search.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.RemoveAll(System.Predicate{`0})">
-      <returns>Returns <see cref="T:System.Collections.Immutable.ImmutableArray`1" />.</returns>
+      <summary>Removes all the items from the array that meet the specified condition.</summary>
+      <returns>A new array with items that meet the specified condition removed.</returns>
+      <param name="match">The delegate that defines the conditions of the elements to remove.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.RemoveAt(System.Int32)">
-      <returns>Returns <see cref="T:System.Collections.Immutable.ImmutableArray`1" />.</returns>
+      <summary>Returns an array with the element at the specified position removed.</summary>
+      <returns>A new array with the item at the specified index removed.</returns>
+      <param name="index">The 0-based index of the element to remove from the returned array.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.RemoveRange(System.Collections.Generic.IEnumerable{`0})">
-      <returns>Returns <see cref="T:System.Collections.Immutable.ImmutableArray`1" />.</returns>
+      <summary>Removes the specified items from this array.</summary>
+      <returns>A new array with the elements removed.</returns>
+      <param name="items">The items to remove if matches are found in this list.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.RemoveRange(System.Collections.Generic.IEnumerable{`0},System.Collections.Generic.IEqualityComparer{`0})">
-      <returns>Returns <see cref="T:System.Collections.Immutable.ImmutableArray`1" />.</returns>
+      <summary>Removes the specified items from this array.</summary>
+      <returns>A new array with the elements removed.</returns>
+      <param name="items">The items to remove if matches are found in this list.</param>
+      <param name="equalityComparer">The equality comparer to use in the search.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.RemoveRange(System.Collections.Immutable.ImmutableArray{`0})">
-      <returns>Returns <see cref="T:System.Collections.Immutable.ImmutableArray`1" />.</returns>
+      <summary>Removes the specified values from this list.</summary>
+      <returns>A new list with the elements removed.</returns>
+      <param name="items">The items to remove if matches are found in this list.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.RemoveRange(System.Collections.Immutable.ImmutableArray{`0},System.Collections.Generic.IEqualityComparer{`0})">
-      <returns>Returns <see cref="T:System.Collections.Immutable.ImmutableArray`1" />.</returns>
+      <summary>Removes the specified items from this list.</summary>
+      <returns>A new array with the elements removed.</returns>
+      <param name="items">The items to remove if matches are found in this list.</param>
+      <param name="equalityComparer">The equality comparer to use in the search.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.RemoveRange(System.Int32,System.Int32)">
-      <returns>Returns <see cref="T:System.Collections.Immutable.ImmutableArray`1" />.</returns>
+      <summary>Returns an array with the elements at the specified position removed.</summary>
+      <returns>The new array with the specified elements removed.</returns>
+      <param name="index">The 0-based index of the starting element to remove from the array.</param>
+      <param name="length">The number of elements to remove from the array.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.Replace(`0,`0)">
-      <returns>Returns <see cref="T:System.Collections.Immutable.ImmutableArray`1" />.</returns>
+      <summary>Finds the first element in the array equal to the specified value and replaces the value with the specified new value.</summary>
+      <returns>A new array that contains <paramref name="newValue" /> even if the new and old values are the same.</returns>
+      <param name="oldValue">The value to find and replace in the array.</param>
+      <param name="newValue">The value to replace the <paramref name="oldvalue" /> with.</param>
+      <exception cref="T:System.ArgumentException">
+        <paramref name="oldValue" /> is not found in the array.</exception>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.Replace(`0,`0,System.Collections.Generic.IEqualityComparer{`0})">
-      <returns>Returns <see cref="T:System.Collections.Immutable.ImmutableArray`1" />.</returns>
+      <summary>Finds the first element in the array equal to the specified value and replaces the value with the specified new value.</summary>
+      <returns>A new array that contains <paramref name="newValue" /> even if the new and old values are the same.</returns>
+      <param name="oldValue">The value to find and replace in the array.</param>
+      <param name="newValue">The value to replace the <paramref name="oldvalue" /> with.</param>
+      <param name="equalityComparer">The equality comparer to use to compare values.</param>
+      <exception cref="T:System.ArgumentException">
+        <paramref name="oldValue" /> is not found in the array.</exception>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.SetItem(System.Int32,`0)">
-      <returns>Returns <see cref="T:System.Collections.Immutable.ImmutableArray`1" />.</returns>
+      <summary>Replaces the item at the specified index with the specified item. </summary>
+      <returns>The new array that contains <paramref name="item" /> at the specified index.</returns>
+      <param name="index">The index of the item to replace.</param>
+      <param name="item">The item to add to the list.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.Sort">
-      <returns>Returns <see cref="T:System.Collections.Immutable.ImmutableArray`1" />.</returns>
+      <summary>Sorts the elements in the immutable array using the default comparer.</summary>
+      <returns>A new immutable array that contains the items in this array, in sorted order.</returns>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.Sort(System.Collections.Generic.IComparer{`0})">
-      <returns>Returns <see cref="T:System.Collections.Immutable.ImmutableArray`1" />.</returns>
+      <summary>Sorts the elements in the immutable array using the specified comparer.</summary>
+      <returns>A new immutable array that contains the items in this array, in sorted order.</returns>
+      <param name="comparer">The implementation to use when comparing elements, or null to use the default comparer</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.Sort(System.Int32,System.Int32,System.Collections.Generic.IComparer{`0})">
-      <returns>Returns <see cref="T:System.Collections.Immutable.ImmutableArray`1" />.</returns>
+      <summary>Sorts the specified elements in the immutable array using the specified comparer.</summary>
+      <returns>A new immutable array that contains the items in this array, in sorted order.</returns>
+      <param name="index">The index of the first element to sort.</param>
+      <param name="count">The number of elements to include in the sort.</param>
+      <param name="comparer">The implementation to use when comparing elements, or null to use the default comparer</param>
     </member>
-    <member name="M:System.Collections.Immutable.ImmutableArray`1.System#Collections#Generic#ICollection{T}#Add(`0)"></member>
-    <member name="M:System.Collections.Immutable.ImmutableArray`1.System#Collections#Generic#ICollection{T}#Clear"></member>
+    <member name="M:System.Collections.Immutable.ImmutableArray`1.System#Collections#Generic#ICollection{T}#Add(`0)">
+      <summary>Throws <see cref="T:System.NotSupportedException" /><see cref="T:System.NotSupportedException" /> in all cases.</summary>
+      <param name="item">The item to add to the end of the array.</param>
+    </member>
+    <member name="M:System.Collections.Immutable.ImmutableArray`1.System#Collections#Generic#ICollection{T}#Clear">
+      <summary>Throws <see cref="T:System.NotSupportedException" /> in all cases.</summary>
+    </member>
     <member name="P:System.Collections.Immutable.ImmutableArray`1.System#Collections#Generic#ICollection{T}#Count">
       <summary>Gets the number elements in the array.</summary>
       <returns>The number of elements in the array.</returns>
@@ -573,208 +717,383 @@
       <returns>Always returns true..</returns>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.System#Collections#Generic#ICollection{T}#Remove(`0)">
-      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+      <summary>Throws <see cref="T:System.NotSupportedException" /> in all cases.</summary>
+      <returns>Throws <see cref="T:System.NotSupportedException" />in all cases.</returns>
+      <param name="item">The object to remove from the array.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.System#Collections#Generic#IEnumerable{T}#GetEnumerator">
-      <returns>Returns <see cref="T:System.Collections.Generic.IEnumerator`1" />.</returns>
+      <summary>Returns an enumerator that iterates through the array.</summary>
+      <returns>An enumerator that can be used to iterate through the array.</returns>
     </member>
-    <member name="M:System.Collections.Immutable.ImmutableArray`1.System#Collections#Generic#IList{T}#Insert(System.Int32,`0)"></member>
+    <member name="M:System.Collections.Immutable.ImmutableArray`1.System#Collections#Generic#IList{T}#Insert(System.Int32,`0)">
+      <summary>Throws <see cref="T:System.NotSupportedException" /> in all cases.</summary>
+      <param name="index">The index of the location to insert the item.</param>
+      <param name="item">The item to insert.</param>
+    </member>
     <member name="P:System.Collections.Immutable.ImmutableArray`1.System#Collections#Generic#IList{T}#Item(System.Int32)">
-      <summary>Gets or sets the element at the specified index in the read-only list.</summary>
-      <returns>The element at the specified index in the read-only list.</returns>
+      <summary>Gets the element at the specified index in the immutable array.</summary>
+      <returns>The element at the specified index in the immutable array.</returns>
       <param name="index">The zero-based index of the element to get.</param>
-      <exception cref="T:System.NotSupportedException">Always thrown from the setter.</exception>
+      <exception cref="T:System.NotSupportedException">Always thrown when you attempt to set this value.</exception>
     </member>
-    <member name="M:System.Collections.Immutable.ImmutableArray`1.System#Collections#Generic#IList{T}#RemoveAt(System.Int32)"></member>
+    <member name="M:System.Collections.Immutable.ImmutableArray`1.System#Collections#Generic#IList{T}#RemoveAt(System.Int32)">
+      <summary>Throws <see cref="T:System.NotSupportedException" /> in all cases.</summary>
+      <param name="index">The index.</param>
+    </member>
     <member name="P:System.Collections.Immutable.ImmutableArray`1.System#Collections#Generic#IReadOnlyCollection{T}#Count">
-      <summary>Gets the number of array in the collection.</summary>
-      <returns>Returns <see cref="T:System.Int32" />.</returns>
+      <summary>Gets the number of elements in the collection.</summary>
+      <returns>The number of elements in the collection.</returns>
     </member>
-    <member name="M:System.Collections.Immutable.ImmutableArray`1.System#Collections#ICollection#CopyTo(System.Array,System.Int32)"></member>
+    <member name="M:System.Collections.Immutable.ImmutableArray`1.System#Collections#ICollection#CopyTo(System.Array,System.Int32)">
+      <summary>Copies this array to another array starting at the specified index.</summary>
+      <param name="array">The array to copy this array to.</param>
+      <param name="index">The index in the destination array to start the copy operation.</param>
+    </member>
     <member name="P:System.Collections.Immutable.ImmutableArray`1.System#Collections#ICollection#Count">
-      <summary>Gets the size of the array.</summary>
-      <returns>Returns <see cref="T:System.Int32" />.</returns>
+      <summary>Gets the number of elements in the array.</summary>
+      <returns>The number of elements in the array.</returns>
     </member>
     <member name="P:System.Collections.Immutable.ImmutableArray`1.System#Collections#ICollection#IsSynchronized">
-      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+      <summary>Gets a value indicating whether access to the collection is synchronized (thread safe).</summary>
+      <returns>true in all cases.</returns>
     </member>
     <member name="P:System.Collections.Immutable.ImmutableArray`1.System#Collections#ICollection#SyncRoot">
-      <returns>Returns <see cref="T:System.Object" />.</returns>
+      <summary>Gets an object that can be used to synchronize access to the array.</summary>
+      <returns>Returns this array because the array is immutable and always synchronized.</returns>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.System#Collections#IEnumerable#GetEnumerator">
-      <returns>Returns <see cref="T:System.Collections.IEnumerator" />.</returns>
+      <summary>Returns an enumerator that iterates through the immutable array.</summary>
+      <returns>An enumerator that iterates through the immutable array.</returns>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.System#Collections#IList#Add(System.Object)">
-      <returns>Returns <see cref="T:System.Int32" />.</returns>
+      <summary>Throws <see cref="T:System.NotSupportedException" /> in all cases.</summary>
+      <returns>Throws <see cref="T:System.NotSupportedException" /> in all cases.</returns>
+      <param name="value">The value to add to the array.</param>
     </member>
-    <member name="M:System.Collections.Immutable.ImmutableArray`1.System#Collections#IList#Clear"></member>
+    <member name="M:System.Collections.Immutable.ImmutableArray`1.System#Collections#IList#Clear">
+      <summary>Throws <see cref="T:System.NotSupportedException" /> in all cases.</summary>
+    </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.System#Collections#IList#Contains(System.Object)">
-      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+      <summary>Throws <see cref="T:System.NotSupportedException" /> in all cases.</summary>
+      <returns>Throws <see cref="T:System.NotSupportedException" /> in all cases.</returns>
+      <param name="value">The value to check for.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.System#Collections#IList#IndexOf(System.Object)">
-      <returns>Returns <see cref="T:System.Int32" />.</returns>
+      <summary>Gets the value at the specified index.</summary>
+      <returns>The value of the element at the specified index.</returns>
+      <param name="value">The value to return the index of.</param>
     </member>
-    <member name="M:System.Collections.Immutable.ImmutableArray`1.System#Collections#IList#Insert(System.Int32,System.Object)"></member>
+    <member name="M:System.Collections.Immutable.ImmutableArray`1.System#Collections#IList#Insert(System.Int32,System.Object)">
+      <summary>Throws <see cref="T:System.NotSupportedException" />in all cases. </summary>
+      <param name="index">Index that indicates where to insert the item.</param>
+      <param name="value">The value to insert.</param>
+    </member>
     <member name="P:System.Collections.Immutable.ImmutableArray`1.System#Collections#IList#IsFixedSize">
-      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+      <summary>Gets a value indicating whether the array has a fixed size.</summary>
+      <returns>true in all cases.</returns>
     </member>
     <member name="P:System.Collections.Immutable.ImmutableArray`1.System#Collections#IList#IsReadOnly">
-      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+      <summary>Gets a value indicating whether the array is read-only.</summary>
+      <returns>true in all cases.</returns>
     </member>
     <member name="P:System.Collections.Immutable.ImmutableArray`1.System#Collections#IList#Item(System.Int32)">
-      <returns>Returns <see cref="T:System.Object" />.</returns>
+      <summary>Gets the <see cref="T:System.Object" /> at the specified index.</summary>
+      <param name="index">The index of the item to get or set.</param>
+      <exception cref="T:System.NotSupportedException">The item is set.</exception>
     </member>
-    <member name="M:System.Collections.Immutable.ImmutableArray`1.System#Collections#IList#Remove(System.Object)"></member>
-    <member name="M:System.Collections.Immutable.ImmutableArray`1.System#Collections#IList#RemoveAt(System.Int32)"></member>
+    <member name="M:System.Collections.Immutable.ImmutableArray`1.System#Collections#IList#Remove(System.Object)">
+      <summary>Throws <see cref="T:System.NotSupportedException" /> in all cases.</summary>
+      <param name="value">The value to remove from the array.</param>
+    </member>
+    <member name="M:System.Collections.Immutable.ImmutableArray`1.System#Collections#IList#RemoveAt(System.Int32)">
+      <summary>Throws <see cref="T:System.NotSupportedException" /> in all cases.</summary>
+      <param name="index">The index of the item to remove.</param>
+    </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.System#Collections#Immutable#IImmutableList{T}#Add(`0)">
-      <returns>Returns <see cref="T:System.Collections.Immutable.IImmutableList`1" />.</returns>
+      <summary>Returns a copy of the original array with the specified item added to the end.</summary>
+      <returns>A new array with the specified item added to the end.</returns>
+      <param name="value">The value to add to the end of the array.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.System#Collections#Immutable#IImmutableList{T}#AddRange(System.Collections.Generic.IEnumerable{`0})">
-      <returns>Returns <see cref="T:System.Collections.Immutable.IImmutableList`1" />.</returns>
+      <summary>Returns a copy of the original array with the specified elements added to the end of the array.</summary>
+      <returns>A new array with the elements added to the end.</returns>
+      <param name="items">The elements to add to the end of the array.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.System#Collections#Immutable#IImmutableList{T}#Clear">
-      <returns>Returns <see cref="T:System.Collections.Immutable.IImmutableList`1" />.</returns>
+      <summary>Returns an array with all the elements removed.</summary>
+      <returns>Returns an array with all the elements removed.</returns>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.System#Collections#Immutable#IImmutableList{T}#Insert(System.Int32,`0)">
-      <returns>Returns <see cref="T:System.Collections.Immutable.IImmutableList`1" />.</returns>
+      <summary>Returns a new array with the specified value inserted at the specified position.</summary>
+      <returns>A new array with the specified value inserted.</returns>
+      <param name="index">The 0-based index into the array at which the new item should be added.</param>
+      <param name="element">The item to insert at the start of the array.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.System#Collections#Immutable#IImmutableList{T}#InsertRange(System.Int32,System.Collections.Generic.IEnumerable{`0})">
-      <returns>Returns <see cref="T:System.Collections.Immutable.IImmutableList`1" />.</returns>
+      <summary>Inserts the specified values at the specified index</summary>
+      <returns>A new array with the specified values inserted.</returns>
+      <param name="index">The index at which to insert the value.</param>
+      <param name="items">The elements to insert.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.System#Collections#Immutable#IImmutableList{T}#Remove(`0,System.Collections.Generic.IEqualityComparer{`0})">
-      <returns>Returns <see cref="T:System.Collections.Immutable.IImmutableList`1" />.</returns>
+      <summary>Returns an array with the first occurrence of the specified element removed from the array; if no match is found, the current array is returned.</summary>
+      <returns>A new array with the value removed.</returns>
+      <param name="value">The value to remove from the array.</param>
+      <param name="equalityComparer">The equality comparer to use in the search.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.System#Collections#Immutable#IImmutableList{T}#RemoveAll(System.Predicate{`0})">
-      <returns>Returns <see cref="T:System.Collections.Immutable.IImmutableList`1" />.</returns>
+      <summary>Removes all the items from the array that meet the specified condition.</summary>
+      <returns>A new array with items that meet the specified condition removed.</returns>
+      <param name="match">The delegate that defines the conditions of the elements to remove.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.System#Collections#Immutable#IImmutableList{T}#RemoveAt(System.Int32)">
-      <returns>Returns <see cref="T:System.Collections.Immutable.IImmutableList`1" />.</returns>
+      <summary>Returns an array with the element at the specified position removed.</summary>
+      <returns>A new array with the specified item removed.</returns>
+      <param name="index">The 0-based index of the element to remove from the returned array.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.System#Collections#Immutable#IImmutableList{T}#RemoveRange(System.Collections.Generic.IEnumerable{`0},System.Collections.Generic.IEqualityComparer{`0})">
-      <returns>Returns <see cref="T:System.Collections.Immutable.IImmutableList`1" />.</returns>
+      <summary>Removes the specified items from this array.</summary>
+      <returns>A new array with the elements removed.</returns>
+      <param name="items">The items to remove if matches are found in this list.</param>
+      <param name="equalityComparer">The equality comparer to use in the search.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.System#Collections#Immutable#IImmutableList{T}#RemoveRange(System.Int32,System.Int32)">
-      <returns>Returns <see cref="T:System.Collections.Immutable.IImmutableList`1" />.</returns>
+      <summary>Returns an array with the elements at the specified position removed.</summary>
+      <returns>The new array with the specified elements removed.</returns>
+      <param name="index">The 0-based index of the starting element to remove from the array.</param>
+      <param name="count">The number of elements to remove from the array.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.System#Collections#Immutable#IImmutableList{T}#Replace(`0,`0,System.Collections.Generic.IEqualityComparer{`0})">
-      <returns>Returns <see cref="T:System.Collections.Immutable.IImmutableList`1" />.</returns>
+      <summary>Finds the first element in the array equal to the specified value and replaces the value with the specified new value.</summary>
+      <returns>A new array that contains <paramref name="newValue" /> even if the new and old values are the same.</returns>
+      <param name="oldValue">The value to find and replace in the array.</param>
+      <param name="newValue">The value to replace the <paramref name="oldvalue" /> with.</param>
+      <param name="equalityComparer">The equality comparer to use to compare values.</param>
+      <exception cref="T:System.ArgumentException">
+        <paramref name="oldValue" /> is not found in the array.</exception>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.System#Collections#Immutable#IImmutableList{T}#SetItem(System.Int32,`0)">
-      <returns>Returns <see cref="T:System.Collections.Immutable.IImmutableList`1" />.</returns>
+      <summary>Replaces the item at the specified index with the specified item. </summary>
+      <returns>The new array that contains <paramref name="item" /> at the specified index.</returns>
+      <param name="index">The index of the item to replace.</param>
+      <param name="value">The value to add to the list.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.System#Collections#IStructuralComparable#CompareTo(System.Object,System.Collections.IComparer)">
-      <returns>Returns <see cref="T:System.Int32" />.</returns>
+      <summary>Determines whether the current collection element precedes, occurs in the same position as, or follows another element in the sort order.</summary>
+      <returns>An integer that indicates whether the current element precedes, is in the same position or follows the other element.</returns>
+      <param name="other">The element to compare with the current instance.</param>
+      <param name="comparer">The object used to compare members of the current array with the corresponding members of other array.</param>
+      <exception cref="T:System.ArgumentException">The arrays are not the same length.</exception>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.System#Collections#IStructuralEquatable#Equals(System.Object,System.Collections.IEqualityComparer)">
-      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+      <summary>Determines whether this array is structurally equal to the specified array.</summary>
+      <returns>true if the two arrays are structurally equal; otherwise, false.</returns>
+      <param name="other">The array to compare with the current instance.</param>
+      <param name="comparer">An object that determines whether the current instance and other are structurally equal.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.System#Collections#IStructuralEquatable#GetHashCode(System.Collections.IEqualityComparer)">
-      <returns>Returns <see cref="T:System.Int32" />.</returns>
+      <summary>Returns a hash code for the current instance.</summary>
+      <returns>The hash code for the current instance.</returns>
+      <param name="comparer">An object that computes the hash code of the current object.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.ToBuilder">
-      <returns>Returns <see cref="T:System.Collections.Immutable.ImmutableArray`1.Builder" />.</returns>
+      <summary>Creates a mutable array that has the same contents as this array and can be efficiently mutated across multiple operations using standard mutable interfaces. </summary>
+      <returns>The new builder with the same contents as this array.</returns>
     </member>
     <member name="T:System.Collections.Immutable.ImmutableArray`1.Builder">
-      <summary>A writable array accessor that can be converted into an <see cref="T:System.Collections.Immutable.ImmutableArray`1" /> instance without allocating memory.</summary>
+      <summary>A writable array accessor that can be converted into an <see cref="T:System.Collections.Immutable.ImmutableArray`1" /> instance without allocating extra memory.NuGet package: System.Collections.Immutable (about immutable collections and how to install)</summary>
     </member>
-    <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.Add(`0)"></member>
-    <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.AddRange(System.Collections.Generic.IEnumerable{`0})"></member>
-    <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.AddRange(System.Collections.Immutable.ImmutableArray{`0})"></member>
-    <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.AddRange(System.Collections.Immutable.ImmutableArray{`0},System.Int32)"></member>
-    <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.AddRange(System.Collections.Immutable.ImmutableArray{`0}.Builder)"></member>
+    <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.Add(`0)">
+      <summary>Adds the specified item to the array.</summary>
+      <param name="item">The object to add to the array.</param>
+    </member>
+    <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.AddRange(System.Collections.Generic.IEnumerable{`0})">
+      <summary>Adds the specified items to the end of the array.</summary>
+      <param name="items">The items to add to the array.</param>
+    </member>
+    <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.AddRange(System.Collections.Immutable.ImmutableArray{`0})">
+      <summary>Adds the specified items to the end of the array.</summary>
+      <param name="items">The items to add to the array.</param>
+    </member>
+    <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.AddRange(System.Collections.Immutable.ImmutableArray{`0},System.Int32)">
+      <summary>Adds the specified items to the end of the array.</summary>
+      <param name="items">The items to add to the array.</param>
+      <param name="length">The number of elements from the source array to add.</param>
+    </member>
+    <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.AddRange(System.Collections.Immutable.ImmutableArray{`0}.Builder)">
+      <summary>Adds the specified items to the end of the array.</summary>
+      <param name="items">The items to add to the array.</param>
+    </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.AddRange``1(System.Collections.Immutable.ImmutableArray{``0})">
-      <typeparam name="TDerived"></typeparam>
+      <summary>Adds the specified items that derive from the type currently in the array, to the end of the array</summary>
+      <param name="items">The items to add to the end of the array.</param>
+      <typeparam name="TDerived">The type that derives from the type of item already in the array.</typeparam>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.AddRange``1(System.Collections.Immutable.ImmutableArray{``0}.Builder)">
-      <typeparam name="TDerived"></typeparam>
+      <summary>Adds the specified items that derive from the type currently in the array, to the end of the array.</summary>
+      <param name="items">The items to add to the end of the array.</param>
+      <typeparam name="TDerived">The type that derives from the type of item already in the array.</typeparam>
     </member>
-    <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.AddRange(`0[])"></member>
-    <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.AddRange(`0[],System.Int32)"></member>
+    <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.AddRange(`0[])">
+      <summary>Adds the specified items to the end of the array.</summary>
+      <param name="items">The items to add to the array.</param>
+    </member>
+    <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.AddRange(`0[],System.Int32)">
+      <summary>Adds the specified items to the end of the array.</summary>
+      <param name="items">The items to add to the array.</param>
+      <param name="length">The number of elements from the source array to add.</param>
+    </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.AddRange``1(``0[])">
-      <typeparam name="TDerived"></typeparam>
+      <summary>Adds the specified items that derive from the type currently in the array, to the end of the array.</summary>
+      <param name="items">The items to add to end of the array.</param>
+      <typeparam name="TDerived">The type that derives from the type of item already in the array.</typeparam>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.Clear">
-      <summary>Removes all items from the <see cref="T:System.Collections.Generic.ICollection`1" />.</summary>
+      <summary>Removes all items from the array.</summary>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.Contains(`0)">
-      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+      <summary>Determines whether the array contains a specific value.</summary>
+      <returns>true if the object is found; otherwise, false.</returns>
+      <param name="item">The object to locate in the array.</param>
     </member>
-    <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.CopyTo(`0[],System.Int32)"></member>
+    <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.CopyTo(`0[],System.Int32)">
+      <summary>Copies the current contents to the specified array.</summary>
+      <param name="array">The array to copy to.</param>
+      <param name="index">The index to start the copy operation.</param>
+    </member>
     <member name="P:System.Collections.Immutable.ImmutableArray`1.Builder.Count">
-      <returns>Returns <see cref="T:System.Int32" />.</returns>
+      <summary>Gets or sets the number of items in the array.</summary>
+      <returns>The number of items in the array.</returns>
     </member>
-    <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.EnsureCapacity(System.Int32)"></member>
+    <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.EnsureCapacity(System.Int32)">
+      <summary>Resizes the array to accommodate the specified capacity requirement.</summary>
+      <param name="capacity">The required capacity.</param>
+    </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.GetEnumerator">
-      <returns>Returns <see cref="T:System.Collections.Generic.IEnumerator`1" />.</returns>
+      <summary>Gets an object that can be used to iterate through the collection.</summary>
+      <returns>An object that can be used to iterate through the collection.</returns>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.IndexOf(`0)">
-      <returns>Returns <see cref="T:System.Int32" />.</returns>
+      <summary>Determines the index of a specific item in the array.</summary>
+      <returns>The index of <paramref name="item" /> if it’s found in the list; otherwise, -1.</returns>
+      <param name="item">The item to locate in the array.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.IndexOf(`0,System.Int32)">
-      <returns>Returns <see cref="T:System.Int32" />.</returns>
+      <summary>Determines the index of the specified item.</summary>
+      <returns>The index of <paramref name="item" /> if it’s found in the list; otherwise, -1.</returns>
+      <param name="item">The item to locate in the array.</param>
+      <param name="startIndex">The starting position of the search.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.IndexOf(`0,System.Int32,System.Int32)">
-      <returns>Returns <see cref="T:System.Int32" />.</returns>
+      <summary>Determines the index of the specified item.</summary>
+      <returns>The index of <paramref name="item" /> if it’s found in the list; otherwise, -1.</returns>
+      <param name="item">The item to locate in the array.</param>
+      <param name="startIndex">The starting position of the search.</param>
+      <param name="count">The number of elements to search.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.IndexOf(`0,System.Int32,System.Int32,System.Collections.Generic.IEqualityComparer{`0})">
-      <returns>Returns <see cref="T:System.Int32" />.</returns>
+      <summary>Determines the index for the specified item.</summary>
+      <returns>The index of <paramref name="item" /> if it’s found in the list; otherwise, -1.</returns>
+      <param name="item">The item to locate in the array.</param>
+      <param name="startIndex">The index at which to begin the search.</param>
+      <param name="count">The starting position of the search.</param>
+      <param name="equalityComparer">The equality comparer to use in the search</param>
     </member>
-    <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.Insert(System.Int32,`0)"></member>
+    <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.Insert(System.Int32,`0)">
+      <summary>Inserts an item in the array at the specified index.</summary>
+      <param name="index">The zero-based index at which to insert the item.</param>
+      <param name="item">The object to insert into the array.</param>
+    </member>
     <member name="P:System.Collections.Immutable.ImmutableArray`1.Builder.Item(System.Int32)">
-      <returns>Returns <see cref="T:System.Int32" />.</returns>
+      <summary>Gets or sets the item at the specified index.</summary>
+      <returns>The item at the specified index.</returns>
+      <param name="index">The index of the item to get or set.</param>
+      <exception cref="T:System.IndexOutOfRangeException">The specified index is not in the array.</exception>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.LastIndexOf(`0)">
-      <returns>Returns <see cref="T:System.Int32" />.</returns>
+      <summary>Determines the 0-based index of the last occurrence of the specified item in this array.</summary>
+      <returns>The 0-based index where the item was found; or -1 if it could not be found.</returns>
+      <param name="item">The item to search for.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.LastIndexOf(`0,System.Int32)">
-      <returns>Returns <see cref="T:System.Int32" />.</returns>
+      <summary>Determines the 0-based index of the last occurrence of the specified item in this array.</summary>
+      <returns>The 0-based index into the array where the item was found; or -1 if it could not be found.</returns>
+      <param name="item">The item to search for.</param>
+      <param name="startIndex">The starting position of the search.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.LastIndexOf(`0,System.Int32,System.Int32)">
-      <returns>Returns <see cref="T:System.Int32" />.</returns>
+      <summary>Determines the 0-based index of the last occurrence of the specified item in this array.</summary>
+      <returns>The 0-based index into the array where the item was found; or -1 if it could not be found.</returns>
+      <param name="item">The item to search for.</param>
+      <param name="startIndex">The starting position of the search.</param>
+      <param name="count">The number of elements to search.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.LastIndexOf(`0,System.Int32,System.Int32,System.Collections.Generic.IEqualityComparer{`0})">
-      <returns>Returns <see cref="T:System.Int32" />.</returns>
+      <summary>Determines the 0-based index of the last occurrence of the specified item in this array.</summary>
+      <returns>The 0-based index into the array where the item was found; or -1 if it could not be found.</returns>
+      <param name="item">The item to search for.</param>
+      <param name="startIndex">The starting position of the search.</param>
+      <param name="count">The number of elements to search.</param>
+      <param name="equalityComparer">The equality comparer to use in the search.</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.Remove(`0)">
-      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+      <summary>Removes the specified element.</summary>
+      <returns>true if <paramref name="element" /> was found and removed; otherwise, false.</returns>
+      <param name="element">The item to remove.</param>
     </member>
-    <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.RemoveAt(System.Int32)"></member>
+    <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.RemoveAt(System.Int32)">
+      <summary>Removes the item at the specified index from the array.</summary>
+      <param name="index">The zero-based index of the item to remove.</param>
+    </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.ReverseContents">
-      <summary>Reverses the order of elements in the collection.</summary>
+      <summary>Reverses the order of elements in the array.</summary>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.Sort">
-      <summary>Sorts the array.</summary>
+      <summary>Sorts the contents of the array.</summary>
     </member>
-    <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.Sort(System.Collections.Generic.IComparer{`0})"></member>
-    <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.Sort(System.Int32,System.Int32,System.Collections.Generic.IComparer{`0})"></member>
+    <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.Sort(System.Collections.Generic.IComparer{`0})">
+      <summary>Sorts the contents of the array.</summary>
+      <param name="comparer">The comparer to use for sorting. If comparer is null, the default comparer for the elements type in the array is used.</param>
+    </member>
+    <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.Sort(System.Int32,System.Int32,System.Collections.Generic.IComparer{`0})">
+      <summary>Sorts the contents of the array.</summary>
+      <param name="index">The starting index for the sort.</param>
+      <param name="count">The number of elements to include in the sort.</param>
+      <param name="comparer">The comparer to use for sorting. If comparer is null, the default comparer for the elements type in the array is used.</param>
+    </member>
     <member name="P:System.Collections.Immutable.ImmutableArray`1.Builder.System#Collections#Generic#ICollection{T}#IsReadOnly">
-      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+      <summary>Gets a value indicating whether the <see cref="T:System.Collections.Generic.ICollection`1" /> is read-only.</summary>
+      <returns>Always returns false.</returns>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.System#Collections#Generic#IEnumerable{T}#GetEnumerator">
-      <returns>Returns <see cref="T:System.Collections.Generic.IEnumerator`1" />.</returns>
+      <summary>Returns an enumerator that iterates through the array.</summary>
+      <returns>An enumerator that iterates through the array.</returns>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.System#Collections#IEnumerable#GetEnumerator">
-      <returns>Returns <see cref="T:System.Collections.IEnumerator" />.</returns>
+      <summary>Returns an enumerator that iterates through the array.</summary>
+      <returns>An enumerator that iterates through the array.</returns>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.ToArray">
-      <returns>Returns <see cref="T:System.Collections.IEnumerator" />.</returns>
+      <summary>Creates a new array with the current contents of this <see cref="T:System.Collections.Immutable.ImmutableArray`1.Builder" />.</summary>
+      <returns>A new array with the contents of this <see cref="T:System.Collections.Immutable.ImmutableArray`1.Builder" />.</returns>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.Builder.ToImmutable">
-      <returns>Returns <see cref="T:System.Collections.Immutable.ImmutableArray`1" />.</returns>
+      <summary>Returns an immutable array that contains the current contents of this <see cref="T:System.Collections.Immutable.ImmutableArray`1.Builder" />.</summary>
+      <returns>An immutable array that contains the current contents of this <see cref="T:System.Collections.Immutable.ImmutableArray`1.Builder" />.</returns>
     </member>
     <member name="T:System.Collections.Immutable.ImmutableArray`1.Enumerator">
       <summary>An array enumerator.</summary>
     </member>
     <member name="P:System.Collections.Immutable.ImmutableArray`1.Enumerator.Current">
-      <summary>Gets the currently enumerated value.</summary>
-      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+      <summary>Gets the currently item.</summary>
+      <returns>The current item.</returns>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableArray`1.Enumerator.MoveNext">
-      <summary>Advances to the next value to be enumerated.</summary>
-      <returns>true if another item exists in the array; false otherwise.</returns>
+      <summary>Advances to the next value in the array.</summary>
+      <returns>true if another item exists in the array; otherwise, false.</returns>
     </member>
     <member name="T:System.Collections.Immutable.ImmutableDictionary">
-      <summary>Provides a set of initialization methods for instances of the <see cref="T:System.Collections.Immutable.ImmutableDictionary`2" /> class.</summary>
+      <summary>Provides a set of initialization methods for instances of the <see cref="T:System.Collections.Immutable.ImmutableDictionary`2" /> class.NuGet package: System.Collections.Immutable (about immutable collections and how to install)</summary>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableDictionary.Contains``2(System.Collections.Immutable.IImmutableDictionary{``0,``1},``0,``1)">
       <summary>Determines whether the specified immutable dictionary contains the specified key/value pair.</summary>
@@ -943,7 +1262,7 @@
       <typeparam name="TValue">The type of the values in the resulting dictionary.</typeparam>
     </member>
     <member name="T:System.Collections.Immutable.ImmutableDictionary`2">
-      <summary>Represents an immutable, unordered collection of keys and values.</summary>
+      <summary>Represents an immutable, unordered collection of keys and values.NuGet package: System.Collections.Immutable (about immutable collections and how to install)</summary>
       <typeparam name="TKey">The type of the keys in the dictionary.</typeparam>
       <typeparam name="TValue">The type of the values in the dictionary.</typeparam>
     </member>
@@ -1219,7 +1538,7 @@
       <param name="valueComparer">The value comparer to use.</param>
     </member>
     <member name="T:System.Collections.Immutable.ImmutableDictionary`2.Builder">
-      <summary>Represents a hash map that mutates with little or no memory allocations and that can produce or build on immutable hash map instances very efficiently.</summary>
+      <summary>Represents a hash map that mutates with little or no memory allocations and that can produce or build on immutable hash map instances very efficiently.NuGet package: System.Collections.Immutable (about immutable collections and how to install)</summary>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableDictionary`2.Builder.Add(System.Collections.Generic.KeyValuePair{`0,`1})">
       <summary>Adds the specified item to the immutable dictionary.</summary>
@@ -1415,7 +1734,7 @@
       <returns>A collection that contains the values of the object that implements the dictionary.</returns>
     </member>
     <member name="T:System.Collections.Immutable.ImmutableDictionary`2.Enumerator">
-      <summary>Enumerates the contents of the immutable dictionary without allocating any memory.</summary>
+      <summary>Enumerates the contents of the immutable dictionary without allocating any memory.NuGet package: System.Collections.Immutable (about immutable collections and how to install)</summary>
     </member>
     <member name="P:System.Collections.Immutable.ImmutableDictionary`2.Enumerator.Current">
       <summary>Gets the element at the current position of the enumerator.</summary>
@@ -1438,7 +1757,7 @@
       <returns>The current element in the dictionary.</returns>
     </member>
     <member name="T:System.Collections.Immutable.ImmutableHashSet">
-      <summary>Provides a set of initialization methods for instances of the <see cref="T:System.Collections.Immutable.ImmutableHashSet`1" /> class.</summary>
+      <summary>Provides a set of initialization methods for instances of the <see cref="T:System.Collections.Immutable.ImmutableHashSet`1" /> class.NuGet package: System.Collections.Immutable (about immutable collections and how to install)</summary>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableHashSet.Create``1">
       <summary>Creates an empty immutable hash set.</summary>
@@ -1515,7 +1834,7 @@
       <typeparam name="TSource">The type of the elements in the sequence.</typeparam>
     </member>
     <member name="T:System.Collections.Immutable.ImmutableHashSet`1">
-      <summary>Represents an immutable, unordered hash set.</summary>
+      <summary>Represents an immutable, unordered hash set.NuGet package: System.Collections.Immutable (about immutable collections and how to install)</summary>
       <typeparam name="T">The type of elements in the hash set.</typeparam>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableHashSet`1.Add(`0)">
@@ -1722,7 +2041,7 @@
       <param name="equalityComparer">The equality comparer to use.</param>
     </member>
     <member name="T:System.Collections.Immutable.ImmutableHashSet`1.Builder">
-      <summary>Represents a hash set that mutates with little or no memory allocations and that can produce or build on immutable hash set instances very efficiently.</summary>
+      <summary>Represents a hash set that mutates with little or no memory allocations and that can produce or build on immutable hash set instances very efficiently.NuGet package: System.Collections.Immutable (about immutable collections and how to install)</summary>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableHashSet`1.Builder.Add(`0)">
       <summary>Adds the specified item to the immutable hash set.</summary>
@@ -1829,7 +2148,7 @@
       <param name="other">The collection to compare to the current set.</param>
     </member>
     <member name="T:System.Collections.Immutable.ImmutableHashSet`1.Enumerator">
-      <summary>Enumerates the contents of the immutable hash set without allocating any memory.</summary>
+      <summary>Enumerates the contents of the immutable hash set without allocating any memory.NuGet package: System.Collections.Immutable (about immutable collections and how to install)</summary>
     </member>
     <member name="P:System.Collections.Immutable.ImmutableHashSet`1.Enumerator.Current">
       <summary>Gets the element at the current position of the enumerator.</summary>
@@ -1852,7 +2171,7 @@
       <returns>The current element in the hash set.</returns>
     </member>
     <member name="T:System.Collections.Immutable.ImmutableInterlocked">
-      <summary>Contains interlocked exchange mechanisms for immutable collections.</summary>
+      <summary>Contains interlocked exchange mechanisms for immutable collections.NuGet package: System.Collections.Immutable (about immutable collections and how to install)</summary>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableInterlocked.AddOrUpdate``2(System.Collections.Immutable.ImmutableDictionary{``0,``1}@,``0,System.Func{``0,``1},System.Func{``0,``1,``1})">
       <summary>Obtains the value from a dictionary after having added it or updated an existing entry.</summary>
@@ -1881,18 +2200,18 @@
       <typeparam name="T">The type of items contained in the collection</typeparam>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableInterlocked.GetOrAdd``2(System.Collections.Immutable.ImmutableDictionary{``0,``1}@,``0,System.Func{``0,``1})">
-      <summary>Obtains the value for the specified key from a dictionary, or adds a new value to the dictionary where the key did not previously exist.</summary>
-      <returns>The value obtained from the dictionary or <paramref name="valueFactory" /> if it was not present.</returns>
+      <summary>Gets the value for the specified key from the dictionary, or if the key was not found, adds a new value to the dictionary.</summary>
+      <returns>The value at the specified key or <paramref name="valueFactory" /> if the key was not present.</returns>
       <param name="location">The variable or field to atomically update if the specified  is not in the dictionary.</param>
       <param name="key">The key for the value to retrieve or add.</param>
-      <param name="valueFactory">The function to execute to obtain the value to insert into the dictionary if the key is not found.  This delegate will not be invoked more than once.</param>
+      <param name="valueFactory">The function to execute to obtain the value to insert into the dictionary if the key is not found. This delegate will not be invoked more than once.</param>
       <typeparam name="TKey">The type of the keys contained in the collection.</typeparam>
       <typeparam name="TValue">The type of the values contained in the collection.</typeparam>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableInterlocked.GetOrAdd``3(System.Collections.Immutable.ImmutableDictionary{``0,``1}@,``0,System.Func{``0,``2,``1},``2)">
-      <summary>Obtains the value for the specified key from a dictionary, or adds a new value to the dictionary where the key did not previously exist.</summary>
-      <returns>The value obtained from the dictionary or <paramref name="valueFactory" /> if it was not present.</returns>
-      <param name="location">The variable or field to atomically update if the specified  is not in the dictionary.</param>
+      <summary>Gets the value for the specified key from the dictionary, or if the key was not found, adds a new value to the dictionary.</summary>
+      <returns>The value at the specified key or <paramref name="valueFactory" /> if the key was not present.</returns>
+      <param name="location">The variable or field to update if the specified is not in the dictionary.</param>
       <param name="key">The key for the value to retrieve or add.</param>
       <param name="valueFactory">The function to execute to obtain the value to insert into the dictionary if the key is not found.</param>
       <param name="factoryArgument">The argument to pass to the value factory.</param>
@@ -1901,73 +2220,86 @@
       <typeparam name="TArg"></typeparam>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableInterlocked.GetOrAdd``2(System.Collections.Immutable.ImmutableDictionary{``0,``1}@,``0,``1)">
-      <summary>Obtains the value for the specified key from a dictionary, or adds a new value to the dictionary where the key did not previously exist.</summary>
-      <returns>The value obtained from the dictionary or <paramref name="valueFactory" /> if it was not present.</returns>
-      <param name="location">The variable or field to atomically update if the specified  is not in the dictionary.</param>
-      <param name="key">The key for the value to retrieve or add.</param>
-      <param name="value">The value to add to the dictionary if it is not already present.</param>
+      <summary>Gets the value for the specified key from the dictionary, or if the key was not found, adds a new value to the dictionary.</summary>
+      <returns>The value at the specified key or <paramref name="valueFactory" /> if the key was not present.</returns>
+      <param name="location">The variable or field to atomically update if the specified key is not in the dictionary.</param>
+      <param name="key">The key for the value to get or add.</param>
+      <param name="value">The value to add to the dictionary the key is not found.</param>
       <typeparam name="TKey">The type of the keys contained in the collection.</typeparam>
       <typeparam name="TValue">The type of the values contained in the collection.</typeparam>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableInterlocked.InterlockedCompareExchange``1(System.Collections.Immutable.ImmutableArray{``0}@,System.Collections.Immutable.ImmutableArray{``0},System.Collections.Immutable.ImmutableArray{``0})">
-      <typeparam name="T"></typeparam>
+      <summary>Compares two immutable arrays for equality and, if they are equal, replaces one of the arrays.</summary>
+      <returns>The original value in <paramref name="location" />.</returns>
+      <param name="location">The destination, whose value is compared with <paramref name="comparand" /> and possibly replaced.</param>
+      <param name="value">The value that replaces the destination value if the comparison results in equality.</param>
+      <param name="comparand">The value that is compared to the value at <paramref name="location" />.</param>
+      <typeparam name="T">The type of element stored by the array.</typeparam>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableInterlocked.InterlockedExchange``1(System.Collections.Immutable.ImmutableArray{``0}@,System.Collections.Immutable.ImmutableArray{``0})">
-      <typeparam name="T"></typeparam>
+      <summary>Sets an array to the specified array and returns a reference to the original array, as an atomic operation.</summary>
+      <returns>The original value of <paramref name="location" />.</returns>
+      <param name="location">The array to set to the specified value.</param>
+      <param name="value">The value to which the <paramref name="location" /> parameter is set.</param>
+      <typeparam name="T">The type of element stored by the array.</typeparam>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableInterlocked.InterlockedInitialize``1(System.Collections.Immutable.ImmutableArray{``0}@,System.Collections.Immutable.ImmutableArray{``0})">
-      <typeparam name="T"></typeparam>
+      <summary>Sets an array to the specified array if the array has not been initialized.</summary>
+      <returns>true if the array was assigned the specified value;  otherwise, false.</returns>
+      <param name="location">The array to set to the specified value.</param>
+      <param name="value">The value to which the <paramref name="location" /> parameter is set, if it’s not initialized.</param>
+      <typeparam name="T">The type of element stored by the array.</typeparam>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableInterlocked.Push``1(System.Collections.Immutable.ImmutableStack{``0}@,``0)">
-      <summary>Pushes a new element onto a stack.</summary>
-      <param name="location">The variable or field to atomically update.</param>
-      <param name="value">The value to push.</param>
+      <summary>Pushes a new element onto the stack.</summary>
+      <param name="location">The stack to update.</param>
+      <param name="value">The value to push on the stack.</param>
       <typeparam name="T">The type of items in the stack.</typeparam>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableInterlocked.TryAdd``2(System.Collections.Immutable.ImmutableDictionary{``0,``1}@,``0,``1)">
-      <summary>Adds the specified key and value to the dictionary if no colliding key already exists in the dictionary.</summary>
-      <returns>true if the key was not previously set in the dictionary and the value was set; false otherwise.</returns>
-      <param name="location">The variable or field to atomically update if the specified  is not in the dictionary.</param>
+      <summary>Adds the specified key and value to the dictionary if the key is not in the dictionary.</summary>
+      <returns>true if the key is not in the dictionary; otherwise, false.</returns>
+      <param name="location">The dictionary to update with the specified key and value.</param>
       <param name="key">The key to add, if is not already defined in the dictionary.</param>
       <param name="value">The value to add.</param>
       <typeparam name="TKey">The type of the keys contained in the collection.</typeparam>
       <typeparam name="TValue">The type of the values contained in the collection.</typeparam>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableInterlocked.TryDequeue``1(System.Collections.Immutable.ImmutableQueue{``0}@,``0@)">
-      <summary>Atomically removes the element at the head of a queue and returns it to the caller, if the queue is not empty.</summary>
-      <returns>true if the queue was not empty and the head element was removed; false otherwise.</returns>
+      <summary>Atomically removes and returns the specified element at the head of the queue, if the queue is not empty.</summary>
+      <returns>true if the queue is not empty and the head element is removed; otherwise, false. </returns>
       <param name="location">The variable or field to atomically update.</param>
-      <param name="value">Receives the value from the head of the queue, if the queue is non-empty.</param>
+      <param name="value">Set to the value from the head of the queue, if the queue not empty.</param>
       <typeparam name="T">The type of items in the queue.</typeparam>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableInterlocked.TryPop``1(System.Collections.Immutable.ImmutableStack{``0}@,``0@)">
-      <summary>Pushes a new element onto a stack.</summary>
-      <returns>true if an element was removed from the stack; false otherwise.</returns>
-      <param name="location">The variable or field to atomically update.</param>
-      <param name="value">The value popped from the stack, if it was non-empty.</param>
+      <summary>Removes an element from the top of the stack, if there is an element to remove.</summary>
+      <returns>true if an element is removed from the stack; otherwise, false.</returns>
+      <param name="location">The stack to update.</param>
+      <param name="value">Receives the value removed from the stack, if the stack is not empty.</param>
       <typeparam name="T">The type of items in the stack.</typeparam>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableInterlocked.TryRemove``2(System.Collections.Immutable.ImmutableDictionary{``0,``1}@,``0,``1@)">
-      <summary>Removes an entry from the dictionary with the specified key if it is defined and returns its value.</summary>
-      <returns>true if the key was found and removed; false otherwise.</returns>
-      <param name="location">The variable or field to atomically update if the specified  is not in the dictionary.</param>
+      <summary>Removes the element with the specified key, if the key exists.</summary>
+      <returns>true if the key was found and removed; otherwise, false. </returns>
+      <param name="location">The dictionary to update. </param>
       <param name="key">The key to remove.</param>
-      <param name="value">Receives the value from the pre-existing entry, if one exists.</param>
+      <param name="value">Receives the value of the removed item, if the dictionary is not empty.</param>
       <typeparam name="TKey">The type of the keys contained in the collection.</typeparam>
       <typeparam name="TValue">The type of the values contained in the collection.</typeparam>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableInterlocked.TryUpdate``2(System.Collections.Immutable.ImmutableDictionary{``0,``1}@,``0,``1,``1)">
-      <summary>Sets the specified key to the given value if the key already is set to a specific value.</summary>
-      <returns>true if the key and comparison value were present in the dictionary and the update was made; false otherwise.</returns>
-      <param name="location">The variable or field to atomically update if the specified  is not in the dictionary.</param>
+      <summary>Sets the specified key to the specified value if the specified key already is set to a specific value.</summary>
+      <returns>true if <paramref name="key" /> and <paramref name="comparisonValue" /> are present in the dictionary and comparison was updated to <paramref name="newValue" />; otherwise, false.</returns>
+      <param name="location">The dictionary to update.</param>
       <param name="key">The key to update.</param>
       <param name="newValue">The new value to set.</param>
-      <param name="comparisonValue">The value that must already be set in the dictionary in order for the update to succeed.</param>
+      <param name="comparisonValue">The current value for <paramref name="key" /> in order for the update to succeed.</param>
       <typeparam name="TKey">The type of the keys contained in the collection.</typeparam>
       <typeparam name="TValue">The type of the values contained in the collection.</typeparam>
     </member>
     <member name="T:System.Collections.Immutable.ImmutableList">
-      <summary>Provides a set of initialization methods for instances of the <see cref="T:System.Collections.Immutable.ImmutableList`1" /> class.</summary>
+      <summary>Provides a set of initialization methods for instances of the <see cref="T:System.Collections.Immutable.ImmutableList`1" /> class.NuGet package: System.Collections.Immutable (about immutable collections and how to install)</summary>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableList.Create``1">
       <summary>Creates an empty immutable list.</summary>
@@ -2091,7 +2423,7 @@
       <typeparam name="TSource">The type of the elements in the sequence.</typeparam>
     </member>
     <member name="T:System.Collections.Immutable.ImmutableList`1">
-      <summary>Represents an immutable list, which is a strongly typed list of objects that can be accessed by index.</summary>
+      <summary>Represents an immutable list, which is a strongly typed list of objects that can be accessed by index.NuGet package: System.Collections.Immutable (about immutable collections and how to install)</summary>
       <typeparam name="T">The type of elements in the list.</typeparam>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableList`1.Add(`0)">
@@ -2106,7 +2438,7 @@
     </member>
     <member name="M:System.Collections.Immutable.ImmutableList`1.BinarySearch(System.Int32,System.Int32,`0,System.Collections.Generic.IComparer{`0})">
       <summary> Searches a range of elements in the sorted list for an element using the specified comparer and returns the zero-based index of the element. </summary>
-      <returns> The zero-based index of item in the sorted list;, if item is found; otherwise, a negative number that is the bitwise complement of the index of the next element that is larger than item or, if there is no larger element, the bitwise complement of <paramref name="count" />. </returns>
+      <returns> The zero-based index of item in the sorted list, if item is found; otherwise, a negative number that is the bitwise complement of the index of the next element that is larger than item or, if there is no larger element, the bitwise complement of <paramref name="count" />. </returns>
       <param name="index">The zero-based starting index of the range to search.</param>
       <param name="count"> The length of the range to search.</param>
       <param name="item">The object to locate. The value can be null for reference types.</param>
@@ -2118,13 +2450,13 @@
     </member>
     <member name="M:System.Collections.Immutable.ImmutableList`1.BinarySearch(`0)">
       <summary> Searches the entire sorted list for an element using the default comparer and returns the zero-based index of the element. </summary>
-      <returns>The zero-based index of item in the sorted List;, if item is found; otherwise, a negative number that is the bitwise complement of the index of the next element that is larger than item or, if there is no larger element, the bitwise complement of <see cref="P:System.Collections.ICollection.Count" />.</returns>
+      <returns>The zero-based index of item in the sorted List, if item is found; otherwise, a negative number that is the bitwise complement of the index of the next element that is larger than item or, if there is no larger element, the bitwise complement of <see cref="P:System.Collections.ICollection.Count" />.</returns>
       <param name="item">The object to locate. The value can be null for reference types.</param>
       <exception cref="T:System.InvalidOperationException"> The default comparer cannot find a comparer implementation of the for type T. </exception>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableList`1.BinarySearch(`0,System.Collections.Generic.IComparer{`0})">
       <summary>  Searches the entire sorted list for an element using the specified comparer and returns the zero-based index of the element. </summary>
-      <returns>The zero-based index of item in the sorted List;, if item is found; otherwise, a negative number that is the bitwise complement of the index of the next element that is larger than item or, if there is no larger element, the bitwise complement of <see cref="P:System.Collections.ICollection.Count" />.</returns>
+      <returns>The zero-based index of item in the sorted List, if item is found; otherwise, a negative number that is the bitwise complement of the index of the next element that is larger than item or, if there is no larger element, the bitwise complement of <see cref="P:System.Collections.ICollection.Count" />.</returns>
       <param name="item">The object to locate. The value can be null for reference types.</param>
       <param name="comparer"> The  comparer implementation to use when comparing elements or null to use the default comparer. </param>
       <exception cref="T:System.InvalidOperationException"> comparer is null, and the default comparer cannot find an comparer implementation for type T. </exception>
@@ -2355,10 +2687,10 @@
     <member name="M:System.Collections.Immutable.ImmutableList`1.Sort(System.Collections.Generic.IComparer{`0})">
       <summary>Sorts the elements in the entire immutable list using the specified comparer.</summary>
       <returns>The sorted list.</returns>
-      <param name="comparer">The  implementation to use when comparing elements, or null to use the default comparer (<see cref="T:System.Collections.Generic.Comparer&lt;T&gt;.Default" />).</param>
+      <param name="comparer">The  implementation to use when comparing elements, or null to use the default comparer (<see cref="P:System.Collections.Generic.Comparer`1.Default" />).</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableList`1.Sort(System.Comparison{`0})">
-      <summary>Sorts the elements in the entire immutable list using the specified <see cref="T:System.Comparison&lt;T&gt;" />.</summary>
+      <summary>Sorts the elements in the entire immutable list using the specified comparer.</summary>
       <returns>The sorted list.</returns>
       <param name="comparison">The delegate to use when comparing elements.</param>
     </member>
@@ -2367,7 +2699,7 @@
       <returns>The sorted list.</returns>
       <param name="index">The zero-based starting index of the range to sort.</param>
       <param name="count">The length of the range to sort.</param>
-      <param name="comparer">The implementation to use when comparing elements, or null to use the default comparer (<see cref="T:System.Collections.Generic.Comparer&lt;T&gt;.Default" />).</param>
+      <param name="comparer">The implementation to use when comparing elements, or null to use the default comparer (<see cref="P:System.Collections.Generic.Comparer`1.Default" />).</param>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableList`1.System#Collections#Generic#ICollection{T}#Add(`0)">
       <summary>Adds the specified item to the immutable list.</summary>
@@ -2555,13 +2887,16 @@
       <param name="match">The delegate that defines the conditions to check against the elements.</param>
     </member>
     <member name="T:System.Collections.Immutable.ImmutableList`1.Builder">
-      <summary>Represents a list that mutates with little or no memory allocations and that can produce or build on immutable list instances very efficiently.</summary>
+      <summary>Represents a list that mutates with little or no memory allocations and that can produce or build on immutable list instances very efficiently.NuGet package: System.Collections.Immutable (about immutable collections and how to install)</summary>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableList`1.Builder.Add(`0)">
       <summary>Adds an item to the immutable list.</summary>
       <param name="item">The item to add to the list.</param>
     </member>
-    <member name="M:System.Collections.Immutable.ImmutableList`1.Builder.AddRange(System.Collections.Generic.IEnumerable{`0})"></member>
+    <member name="M:System.Collections.Immutable.ImmutableList`1.Builder.AddRange(System.Collections.Generic.IEnumerable{`0})">
+      <summary>Adds a series of elements to the end of this list.</summary>
+      <param name="items">The elements to add to the end of the list.</param>
+    </member>
     <member name="M:System.Collections.Immutable.ImmutableList`1.Builder.BinarySearch(System.Int32,System.Int32,`0,System.Collections.Generic.IComparer{`0})">
       <summary>Searches the specified range of the <see cref="T:System.Collections.Immutable.ImmutableList`1.Builder" /> for an element using the specified comparer and returns the zero-based index of the element.</summary>
       <returns>The zero-based index of item in the <see cref="T:System.Collections.Immutable.ImmutableList`1.Builder" />, if item is found; otherwise, a negative number that is the bitwise complement of the index of the next element that is larger than <paramref name="item" />.</returns>
@@ -2873,7 +3208,7 @@
       <param name="match">The delegate that defines the conditions to check against the elements.</param>
     </member>
     <member name="T:System.Collections.Immutable.ImmutableList`1.Enumerator">
-      <summary>Enumerates the contents of a binary tree.</summary>
+      <summary>Enumerates the contents of a binary tree.NuGet package: System.Collections.Immutable (about immutable collections and how to install)</summary>
     </member>
     <member name="P:System.Collections.Immutable.ImmutableList`1.Enumerator.Current">
       <summary>Gets the element at the current position of the enumerator.</summary>
@@ -2894,7 +3229,7 @@
       <returns>The current element in the immutable list.</returns>
     </member>
     <member name="T:System.Collections.Immutable.ImmutableQueue">
-      <summary>Provides a set of initialization methods for instances of the <see cref="T:System.Collections.Immutable.ImmutableQueue`1" /> class.</summary>
+      <summary>Provides a set of initialization methods for instances of the <see cref="T:System.Collections.Immutable.ImmutableQueue`1" /> class.NuGet package: System.Collections.Immutable (about immutable collections and how to install)</summary>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableQueue.Create``1">
       <summary>Creates an empty immutable queue.</summary>
@@ -2927,7 +3262,7 @@
       <typeparam name="T">The type of elements in the immutable queue.</typeparam>
     </member>
     <member name="T:System.Collections.Immutable.ImmutableQueue`1">
-      <summary>Represents an immutable queue.</summary>
+      <summary>Represents an immutable queue.NuGet package: System.Collections.Immutable (about immutable collections and how to install)</summary>
       <typeparam name="T">The type of elements in the queue.</typeparam>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableQueue`1.Clear">
@@ -2957,7 +3292,7 @@
       <returns>An enumerator that can be used to iterate through the queue.</returns>
     </member>
     <member name="P:System.Collections.Immutable.ImmutableQueue`1.IsEmpty">
-      <summary>Gets a value that indicates whether this immutable queue is empty.</summary>
+      <summary>Gets a value that indicates whether this immutable queue is empty.NuGet package: System.Collections.Immutable (about immutable collections and how to install)</summary>
       <returns>true if this queue is empty; otherwise, false.</returns>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableQueue`1.Peek">
@@ -2986,7 +3321,7 @@
       <param name="value">The element to add.</param>
     </member>
     <member name="T:System.Collections.Immutable.ImmutableQueue`1.Enumerator">
-      <summary>Enumerates the contents of an immutable queue without allocating any memory.</summary>
+      <summary>Enumerates the contents of an immutable queue without allocating any memory.NuGet package: System.Collections.Immutable (about immutable collections and how to install)</summary>
     </member>
     <member name="P:System.Collections.Immutable.ImmutableQueue`1.Enumerator.Current">
       <summary>Gets the element at the current position of the enumerator. </summary>
@@ -2997,7 +3332,7 @@
       <returns>true if the enumerator was successfully advanced to the next element; false if the enumerator has passed the end of the queue.</returns>
     </member>
     <member name="T:System.Collections.Immutable.ImmutableSortedDictionary">
-      <summary>Provides a set of initialization methods for instances of the <see cref="T:System.Collections.Immutable.ImmutableSortedDictionary`2" /> class.</summary>
+      <summary>Provides a set of initialization methods for instances of the <see cref="T:System.Collections.Immutable.ImmutableSortedDictionary`2" /> class.NuGet package: System.Collections.Immutable (about immutable collections and how to install)</summary>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableSortedDictionary.Create``2">
       <summary>Creates an empty immutable sorted dictionary.</summary>
@@ -3123,7 +3458,7 @@
       <typeparam name="TValue">The type of the values in the resulting dictionary.</typeparam>
     </member>
     <member name="T:System.Collections.Immutable.ImmutableSortedDictionary`2">
-      <summary>Represents an immutable sorted dictionary.</summary>
+      <summary>Represents an immutable sorted dictionary.NuGet package: System.Collections.Immutable (about immutable collections and how to install)</summary>
       <typeparam name="TKey">The type of the key contained in the dictionary.</typeparam>
       <typeparam name="TValue">The type of the value contained in the dictionary.</typeparam>
     </member>
@@ -3396,7 +3731,7 @@
       <param name="valueComparer">The value comparer to use.</param>
     </member>
     <member name="T:System.Collections.Immutable.ImmutableSortedDictionary`2.Builder">
-      <summary>Represents a sorted dictionary that mutates with little or no memory allocations and that can produce or build on immutable sorted dictionary instances very efficiently.</summary>
+      <summary>Represents a sorted dictionary that mutates with little or no memory allocations and that can produce or build on immutable sorted dictionary instances very efficiently.NuGet package: System.Collections.Immutable (about immutable collections and how to install)</summary>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableSortedDictionary`2.Builder.Add(System.Collections.Generic.KeyValuePair{`0,`1})">
       <summary>Adds the specified item to the immutable sorted dictionary.</summary>
@@ -3497,7 +3832,7 @@
       <returns>An enumerator object that can be used to iterate through the collection.</returns>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableSortedDictionary`2.Builder.System#Collections#ICollection#CopyTo(System.Array,System.Int32)">
-      <summary>Copies the elements of the dictionary to an array, starting at a particular array index.</summary>
+      <summary>Copies the elements of the dictionary to an array, starting at a particular array index.NuGet package: System.Collections.Immutable (about immutable collections and how to install)</summary>
       <param name="array">The one-dimensional array that is the destination of the elements copied from the dictionary. The array must have zero-based indexing.</param>
       <param name="index">The zero-based index in <paramref name="array" /> at which copying begins.</param>
     </member>
@@ -3577,7 +3912,7 @@
       <returns>A collection that contains the values of the object that implements the dictionary.</returns>
     </member>
     <member name="T:System.Collections.Immutable.ImmutableSortedDictionary`2.Enumerator">
-      <summary>Enumerates the contents of a binary tree.</summary>
+      <summary>Enumerates the contents of a binary tree.NuGet package: System.Collections.Immutable (about immutable collections and how to install)</summary>
     </member>
     <member name="P:System.Collections.Immutable.ImmutableSortedDictionary`2.Enumerator.Current">
       <summary>Gets the element at the current position of the enumerator.</summary>
@@ -3598,7 +3933,7 @@
       <returns>The current element in the immutable sorted dictionary.</returns>
     </member>
     <member name="T:System.Collections.Immutable.ImmutableSortedSet">
-      <summary>Provides a set of initialization methods for instances of the <see cref="T:System.Collections.Immutable.ImmutableSortedSet`1" /> class.</summary>
+      <summary>Provides a set of initialization methods for instances of the <see cref="T:System.Collections.Immutable.ImmutableSortedSet`1" /> class.NuGet package: System.Collections.Immutable (about immutable collections and how to install)</summary>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableSortedSet.Create``1">
       <summary>Creates an empty immutable sorted set.</summary>
@@ -3675,7 +4010,7 @@
       <typeparam name="TSource">The type of the elements in the sequence.</typeparam>
     </member>
     <member name="T:System.Collections.Immutable.ImmutableSortedSet`1">
-      <summary>Represents an immutable sorted set implementation.</summary>
+      <summary>Represents an immutable sorted set implementation.NuGet package: System.Collections.Immutable (about immutable collections and how to install)</summary>
       <typeparam name="T">The type of elements in the set.</typeparam>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableSortedSet`1.Add(`0)">
@@ -3964,7 +4299,7 @@
       <param name="comparer">The comparer to check for.</param>
     </member>
     <member name="T:System.Collections.Immutable.ImmutableSortedSet`1.Builder">
-      <summary>Represents a sorted set that enables changes with little or no memory allocations, and efficiently manipulates or builds immutable sorted sets.</summary>
+      <summary>Represents a sorted set that enables changes with little or no memory allocations, and efficiently manipulates or builds immutable sorted sets.NuGet package: System.Collections.Immutable (about immutable collections and how to install)</summary>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableSortedSet`1.Builder.Add(`0)">
       <summary>Adds an element to the current set and returns a value to indicate whether the element was successfully added.</summary>
@@ -4093,28 +4428,28 @@
       <param name="other">The collection to compare to the current state.</param>
     </member>
     <member name="T:System.Collections.Immutable.ImmutableSortedSet`1.Enumerator">
-      <summary>Enumerates the contents of a binary tree.</summary>
+      <summary>Enumerates the contents of a binary tree.NuGet package: System.Collections.Immutable (about immutable collections and how to install)</summary>
     </member>
     <member name="P:System.Collections.Immutable.ImmutableSortedSet`1.Enumerator.Current">
-      <summary>Gets the element at the current position of the enumerator.</summary>
+      <summary>Gets the element at the current position of the enumerator.NuGet package: System.Collections.Immutable (about immutable collections and how to install)</summary>
       <returns>The element at the current position of the enumerator.</returns>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableSortedSet`1.Enumerator.Dispose">
-      <summary>Releases the resources used by the current instance of the <see cref="T:System.Collections.Immutable.ImmutableSortedSet`1.Enumerator" /> class.</summary>
+      <summary>Releases the resources used by the current instance of the <see cref="T:System.Collections.Immutable.ImmutableSortedSet`1.Enumerator" /> class.NuGet package: System.Collections.Immutable (about immutable collections and how to install)</summary>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableSortedSet`1.Enumerator.MoveNext">
-      <summary>Advances the enumerator to the next element of the immutable sorted set.</summary>
+      <summary>Advances the enumerator to the next element of the immutable sorted set.NuGet package: System.Collections.Immutable (about immutable collections and how to install)</summary>
       <returns>true if the enumerator was successfully advanced to the next element; false if the enumerator has passed the end of the sorted set.</returns>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableSortedSet`1.Enumerator.Reset">
-      <summary>Sets the enumerator to its initial position, which is before the first element in the immutable sorted set.</summary>
+      <summary>Sets the enumerator to its initial position, which is before the first element in the immutable sorted set.NuGet package: System.Collections.Immutable (about immutable collections and how to install)</summary>
     </member>
     <member name="P:System.Collections.Immutable.ImmutableSortedSet`1.Enumerator.System#Collections#IEnumerator#Current">
-      <summary>Gets the current element in the immutable sorted set.</summary>
+      <summary>Gets the current element in the immutable sorted set.NuGet package: System.Collections.Immutable (about immutable collections and how to install)</summary>
       <returns>The current element in the immutable sorted set.</returns>
     </member>
     <member name="T:System.Collections.Immutable.ImmutableStack">
-      <summary>Provides a set of initialization methods for instances of the <see cref="T:System.Collections.Immutable.ImmutableStack`1" /> class.</summary>
+      <summary>Provides a set of initialization methods for instances of the <see cref="T:System.Collections.Immutable.ImmutableStack`1" /> class.NuGet package: System.Collections.Immutable (about immutable collections and how to install)</summary>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableStack.Create``1">
       <summary>Creates an empty immutable stack.</summary>
@@ -4147,7 +4482,7 @@
       <typeparam name="T">The type of items contained in the stack.</typeparam>
     </member>
     <member name="T:System.Collections.Immutable.ImmutableStack`1">
-      <summary>Represents an immutable stack.</summary>
+      <summary>Represents an immutable stack.NuGet package: System.Collections.Immutable (about immutable collections and how to install)</summary>
       <typeparam name="T">The type of element on the stack.</typeparam>
     </member>
     <member name="M:System.Collections.Immutable.ImmutableStack`1.Clear">
@@ -4206,7 +4541,7 @@
       <param name="value">The element to push onto the stack.</param>
     </member>
     <member name="T:System.Collections.Immutable.ImmutableStack`1.Enumerator">
-      <summary>Enumerates the contents of an immutable stack without allocating any memory.</summary>
+      <summary>Enumerates the contents of an immutable stack without allocating any memory.NuGet package: System.Collections.Immutable (about immutable collections and how to install)</summary>
     </member>
     <member name="P:System.Collections.Immutable.ImmutableStack`1.Enumerator.Current">
       <summary>Gets the element at the current position of the enumerator.</summary>
@@ -4217,7 +4552,7 @@
       <returns>true if the enumerator was successfully advanced to the next element; false if the enumerator has passed the end of the stack.</returns>
     </member>
     <member name="T:System.Linq.ImmutableArrayExtensions">
-      <summary>LINQ extension method overrides that offer greater efficiency for <see cref="T:System.Collections.Immutable.ImmutableArray`1" /> than the standard LINQ methods</summary>
+      <summary>LINQ extension method overrides that offer greater efficiency for <see cref="T:System.Collections.Immutable.ImmutableArray`1" /> than the standard LINQ methodsNuGet package: System.Collections.Immutable (about immutable collections and how to install)</summary>
     </member>
     <member name="M:System.Linq.ImmutableArrayExtensions.Aggregate``1(System.Collections.Immutable.ImmutableArray{``0},System.Func{``0,``0,``0})">
       <summary>Applies a function to a sequence of elements in a cumulative way.</summary>
@@ -4246,128 +4581,166 @@
       <typeparam name="T">The type of element contained by the collection.</typeparam>
     </member>
     <member name="M:System.Linq.ImmutableArrayExtensions.All``1(System.Collections.Immutable.ImmutableArray{``0},System.Func{``0,System.Boolean})">
-      <summary>Gets a value indicating whether all elements in this collection match a given condition.</summary>
-      <returns>true if every element of the source sequence passes the test in the specified predicate, or if the sequence is empty; otherwise, false.</returns>
+      <summary>Gets a value indicating whether all elements in this array match a given condition.</summary>
+      <returns>true if every element of the source sequence passes the test in the specified predicate; otherwise, false.</returns>
+      <param name="immutableArray">The array to check for matches.</param>
       <param name="predicate">The predicate.</param>
       <typeparam name="T">The type of element contained by the collection.</typeparam>
     </member>
     <member name="M:System.Linq.ImmutableArrayExtensions.Any``1(System.Collections.Immutable.ImmutableArray{``0})">
-      <summary>Gets a value indicating whether any elements are in this collection.</summary>
-      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+      <summary>Gets a value indicating whether the array contains any elements.</summary>
+      <returns>true if the array contains an elements; otherwise, false.</returns>
+      <param name="immutableArray">The array to check for elements.</param>
       <typeparam name="T">The type of element contained by the collection.</typeparam>
     </member>
     <member name="M:System.Linq.ImmutableArrayExtensions.Any``1(System.Collections.Immutable.ImmutableArray{``0},System.Func{``0,System.Boolean})">
-      <summary>Gets a value indicating whether any elements are in this collection that match a given condition.</summary>
-      <returns>Returns <see cref="T:System.Boolean" />.</returns>
-      <param name="predicate">The predicate.</param>
+      <summary>Gets a value indicating whether the array contains any elements that match a specified condition.</summary>
+      <returns>true if an element matches the specified condition; otherwise, false.</returns>
+      <param name="immutableArray">The array to check for elements.</param>
+      <param name="predicate">The delegate that defines the condition to match to an element.</param>
       <typeparam name="T">The type of element contained by the collection.</typeparam>
     </member>
     <member name="M:System.Linq.ImmutableArrayExtensions.Any``1(System.Collections.Immutable.ImmutableArray{``0}.Builder)">
       <summary>Returns a value indicating whether this collection contains any elements.</summary>
-      <returns>Returns <see cref="T:System.Boolean" />.</returns>
-      <typeparam name="T"></typeparam>
+      <returns>true if the array builder contains any elements; otherwise, false.</returns>
+      <param name="builder">The builder to check for matches.</param>
+      <typeparam name="T">The type of elements in the array.</typeparam>
     </member>
     <member name="M:System.Linq.ImmutableArrayExtensions.ElementAt``1(System.Collections.Immutable.ImmutableArray{``0},System.Int32)">
-      <summary>Returns the element at a specified index in a sequence.</summary>
-      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+      <summary>Returns the element at a specified index in the array.</summary>
+      <returns>The item at the specified index.</returns>
+      <param name="immutableArray">The array to find an element in.</param>
+      <param name="index">The index for the element to retrieve.</param>
       <typeparam name="T">The type of element contained by the collection.</typeparam>
     </member>
     <member name="M:System.Linq.ImmutableArrayExtensions.ElementAtOrDefault``1(System.Collections.Immutable.ImmutableArray{``0},System.Int32)">
       <summary>Returns the element at a specified index in a sequence or a default value if the index is out of range.</summary>
-      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+      <returns>The item at the specified index, or the default value if the index is not found.</returns>
+      <param name="immutableArray">The array to find an element in.</param>
+      <param name="index">The index for the element to retrieve.</param>
       <typeparam name="T">The type of element contained by the collection.</typeparam>
     </member>
     <member name="M:System.Linq.ImmutableArrayExtensions.First``1(System.Collections.Immutable.ImmutableArray{``0})">
-      <summary>Returns the first element in a sequence that satisfies a specified condition.</summary>
-      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+      <summary>Returns the first element in an array.</summary>
+      <returns>The first item in the array.</returns>
+      <param name="immutableArray">The array to get an item from.</param>
       <typeparam name="T">The type of element contained by the collection.</typeparam>
+      <exception cref="T:System.InvalidOperationException">If the array is empty.</exception>
     </member>
     <member name="M:System.Linq.ImmutableArrayExtensions.First``1(System.Collections.Immutable.ImmutableArray{``0},System.Func{``0,System.Boolean})">
       <summary>Returns the first element in a sequence that satisfies a specified condition.</summary>
-      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+      <returns>The first item in the list if it meets the condition specified by <paramref name="predicate" />.</returns>
+      <param name="immutableArray">The array to get an item from.</param>
+      <param name="predicate">The delegate that defines the conditions of the element to search for.</param>
       <typeparam name="T">The type of element contained by the collection.</typeparam>
+      <exception cref="T:System.InvalidOperationException">If the array is empty.</exception>
     </member>
     <member name="M:System.Linq.ImmutableArrayExtensions.First``1(System.Collections.Immutable.ImmutableArray{``0}.Builder)">
       <summary>Returns the first element in the collection.</summary>
-      <returns>Returns <see cref="T:System.Boolean" />.</returns>
-      <typeparam name="T"></typeparam>
-      <exception cref="T:System.InvalidOperationException">Thrown if the collection is empty.</exception>
+      <returns>The first item in the list.</returns>
+      <param name="builder">The builder to retrieve an item from.</param>
+      <typeparam name="T">The type of items in the array.</typeparam>
+      <exception cref="T:System.InvalidOperationException">If the array is empty.</exception>
     </member>
     <member name="M:System.Linq.ImmutableArrayExtensions.FirstOrDefault``1(System.Collections.Immutable.ImmutableArray{``0})">
       <summary>Returns the first element of a sequence, or a default value if the sequence contains no elements.</summary>
-      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+      <returns>The first item in the list, if found; otherwise the default value for the item type.</returns>
+      <param name="immutableArray">The array to retrieve items from.</param>
       <typeparam name="T">The type of element contained by the collection.</typeparam>
     </member>
     <member name="M:System.Linq.ImmutableArrayExtensions.FirstOrDefault``1(System.Collections.Immutable.ImmutableArray{``0},System.Func{``0,System.Boolean})">
       <summary>Returns the first element of the sequence that satisfies a condition or a default value if no such element is found.</summary>
-      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+      <returns>The first item in the list, if found; otherwise the default value for the item type.</returns>
+      <param name="immutableArray">The array to retrieve elments from.</param>
+      <param name="predicate">The delegate that defines the conditions of the element to search for.</param>
       <typeparam name="T">The type of element contained by the collection.</typeparam>
     </member>
     <member name="M:System.Linq.ImmutableArrayExtensions.FirstOrDefault``1(System.Collections.Immutable.ImmutableArray{``0}.Builder)">
       <summary>Returns the first element in the collection, or the default value if the collection is empty.</summary>
-      <returns>Returns <see cref="T:System.Boolean" />.</returns>
-      <typeparam name="T"></typeparam>
+      <returns>The first item in the list, if found; otherwise the default value for the item type.</returns>
+      <param name="builder">The builder to retrieve an element from.</param>
+      <typeparam name="T">The type of item in the builder.</typeparam>
     </member>
     <member name="M:System.Linq.ImmutableArrayExtensions.Last``1(System.Collections.Immutable.ImmutableArray{``0})">
-      <summary>Returns the last element of a sequence.</summary>
-      <returns>Returns <see cref="T:System.Boolean" />.</returns>
-      <typeparam name="T">The type of element contained by the collection.</typeparam>
+      <summary>Returns the last element of the array.</summary>
+      <returns>The last element in the array.</returns>
+      <param name="immutableArray">The array to retrieve items from.</param>
+      <typeparam name="T">The type of element contained by the array.</typeparam>
+      <exception cref="T:System.InvalidOperationException">Thrown if the collection is empty.</exception>
     </member>
     <member name="M:System.Linq.ImmutableArrayExtensions.Last``1(System.Collections.Immutable.ImmutableArray{``0},System.Func{``0,System.Boolean})">
       <summary>Returns the last element of a sequence that satisfies a specified condition.</summary>
-      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+      <returns>The last element of the array that satisfies the <paramref name="predicate" /> condition.</returns>
+      <param name="immutableArray">The array to retrieve elements from.</param>
+      <param name="predicate">The delegate that defines the conditions of the element to retrieve.</param>
       <typeparam name="T">The type of element contained by the collection.</typeparam>
+      <exception cref="T:System.InvalidOperationException">Thrown if the collection is empty.</exception>
     </member>
     <member name="M:System.Linq.ImmutableArrayExtensions.Last``1(System.Collections.Immutable.ImmutableArray{``0}.Builder)">
       <summary>Returns the last element in the collection.</summary>
-      <returns>Returns <see cref="T:System.Boolean" />.</returns>
-      <typeparam name="T"></typeparam>
+      <returns>The last element in the builder.</returns>
+      <param name="builder">The builder to retrieve elements from.</param>
+      <typeparam name="T">The type of item in the builder.</typeparam>
       <exception cref="T:System.InvalidOperationException">Thrown if the collection is empty.</exception>
     </member>
     <member name="M:System.Linq.ImmutableArrayExtensions.LastOrDefault``1(System.Collections.Immutable.ImmutableArray{``0})">
       <summary>Returns the last element of a sequence, or a default value if the sequence contains no elements.</summary>
-      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+      <returns>The last element of a sequence, or a default value if the sequence contains no elements.</returns>
+      <param name="immutableArray">The array to retrieve items from.</param>
       <typeparam name="T">The type of element contained by the collection.</typeparam>
     </member>
     <member name="M:System.Linq.ImmutableArrayExtensions.LastOrDefault``1(System.Collections.Immutable.ImmutableArray{``0},System.Func{``0,System.Boolean})">
       <summary>Returns the last element of a sequence that satisfies a condition or a default value if no such element is found.</summary>
-      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+      <returns>The last element of a sequence, or a default value if the sequence contains no elements.</returns>
+      <param name="immutableArray">The array to retrieve an element from.</param>
+      <param name="predicate">The delegate that defines the conditions of the element to search for.</param>
       <typeparam name="T">The type of element contained by the collection.</typeparam>
     </member>
     <member name="M:System.Linq.ImmutableArrayExtensions.LastOrDefault``1(System.Collections.Immutable.ImmutableArray{``0}.Builder)">
       <summary>Returns the last element in the collection, or the default value if the collection is empty.</summary>
-      <returns>Returns <see cref="T:System.Boolean" />.</returns>
-      <typeparam name="T"></typeparam>
+      <returns>The last element of a sequence, or a default value if the sequence contains no elements.</returns>
+      <param name="builder">The builder to retrieve an element from.</param>
+      <typeparam name="T">The type of item in the builder.</typeparam>
     </member>
     <member name="M:System.Linq.ImmutableArrayExtensions.Select``2(System.Collections.Immutable.ImmutableArray{``0},System.Func{``0,``1})">
       <summary>Projects each element of a sequence into a new form.</summary>
-      <returns>Returns <see cref="T:System.Collections.Generic.IEnumerable`1" />.</returns>
-      <param name="immutableArray">The immutable array.</param>
-      <param name="selector">The selector.</param>
+      <returns>An <see cref="T:System.Collections.Generic.IEnumerable`1" /> whose elements are the result of invoking the transform function on each element of source.</returns>
+      <param name="immutableArray">The immutable array to select items from.</param>
+      <param name="selector">A transform function to apply to each element.</param>
       <typeparam name="T">The type of element contained by the collection.</typeparam>
       <typeparam name="TResult">The type of the result element.</typeparam>
     </member>
     <member name="M:System.Linq.ImmutableArrayExtensions.SequenceEqual``2(System.Collections.Immutable.ImmutableArray{``1},System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEqualityComparer{``1})">
       <summary>Determines whether two sequences are equal according to an equality comparer.</summary>
-      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+      <returns>true to indicate the sequences are equal; otherwise, false. </returns>
+      <param name="immutableArray">The array to use for comparison.</param>
+      <param name="items">The items to use for comparison.</param>
+      <param name="comparer">The comparer to use to check for equality.</param>
       <typeparam name="TDerived">The type of element in the compared array.</typeparam>
       <typeparam name="TBase">The type of element contained by the collection.</typeparam>
     </member>
     <member name="M:System.Linq.ImmutableArrayExtensions.SequenceEqual``2(System.Collections.Immutable.ImmutableArray{``1},System.Collections.Immutable.ImmutableArray{``0},System.Collections.Generic.IEqualityComparer{``1})">
       <summary>Determines whether two sequences are equal according to an equality comparer.</summary>
-      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+      <returns>true to indicate the sequences are equal; otherwise, false. </returns>
+      <param name="immutableArray">The array to use for comparison.</param>
+      <param name="items">The items to use for comparison.</param>
+      <param name="comparer">The comparer to use to check for equality.</param>
       <typeparam name="TDerived">The type of element in the compared array.</typeparam>
       <typeparam name="TBase">The type of element contained by the collection.</typeparam>
     </member>
     <member name="M:System.Linq.ImmutableArrayExtensions.SequenceEqual``2(System.Collections.Immutable.ImmutableArray{``1},System.Collections.Immutable.ImmutableArray{``0},System.Func{``1,``1,System.Boolean})">
       <summary>Determines whether two sequences are equal according to an equality comparer.</summary>
-      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+      <returns>true to indicate the sequences are equal; otherwise, false. </returns>
+      <param name="immutableArray">The array to use for comparison.</param>
+      <param name="items">The items to use for comparison.</param>
+      <param name="predicate">The comparer to use to check for equality.</param>
       <typeparam name="TDerived">The type of element in the compared array.</typeparam>
       <typeparam name="TBase">The type of element contained by the collection.</typeparam>
     </member>
     <member name="M:System.Linq.ImmutableArrayExtensions.Single``1(System.Collections.Immutable.ImmutableArray{``0})">
       <summary>Returns the only element of a sequence, and throws an exception if there is not exactly one element in the sequence.</summary>
-      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+      <returns>The element in the sequence.</returns>
+      <param name="immutableArray">The array to retrieve the element from.</param>
       <typeparam name="T">The type of element contained by the collection.</typeparam>
     </member>
     <member name="M:System.Linq.ImmutableArrayExtensions.Single``1(System.Collections.Immutable.ImmutableArray{``0},System.Func{``0,System.Boolean})">
@@ -4376,13 +4749,15 @@
       <typeparam name="T">The type of element contained by the collection.</typeparam>
     </member>
     <member name="M:System.Linq.ImmutableArrayExtensions.SingleOrDefault``1(System.Collections.Immutable.ImmutableArray{``0})">
-      <summary>Returns the only element of a sequence, or a default value if the sequence is empty; this method throws an exception if there is more than one element in the sequence.</summary>
-      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+      <summary>Returns the only element of the array, or a default value if the sequence is empty; this method throws an exception if there is more than one element in the sequence.</summary>
+      <returns>The element in the array, or the default value if the array is empty.</returns>
       <typeparam name="T">The type of element contained by the collection.</typeparam>
     </member>
     <member name="M:System.Linq.ImmutableArrayExtensions.SingleOrDefault``1(System.Collections.Immutable.ImmutableArray{``0},System.Func{``0,System.Boolean})">
       <summary>Returns the only element of a sequence that satisfies a specified condition or a default value if no such element exists; this method throws an exception if more than one element satisfies the condition.</summary>
-      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+      <returns>The element if it satisfies the specified condition; otherwise the default element.</returns>
+      <param name="immutableArray">The array to get the element from.</param>
+      <param name="predicate">The condition the element must satisfy.</param>
       <typeparam name="T">The type of element contained by the collection.</typeparam>
     </member>
     <member name="M:System.Linq.ImmutableArrayExtensions.ToArray``1(System.Collections.Immutable.ImmutableArray{``0})">
@@ -4393,6 +4768,7 @@
     <member name="M:System.Linq.ImmutableArrayExtensions.ToDictionary``2(System.Collections.Immutable.ImmutableArray{``1},System.Func{``1,``0})">
       <summary>Creates a dictionary based on the contents of this array.</summary>
       <returns>The newly initialized dictionary.</returns>
+      <param name="immutableArray">The array to create a dictionary from.</param>
       <param name="keySelector">The key selector.</param>
       <typeparam name="TKey">The type of the key.</typeparam>
       <typeparam name="T">The type of element contained by the collection.</typeparam>
@@ -4400,6 +4776,7 @@
     <member name="M:System.Linq.ImmutableArrayExtensions.ToDictionary``2(System.Collections.Immutable.ImmutableArray{``1},System.Func{``1,``0},System.Collections.Generic.IEqualityComparer{``0})">
       <summary>Creates a dictionary based on the contents of this array.</summary>
       <returns>The newly initialized dictionary.</returns>
+      <param name="immutableArray">The array to create a dictionary from.</param>
       <param name="keySelector">The key selector.</param>
       <param name="comparer">The comparer to initialize the dictionary with.</param>
       <typeparam name="TKey">The type of the key.</typeparam>
@@ -4408,6 +4785,7 @@
     <member name="M:System.Linq.ImmutableArrayExtensions.ToDictionary``3(System.Collections.Immutable.ImmutableArray{``2},System.Func{``2,``0},System.Func{``2,``1})">
       <summary>Creates a dictionary based on the contents of this array.</summary>
       <returns>The newly initialized dictionary.</returns>
+      <param name="immutableArray">The array to create a dictionary from.</param>
       <param name="keySelector">The key selector.</param>
       <param name="elementSelector">The element selector.</param>
       <typeparam name="TKey">The type of the key.</typeparam>
@@ -4417,6 +4795,7 @@
     <member name="M:System.Linq.ImmutableArrayExtensions.ToDictionary``3(System.Collections.Immutable.ImmutableArray{``2},System.Func{``2,``0},System.Func{``2,``1},System.Collections.Generic.IEqualityComparer{``0})">
       <summary>Creates a dictionary based on the contents of this array.</summary>
       <returns>The newly initialized dictionary.</returns>
+      <param name="immutableArray">The array to create a dictionary from.</param>
       <param name="keySelector">The key selector.</param>
       <param name="elementSelector">The element selector.</param>
       <param name="comparer">The comparer to initialize the dictionary with.</param>
@@ -4426,14 +4805,27 @@
     </member>
     <member name="M:System.Linq.ImmutableArrayExtensions.Where``1(System.Collections.Immutable.ImmutableArray{``0},System.Func{``0,System.Boolean})">
       <summary>Filters a sequence of values based on a predicate.</summary>
-      <returns>Returns <see cref="T:System.Collections.Generic.IEnumerable`1" />.</returns>
+      <returns>Returns <see cref="T:System.Collections.Generic.IEnumerable`1" /> that contains elements that meet the condition.</returns>
+      <param name="immutableArray">The array to filter.</param>
+      <param name="predicate">The condition to use for filtering the array content.</param>
       <typeparam name="T">The type of element contained by the collection.</typeparam>
     </member>
-    <member name="T:System.Runtime.InteropServices.PinnedImmutableArray"></member>
-    <member name="M:System.Runtime.InteropServices.PinnedImmutableArray.Create``1(System.Collections.Immutable.ImmutableArray{``0})">
-      <typeparam name="T"></typeparam>
+    <member name="T:System.Runtime.InteropServices.PinnedImmutableArray">
+      <summary>Provides an <see cref="T:System.Collections.Immutable.ImmutableArray`1" /> that can be used with in interop scenarios.</summary>
     </member>
-    <member name="M:System.Runtime.InteropServices.PinnedImmutableArray.Dispose"></member>
-    <member name="P:System.Runtime.InteropServices.PinnedImmutableArray.Pointer"></member>
+    <member name="M:System.Runtime.InteropServices.PinnedImmutableArray.Create``1(System.Collections.Immutable.ImmutableArray{``0})">
+      <summary>Initializes a new instance of the <see cref="T:System.Runtime.InteropServices.PinnedImmutableArray" /> and ensures the array is pinned in memory.</summary>
+      <returns>An immutable array that stays in the same memory location.</returns>
+      <param name="array">The array to use in interop.</param>
+      <typeparam name="T">The type of element stored in the array.</typeparam>
+      <exception cref="T:System.ArgumentException">Occurs if the type in the array is not blittable, meaning it cannot be represented in unmanaged code. For more information, see Blittable and Non-Blittable Types.</exception>
+    </member>
+    <member name="M:System.Runtime.InteropServices.PinnedImmutableArray.Dispose">
+      <summary>Releases the resource held by this instance and unpins the array passed to the constructor.</summary>
+    </member>
+    <member name="P:System.Runtime.InteropServices.PinnedImmutableArray.Pointer">
+      <summary>Gets a pointer to the immutable array to for use with a platform invoke call to unmanaged code.</summary>
+      <returns>A pointer that can be used for calls to unmanaged code.</returns>
+    </member>
   </members>
 </doc>
