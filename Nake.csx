@@ -26,7 +26,7 @@ var AppVeyor = Var["APPVEYOR"] == "True";
 }
 
 /// Wipeout all build output and temporary build files 
-[Step] void Clean(string path = OutputPath)
+[Task] void Clean(string path = OutputPath)
 {
     Delete(@"{path}\*.*|-:*.vshost.exe");
     RemoveDir(@"**\bin|**\obj|{path}\*");    
@@ -35,8 +35,6 @@ var AppVeyor = Var["APPVEYOR"] == "True";
 /// Builds sources using specified configuration and output path
 [Step] void Build(string config = "Debug", string outDir = OutputPath)
 {
-    Clean(outDir);
-
     Exec(MSBuildExe, 
         "Nake.sln /p:Configuration={config};OutDir={outDir};ReferencePath={outDir} /m");
 }
@@ -62,6 +60,7 @@ var AppVeyor = Var["APPVEYOR"] == "True";
     var packagePath = OutputPath + @"\Package";
     var releasePath = packagePath + @"\Release";
 
+    Clean();
     Test(@"{packagePath}\Debug");
     Build("Release", releasePath);
 
