@@ -56,7 +56,7 @@ var AppVeyor = Var["APPVEYOR"] == "True";
 }
 
 /// Builds official NuGet package 
-[Step] void Package(bool noChm = false)
+[Step] void Package()
 {
     var packagePath = OutputPath + @"\Package";
     var releasePath = packagePath + @"\Release";
@@ -75,15 +75,9 @@ var AppVeyor = Var["APPVEYOR"] == "True";
         @"Packages\Nake.{version}\tools\net45\Nake.exe %*"
     );
 
-    string text = File.ReadAllText(@"{RootPath}\Build\Readme.txt");
-    text = text.Replace("###","Nake.{version}");
-    File.WriteAllText(@"{releasePath}\Readme.txt", text);
+    string readme = File.ReadAllText(@"{RootPath}\Build\Readme.txt");
+    File.WriteAllText(@"{releasePath}\Readme.txt", readme.Replace("###", "Nake.{version}"));
     
-    if (AppVeyor || noChm)
-    	File.WriteAllText(@"{releasePath}\Utility.chm", "NOP");
-    else
-    	Exec(MSBuildExe, @"Source\Utility\Utility.shfbproj /p:OutputPath={releasePath};SourcePath={releasePath}");    	
-
     Cmd(@"Tools\Nuget.exe pack Build\Nake.nuspec -Version {version} " +
          "-OutputDirectory {packagePath} -BasePath {RootPath} -NoPackageAnalysis");
 }
