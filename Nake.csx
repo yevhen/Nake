@@ -16,12 +16,13 @@ using System.Diagnostics;
 const string RootPath = "$NakeScriptDirectory$";
 const string OutputPath = RootPath + @"\Output";
 
-var MSBuildExe = @"$ProgramFiles(x86)$\MSBuild\12.0\Bin\MSBuild.exe";
+var MSBuildExe = @"$ProgramFiles(x86)$\MSBuild\14.0\Bin\MSBuild.exe";
 var AppVeyor = Var["APPVEYOR"] == "True";
 
 /// Builds sources in debug mode 
 [Task] void Default()
 {
+    Clean();
     Build();
 }
 
@@ -35,6 +36,7 @@ var AppVeyor = Var["APPVEYOR"] == "True";
 /// Builds sources using specified configuration and output path
 [Step] void Build(string config = "Debug", string outDir = OutputPath)
 {
+    Restore();
     Exec(MSBuildExe, 
         "Nake.sln /p:Configuration={config};OutDir={outDir};ReferencePath={outDir} /m");
 }
@@ -74,7 +76,7 @@ var AppVeyor = Var["APPVEYOR"] == "True";
         @"Packages\Nake.{version}\tools\net45\Nake.exe %*"
     );
 
-    string text = File.ReadAllText(@"{RootPath}\Build\NuGet\Readme.txt");
+    string text = File.ReadAllText(@"{RootPath}\Build\Readme.txt");
     text = text.Replace("###","Nake.{version}");
     File.WriteAllText(@"{releasePath}\Readme.txt", text);
     
@@ -83,20 +85,13 @@ var AppVeyor = Var["APPVEYOR"] == "True";
     else
     	Exec(MSBuildExe, @"Source\Utility\Utility.shfbproj /p:OutputPath={releasePath};SourcePath={releasePath}");    	
 
-    Cmd(@"Tools\Nuget.exe pack Build\NuGet\Nake.nuspec -Version {version} " +
+    Cmd(@"Tools\Nuget.exe pack Build\Nake.nuspec -Version {version} " +
          "-OutputDirectory {packagePath} -BasePath {RootPath} -NoPackageAnalysis");
 }
 
-/// Installs dependencies (packages) from NuGet 
-[Task] void Install()
+/// Restores dependencies (packages) from NuGet 
+[Task] void Restore()
 {
-    var packagesDir = @"{RootPath}\Packages";
-
-    var configs = XElement
-        .Load(packagesDir + @"\repositories.config")
-        .Descendants("repository")
-        .Select(x => x.Attribute("path").Value.Replace("..", RootPath)); 
-
-    foreach (var config in configs)
-        Cmd(@"Tools\NuGet.exe install {config} -o {packagesDir}");
+    Cmd(@"Tools\NuGet.exe restore {RootPath}\Tools\Packages.config -o {RootPath}\Packages");
+    Cmd(@"Tools\NuGet.exe restore {RootPath}\Nake.sln -o {RootPath}\Packages");
 }

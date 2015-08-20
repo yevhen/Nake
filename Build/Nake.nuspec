@@ -24,7 +24,7 @@
     <file src="Output\Package\Release\System.Collections.Immutable.dll" target="tools/net45" />
     <file src="Output\Package\Release\System.Reflection.Metadata.dll" target="tools/net45" />
 
-    <file src="Build\NuGet\Nake.csx" target="sample" />
+    <file src="Nake.csx" target="sample" />
     <file src="Output\Package\Release\Nake.bat" target="sample" />
     
     <file src="Output\Package\Release\Readme.txt" target="" />
