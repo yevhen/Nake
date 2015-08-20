@@ -4,10 +4,6 @@
 #r "System.IO.Compression"
 #r "System.IO.Compression.FileSystem"
 
-using Nake;
-using Nake.FS;
-using Nake.Run;
-
 using System.Diagnostics;
 using System.Dynamic;
 using System.IO.Compression;
@@ -15,7 +11,10 @@ using System.IO.Compression;
 using EasyHttp.Http;
 using EasyHttp.Infrastructure;
 
-var OutputPath = @"$NakeScriptDirectory$\Output";
+using static Nake.FS;
+using static Nake.Run;
+
+var OutputPath = @"%NakeScriptDirectory%\Output";
 var PackagePath = @"{OutputPath}\Package";
 
 var DebugOutputPath = @"{PackagePath}\Debug";
@@ -52,7 +51,7 @@ Func<string> ArchiveFile = () => OutputPath + @"\{Version()}.zip";
 /// Publishes package to NuGet gallery
 [Step] void NuGet()
 {
-    Cmd(@"Tools\Nuget.exe push {PackageFile()} $NuGetApiKey$");
+    Cmd(@"Tools\Nuget.exe push {PackageFile()} %NuGetApiKey%");
 }
 
 /// Publishes standalone version to GitHub releases
@@ -105,7 +104,7 @@ HttpClient GitHub()
 
     client.Request.Accept = "application/vnd.github.manifold-preview";
     client.Request.ContentType = "application/json";
-    client.Request.AddExtraHeader("Authorization", "token $GitHubToken$");
+    client.Request.AddExtraHeader("Authorization", "token %GitHubToken%");
 
     return client;
 }
