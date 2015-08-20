@@ -15,14 +15,26 @@ using static Nake.Run;
 const string RootPath = "%NakeScriptDirectory%";
 const string OutputPath = RootPath + @"\Output";
 
+var PackagePath = @"{OutputPath}\Package";
+var DebugOutputPath = @"{PackagePath}\Debug";
+var ReleaseOutputPath = @"{PackagePath}\Release";
+
 var MSBuildExe = @"%ProgramFiles(x86)%\MSBuild\14.0\Bin\MSBuild.exe";
 var AppVeyor = Var["APPVEYOR"] == "True";
 
 /// Builds sources in debug mode 
 [Task] void Default()
 {
+    Restore();
     Clean();
     Build();
+}
+
+/// Restores dependencies (packages) from NuGet 
+[Task] void Restore()
+{
+    Cmd(@"Tools\NuGet.exe restore {RootPath}\Tools\Packages.config -o {RootPath}\Packages");
+    Cmd(@"Tools\NuGet.exe restore {RootPath}\Nake.sln -o {RootPath}\Packages");
 }
 
 /// Wipeout all build output and temporary build files 
@@ -35,9 +47,7 @@ var AppVeyor = Var["APPVEYOR"] == "True";
 /// Builds sources using specified configuration and output path
 [Step] void Build(string config = "Debug", string outDir = OutputPath)
 {
-    Info(MSBuildExe);
-    Exec(MSBuildExe, 
-        "Nake.sln /p:Configuration={config};OutDir={outDir};ReferencePath={outDir} /m");
+    Exec(MSBuildExe, "Nake.sln /p:Configuration={config};OutDir={outDir};ReferencePath={outDir} /m");
 }
 
 /// Runs unit tests 
@@ -58,33 +68,38 @@ var AppVeyor = Var["APPVEYOR"] == "True";
 /// Builds official NuGet package 
 [Step] void Package()
 {
-    var packagePath = OutputPath + @"\Package";
-    var releasePath = packagePath + @"\Release";
-
     Clean();
-    Test(@"{packagePath}\Debug");
-    Build("Release", releasePath);
+
+    Test(DebugOutputPath);
+    Build("Release", ReleaseOutputPath);
 
     var version = FileVersionInfo
-        .GetVersionInfo(@"{releasePath}\Nake.exe")
+        .GetVersionInfo(@"{ReleaseOutputPath}\Nake.exe")
         .ProductVersion;
 
     File.WriteAllText(
-        @"{releasePath}\Nake.bat",
+        @"{ReleaseOutputPath}\Nake.bat",
         "@ECHO OFF \r\n" +
         @"Packages\Nake.{version}\tools\net45\Nake.exe %*"
     );
 
     string readme = File.ReadAllText(@"{RootPath}\Build\Readme.txt");
-    File.WriteAllText(@"{releasePath}\Readme.txt", readme.Replace("###", "Nake.{version}"));
+    File.WriteAllText(@"{ReleaseOutputPath}\Readme.txt", readme.Replace("###", "Nake.{version}"));
     
     Cmd(@"Tools\Nuget.exe pack Build\Nake.nuspec -Version {version} " +
-         "-OutputDirectory {packagePath} -BasePath {RootPath} -NoPackageAnalysis");
+         "-OutputDirectory {PackagePath} -BasePath {RootPath} -NoPackageAnalysis");
 }
 
-/// Restores dependencies (packages) from NuGet 
-[Task] void Restore()
+/// Publishes package to NuGet gallery
+[Step] void Publish()
 {
-    Cmd(@"Tools\NuGet.exe restore {RootPath}\Tools\Packages.config -o {RootPath}\Packages");
-    Cmd(@"Tools\NuGet.exe restore {RootPath}\Nake.sln -o {RootPath}\Packages");
+    var packageFile = @"{PackagePath}\Nake.{Version()}.nupkg";
+    Cmd(@"Tools\Nuget.exe push {packageFile} %NuGetApiKey%");
+}
+
+string Version()
+{
+    return FileVersionInfo
+            .GetVersionInfo(@"{ReleaseOutputPath}\Nake.exe")
+            .ProductVersion;
 }
