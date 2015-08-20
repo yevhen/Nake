@@ -37,11 +37,9 @@ namespace Nake
             if (options.TraceEnabled)
                 SetTrace();
 
-            var file   = Find();
+            var file = Find();
             var script = Preprocess(file);
-            
-            var code = script.Code();
-            var declarations = Scan(code);
+            var declarations = Scan(script);
 
             if (options.ShowTasks)
                 ShowTasks(declarations);
@@ -49,10 +47,7 @@ namespace Nake
             OverrideEnvironmentVariables();
             DefineNakeEnvironmentVariables(file);
 
-            var result = Build(file, script, code, declarations);
-            Initialize(result);
-
-            Invoke();
+            Invoke(script, declarations);
         }
 
         void SetCurrentDirectory()
@@ -64,9 +59,7 @@ namespace Nake
         void OverrideEnvironmentVariables()
         {
             foreach (var variable in options.Variables)
-            {
                 Env.Var[variable.Name] = variable.Value;
-            }
         }
 
         static void DefineNakeEnvironmentVariables(FileInfo scriptFile)
@@ -97,7 +90,7 @@ namespace Nake
             return new FileInfo(defaultScriptFile);
         }
 
-        BuildResult Build(FileInfo file, PreprocessedScript script, string code, IEnumerable<TaskDeclaration> declarations)
+        BuildResult Build(PreprocessedScript script, IEnumerable<TaskDeclaration> declarations)
         {
             var engine = new Engine(
                 script.References, 
@@ -106,11 +99,11 @@ namespace Nake
             );
 
             var cachingEngine = new CachingEngine(
-                engine, file, declarations.Select(x => new Task(x)).ToArray(), options.ResetCache              
+                engine, script.File, declarations.Select(x => new Task(x)).ToArray(), options.ResetCache              
             );
 
             var result = cachingEngine.Build(
-                code, VariableSubstitutions(), options.DebugScript
+                script.Code, VariableSubstitutions(), options.DebugScript
             );
 
             return result;
@@ -185,9 +178,9 @@ namespace Nake
             Console.WriteLine();
         }
 
-        TaskDeclaration[] Scan(string code)
+        TaskDeclaration[] Scan(PreprocessedScript script)
         {
-            return new TaskDeclarationScanner().Scan(code, options.ShowTasks).ToArray();
+            return new TaskDeclarationScanner().Scan(script.Code, options.ShowTasks).ToArray();
         }
 
         static PreprocessedScript Preprocess(FileInfo file)
@@ -195,10 +188,12 @@ namespace Nake
             return new Preprocessor().Process(file);
         }
 
-        void Invoke()
+        void Invoke(PreprocessedScript script, IEnumerable<TaskDeclaration> declarations)
         {
+            var result = Build(script, declarations);
+            Initialize(result);
+
             var tasks = options.Tasks;
-            
             if (tasks.Count == 0)
                 tasks.Add(Options.Task.Default);
 

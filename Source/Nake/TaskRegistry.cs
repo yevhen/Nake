@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Nake
 {
@@ -35,18 +36,18 @@ namespace Nake
 
         static object CreateScriptInstance(Assembly assembly)
         {
-            var ctor = assembly.GetType(Task.ScriptClass).GetConstructor(new[]
-            {
-                typeof(object[]),
-                typeof(object).MakeByRefType()
-            });
+            var submission = assembly.GetType(Task.ScriptClass);
 
+            var ctor = submission.GetConstructor(new[] {typeof(object[])});
             Debug.Assert(ctor != null);
 
             var submissionStates = new object[2];
             submissionStates[0] = new object();
 
-            return ctor.Invoke(new[] {submissionStates, new object()});
+            var instance = ctor.Invoke(new object[] {submissionStates});
+            submission.GetMethod("<Initialize>").Invoke(instance, new object[0]);
+
+            return instance;
         }
 
         internal Task Find(string taskFullName)

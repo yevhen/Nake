@@ -42,9 +42,14 @@ namespace Nake.Scripting
 
         static readonly string[] DefaultNamespaces =
         {
-            "Nake", 
-            "System.Collections.Generic", "System.Linq", "System.Text", "System.IO", 
-            "Microsoft.Build.Framework", "Microsoft.Build.Utilities"
+            "Nake",
+            "System",
+            "System.Linq",
+            "System.Text",
+            "System.IO",
+            "System.Collections.Generic", 
+            "Microsoft.Build.Framework",
+            "Microsoft.Build.Utilities"
         };
 
         static MetadataReference Reference(Type type)

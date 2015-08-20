@@ -31,10 +31,11 @@ namespace Nake.Scripting
 
         public PreprocessedScript Process(FileInfo file)
         {
-            var result = new PreprocessedScript();
-            
+            var result = new PreprocessedScript(file);
+
             scriptDirectoryPath = file.DirectoryName;
             ParseFile(file.FullName, result);
+            result.FinalizeScript();
 
             return result;
         }
@@ -121,7 +122,7 @@ namespace Nake.Scripting
 
         public static bool IsUsingLine(string line)
         {
-            return line.TrimStart(' ').StartsWith(UsingString) && !line.Contains("{") && line.Contains(";");
+            return line.TrimStart(' ').StartsWith(UsingString) && !line.Contains("{") && line.Contains(";") && !line.Contains("static");
         }
 
         public static bool IsRLine(string line)
@@ -147,31 +148,37 @@ namespace Nake.Scripting
         public readonly HashSet<AssemblyAbsoluteReference> AbsoluteReferences = new HashSet<AssemblyAbsoluteReference>();
         public readonly List<string> LoadedScripts = new List<string>();
         public readonly List<string> Body = new List<string>();
-
-        public string Code()
+        public readonly FileInfo File;
+        public string Code { get; private set; }
+    
+        public PreprocessedScript(FileInfo file)
         {
-            var code = new StringBuilder();
-
-            AppendUsings(code);
-            AppendBody(code);
-
-            return code.ToString();
+            File = file;
         }
 
-        void AppendUsings(StringBuilder code)
+        public void FinalizeScript()
         {
-            var lines = Namespaces.Distinct().Select(item => String.Format("using {0};", item)).ToList();
+            var builder = new StringBuilder();
 
+            AppendUsings(builder);
+            AppendBody(builder);
+
+            Code = builder.ToString();
+        }
+
+        void AppendUsings(StringBuilder b)
+        {
+            var lines = Namespaces.Distinct().Select(item => $"using {item};").ToList();
             if (lines.Count == 0)
                 return;
 
-            code.AppendLine(String.Join(Environment.NewLine, lines));
-            code.AppendLine(); // Insert a blank separator line
+            b.AppendLine(string.Join(Environment.NewLine, lines));
+            b.AppendLine(); // Insert a blank separator line
         }
 
-        void AppendBody(StringBuilder code)
+        void AppendBody(StringBuilder b)
         {
-            code.Append(String.Join(Environment.NewLine, Body));
+            b.Append(string.Join(Environment.NewLine, Body));
         }
     }
 

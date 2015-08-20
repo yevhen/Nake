@@ -409,9 +409,9 @@
             
              Spec 7.5.4: Compile-time checking of dynamic overload resolution 
                If F is a static method, the method group must have resulted from a simple-name, a member-access through a type, 
-               or a member-access whose receiver can’t be classified as a type or value until after overload resolution (see §7.6.4.1). 
+               or a member-access whose receiver can't be classified as a type or value until after overload resolution (see §7.6.4.1). 
                If F is an instance method, the method group must have resulted from a simple-name, a member-access through a variable or value,
-               or a member-access whose receiver can’t be classified as a type or value until after overload resolution (see §7.6.4.1).
+               or a member-access whose receiver can't be classified as a type or value until after overload resolution (see §7.6.4.1).
              </summary>
              <returns>
              True if there is any error.
@@ -798,7 +798,7 @@
             may not reference instance members.
             </summary>
         </member>
-        <member name="M:Microsoft.CodeAnalysis.CSharp.Binder.BindScriptFieldInitializers(Microsoft.CodeAnalysis.CSharp.CSharpCompilation,Microsoft.CodeAnalysis.CSharp.Symbols.MethodSymbol,System.Collections.Immutable.ImmutableArray{System.Collections.Immutable.ImmutableArray{Microsoft.CodeAnalysis.CSharp.Symbols.FieldOrPropertyInitializer}},Microsoft.CodeAnalysis.ArrayBuilder{Microsoft.CodeAnalysis.CSharp.BoundInitializer},Microsoft.CodeAnalysis.DiagnosticBag,Microsoft.CodeAnalysis.CSharp.ImportChain@)">
+        <member name="M:Microsoft.CodeAnalysis.CSharp.Binder.BindScriptFieldInitializers(Microsoft.CodeAnalysis.CSharp.CSharpCompilation,Microsoft.CodeAnalysis.CSharp.Symbols.SynthesizedInteractiveInitializerMethod,System.Collections.Immutable.ImmutableArray{System.Collections.Immutable.ImmutableArray{Microsoft.CodeAnalysis.CSharp.Symbols.FieldOrPropertyInitializer}},Microsoft.CodeAnalysis.ArrayBuilder{Microsoft.CodeAnalysis.CSharp.BoundInitializer},Microsoft.CodeAnalysis.DiagnosticBag,Microsoft.CodeAnalysis.CSharp.ImportChain@)">
             <summary>
             In script C#, some field initializers are assignments to fields and others are global
             statements.  There are no restrictions on accessing instance members.
@@ -1128,7 +1128,7 @@
             Noteworthy override is in MemberSemanticModel.IncrementalBinder (used for caching).
             </remarks>
         </member>
-        <member name="M:Microsoft.CodeAnalysis.CSharp.Binder.CheckForUnobservedAwaitable(Microsoft.CodeAnalysis.CSharp.BoundExpressionStatement,Microsoft.CodeAnalysis.DiagnosticBag)">
+        <member name="M:Microsoft.CodeAnalysis.CSharp.Binder.CheckForUnobservedAwaitable(Microsoft.CodeAnalysis.CSharp.BoundExpression,Microsoft.CodeAnalysis.DiagnosticBag)">
             <summary>
             Report an error if this is an awaitable async method invocation that is not being awaited.
             </summary>
@@ -1930,7 +1930,7 @@
                                      a viable or non-accessible result. An error is attached with the error that indicates
                                      why the result is non-viable.  A typical reason would be that it is the wrong kind of symbol.
             
-            Note that the class is poolable so its instances can be obtained from a pool vai GetInstance.
+            Note that the class is poolable so its instances can be obtained from a pool via GetInstance.
             Also it is a good idea to call Free on instances after they no longer needed.
             
             The typical pattern is "caller allocates / caller frees" -
@@ -2005,7 +2005,7 @@
             detected at lookup time (e.g., NotAVariable), so only occur in bound nodes.
             </summary>
             <remarks>
-            This enumeration is parallel to and almost the same as as the CandidateReason enumeration.
+            This enumeration is parallel to and almost the same as the CandidateReason enumeration.
             Changes to one should usually result in changes to the other.
             
             There are two enumerations because:
@@ -2582,6 +2582,11 @@
             7.5.3.2 of the language specification).
             </summary>
         </member>
+        <member name="F:Microsoft.CodeAnalysis.CSharp.MemberResolutionKind.Worst">
+            <summary>
+            Same as <see cref="F:Microsoft.CodeAnalysis.CSharp.MemberResolutionKind.Worse"/>, but the candidate shouldn't be mentioned in an ambiguity diagnostics.
+            </summary>
+        </member>
         <member name="T:Microsoft.CodeAnalysis.CSharp.MemberResolutionResult`1">
             <summary>
             Represents the results of overload resolution for a single member.
@@ -2620,7 +2625,7 @@
             <summary>
             Return the interface with an original definition matches
             the original definition of the target. If the are no matches,
-            or multiple multiple matches, the return value is null.
+            or multiple matches, the return value is null.
             </summary>
         </member>
         <member name="M:Microsoft.CodeAnalysis.CSharp.MethodTypeInferrer.GetInferredTypeArguments">
@@ -3177,7 +3182,7 @@
             has executed <see cref="M:Microsoft.CodeAnalysis.CSharp.Symbol.DecodeWellKnownAttribute(Microsoft.CodeAnalysis.DecodeWellKnownAttributeArguments{Microsoft.CodeAnalysis.CSharp.Syntax.AttributeSyntax,Microsoft.CodeAnalysis.CSharp.Symbols.CSharpAttributeData,Microsoft.CodeAnalysis.CSharp.Symbols.AttributeLocation}@)"/> for attributes applied on the symbol and has stored the decoded data in the
             lazyCustomAttributesBag on the symbol. Bound attributes haven't been stored on the bag yet.
             
-            Post-validation for attributes that is dependant on other attributes can be done here.
+            Post-validation for attributes that is dependent on other attributes can be done here.
             
             This method should not have any side effects on the symbol, i.e. it SHOULD NOT change the symbol state.
             </remarks>
@@ -3201,7 +3206,7 @@
                 (a) Store the bound attributes in lazyCustomAttributes in a thread safe manner.
                 (b) Perform some additional post attribute validations, such as
                     1) Duplicate attributes, attribute usage target validation, etc.
-                    2) Post validation for attributes dependant on other attributes
+                    2) Post validation for attributes dependent on other attributes
                     These validations cannot be performed prior to step 6(a) as we might need to
                     perform a GetAttributes() call on a symbol which can introduce a cycle in attribute binding.
                     We avoid this cycle by performing such validations in PostDecodeWellKnownAttributes after lazyCustomAttributes have been set.
@@ -3390,8 +3395,8 @@
         </member>
         <member name="M:Microsoft.CodeAnalysis.CSharp.BoundConversion.ConversionHasSideEffects">
             <summary>
-            Returns true when conversion itself (not the operand) may have sideeffects
-            A typical sideeffect of a conversion is an exception when conversion is unsuccessful.
+            Returns true when conversion itself (not the operand) may have side-effects
+            A typical side-effect of a conversion is an exception when conversion is unsuccessful.
             </summary>
             <returns></returns>
         </member>
@@ -3435,7 +3440,7 @@
             to the node constructor. If any child nodes of a node have
             the HasErrors bit set, then it is automatically set to true on the parent bound node.
             
-            HasErrors indicates that the tree is not emittable and used to shortcircuit lowering/emit stages.
+            HasErrors indicates that the tree is not emittable and used to short-circuit lowering/emit stages.
             NOTE: not having HasErrors does not guarantee that we do not have any diagnostic associated
                   with corresponding syntax or type.
             </summary>
@@ -3510,7 +3515,7 @@
         </member>
         <member name="M:Microsoft.CodeAnalysis.CSharp.CodeGen.CodeGenerator.HasHome(Microsoft.CodeAnalysis.CSharp.BoundFieldAccess)">
             <summary>
-            Special HasHome for fields. Fields have homes when they are writeable.
+            Special HasHome for fields. Fields have homes when they are writable.
             </summary>
         </member>
         <member name="M:Microsoft.CodeAnalysis.CSharp.CodeGen.CodeGenerator.EmitFieldAddress(Microsoft.CodeAnalysis.CSharp.BoundFieldAccess)">
@@ -3541,7 +3546,7 @@
             Assumes that we have newly created array on the stack.
             
             inits could be an array of values for a single dimensional array
-            or an   array (of array)+  of values for a multidimensional case
+            or an array (of array)+ of values for a multidimensional case
             
             in either case it is expected that number of leaf values will match number 
             of elements in the array and nesting level should match the rank of the array.
@@ -3585,7 +3590,7 @@
         <member name="M:Microsoft.CodeAnalysis.CSharp.CodeGen.CodeGenerator.GetRawData(System.Collections.Immutable.ImmutableArray{Microsoft.CodeAnalysis.CSharp.BoundExpression})">
             <summary>
             Produces a serialized blob of all constant initializers.
-            Nonconstant initializers are matched with a zero of corresponding size.
+            Non-constant initializers are matched with a zero of corresponding size.
             </summary>
         </member>
         <member name="M:Microsoft.CodeAnalysis.CSharp.CodeGen.CodeGenerator.IsMultidimensionalInitializer(System.Collections.Immutable.ImmutableArray{Microsoft.CodeAnalysis.CSharp.BoundExpression})">
@@ -6178,7 +6183,7 @@
         <member name="F:Microsoft.CodeAnalysis.CSharp.Symbols.AnonymousTypeManager._lazySynthesizedDelegates">
             <summary>
             Maps delegate signature shape (number of parameters and their ref-ness) to a synthesized generic delegate symbol.
-            Unlike anonymous types synthesized delegates are not available thru symbol APIs. They are only used in lowered bound trees.
+            Unlike anonymous types synthesized delegates are not available through symbol APIs. They are only used in lowered bound trees.
             Currently used for dynamic call-site sites whose signature doesn't match any of the well-known Func or Action types.
             </summary>
         </member>
@@ -6538,7 +6543,7 @@
              It involves following steps:
               1) Verifying that the specified file name resolves to a valid path.
               2) Reading the contents of the file into a byte array.
-              3) Convert each byte in the file content into two bytes containing hexa-decimal characters.
+              3) Convert each byte in the file content into two bytes containing hexadecimal characters.
               4) Replacing the 'File = fileName' named argument with 'Hex = hexFileContent' argument, where hexFileContent is the converted output from step 3) above.
             
              Step 1) is performed in this method, i.e. during binding.
@@ -6934,9 +6939,9 @@
         <member name="P:Microsoft.CodeAnalysis.CSharp.Symbols.MethodSymbol.IsVararg">
              <summary>
              Returns whether this method is using CLI VARARG calling convention. This is used for C-style variable
-             argument lists. This is used extremely rarely in C# code and is represented using the undocumented “__arglist” keyword.
+             argument lists. This is used extremely rarely in C# code and is represented using the undocumented "__arglist" keyword.
             
-             Note that methods with “params” on the last parameter are indicated with the “IsParams” property on ParameterSymbol, and
+             Note that methods with "params" on the last parameter are indicated with the "IsParams" property on ParameterSymbol, and
              are not represented with this property.
              </summary>
         </member>
@@ -7357,7 +7362,7 @@
         <member name="P:Microsoft.CodeAnalysis.CSharp.Symbols.NamedTypeSymbol.DelegateInvokeMethod">
             <summary>
             For delegate types, gets the delegate's invoke method.  Returns null on
-            all other kinds of types.  Note that is is possible to have an ill-formed
+            all other kinds of types.  Note that it is possible to have an ill-formed
             delegate type imported from metadata which does not have an Invoke method.
             Such a type will be classified as a delegate but its DelegateInvokeMethod
             would be null.
@@ -8738,9 +8743,9 @@
             Comments from the C# design document for Dynamic:
             SPEC:   To represent the dynamic type in metadata, any indexer, field or return value typed as dynamic or known to be a constructed type
             SPEC:   containing dynamic will have each occurrence of dynamic erased to object and will be annotated with a [DynamicAttribute].
-            SPEC:   If the relevant type is a constructed type, the attribute’s constructor is passed a bool array.
-            SPEC:   This array represents a preorder traversal of each “node” in the constructed type’s “tree of types”,
-            SPEC:   with true set for each “node” that is dynamic, and false set for all other types.
+            SPEC:   If the relevant type is a constructed type, the attribute's constructor is passed a bool array.
+            SPEC:   This array represents a preorder traversal of each "node" in the constructed type's "tree of types",
+            SPEC:   with true set for each "node" that is dynamic, and false set for all other types.
             SPEC:   When dynamic occurs as part of the base type of a type, the applicable [DynamicAttribute] is applied to the type itself.
             </remarks>
         </member>
@@ -10331,11 +10336,11 @@
             Returns true if the local variable is declared in resource-acquisition of a 'using statement';
             otherwise false
             </summary>
-            <exmaple>
+            <example>
             <code>
                 using (var localVariable = new StreamReader("C:\\Temp\\MyFile.txt")) { ... } 
             </code>
-            </exmaple>
+            </example>
         </member>
         <member name="P:Microsoft.CodeAnalysis.CSharp.Symbols.LocalSymbol.IsFixed">
             <summary>
@@ -10389,7 +10394,7 @@
             name, the number of type parameters and the number, modifiers, and types of its formal
             parameters. For these purposes, any type parameter of the method that occurs in the type of
             a formal parameter is identified not by its name, but by its ordinal position in the type
-            argument list of the method. The return type is not part of a method’s signature, nor are
+            argument list of the method. The return type is not part of a method's signature, nor are
             the names of the type parameters or the formal parameters.
             </para>
             <para>
@@ -12512,7 +12517,7 @@
         <member name="M:Microsoft.CodeAnalysis.CSharp.Symbols.SourceMemberContainerTypeSymbol.IsOverrideOfPossibleImplementationUnderRuntimeRules(Microsoft.CodeAnalysis.CSharp.Symbols.MethodSymbol,Microsoft.CodeAnalysis.CSharp.Symbols.NamedTypeSymbol)">
             <summary>
             If C# picks a different implementation than the CLR (see IsPossibleImplementationUnderClrRules), then we might
-            still be okay, but dynamic dispath might result in C#'s choice getting called anyway.
+            still be okay, but dynamic dispatch might result in C#'s choice getting called anyway.
             </summary>
             <remarks>
             This is based on SymbolPreparer::IsCLRMethodImplSame in the native compiler.
@@ -12881,7 +12886,7 @@
         </member>
         <member name="M:Microsoft.CodeAnalysis.CSharp.Symbols.SourcePropertyAccessorSymbol.GetAccessorName(System.String,System.Boolean,System.Boolean)">
             <summary>
-            If we are outputing a .winmdobj then the setter name is put_, not set_.
+            If we are outputting a .winmdobj then the setter name is put_, not set_.
             </summary>
         </member>
         <member name="M:Microsoft.CodeAnalysis.CSharp.Symbols.SourcePropertyAccessorSymbol.GetSyntax">
@@ -12907,7 +12912,7 @@
             interface implementation is not an indexer because it will not cause the
             containing type to be emitted with a DefaultMemberAttribute (and even if
             there is another indexer, the name of the explicit implementation won't
-            match).  This is important for roundtripping.
+            match).  This is important for round-tripping.
             </remarks>
         </member>
         <member name="P:Microsoft.CodeAnalysis.CSharp.Symbols.SourcePropertySymbol.BackingField">
@@ -13282,7 +13287,7 @@
         </member>
         <member name="M:Microsoft.CodeAnalysis.CSharp.Symbols.TypeSymbol.IsEqualToOrDerivedFrom(Microsoft.CodeAnalysis.CSharp.Symbols.TypeSymbol,System.Boolean,System.Collections.Generic.HashSet{Microsoft.CodeAnalysis.DiagnosticInfo}@)">
             <summary>
-            Returns true if this type si equal or derives from a given type.
+            Returns true if this type is equal or derives from a given type.
             </summary>
         </member>
         <member name="M:Microsoft.CodeAnalysis.CSharp.Symbols.TypeSymbol.Equals(Microsoft.CodeAnalysis.CSharp.Symbols.TypeSymbol,System.Boolean,System.Boolean)">
@@ -13568,7 +13573,7 @@
         </member>
         <member name="M:Microsoft.CodeAnalysis.CSharp.Symbols.TypeSymbolExtensions.GetNonErrorTypeKindGuess(Microsoft.CodeAnalysis.CSharp.Symbols.TypeSymbol)">
             <summary>
-            Guess the non-error typekind that the given type was intended to represent,
+            Guess the non-error type kind that the given type was intended to represent,
             if possible. If not, return TypeKind.Error.
             </summary>
         </member>
@@ -13798,7 +13803,7 @@
             <remarks>
             This check (the only one that uses the "context" parameter is based on CLS Rule 46,
             as implemented by LangCompiler::IsCLSAccessible.  The idea is that C&lt;int&gt; and C&lt;char&gt;
-            are separate types in CLS, so they can't touch eachother's protected members.
+            are separate types in CLS, so they can't touch each other's protected members.
             TODO: This should really have a separate error code - it's logically separate and requires explanation.
             </remarks>
             <param name="type">Check the accessibility of this type (probably a parameter or return type).</param>
@@ -14073,7 +14078,7 @@
             form that needs lowering, primarily method bodies for compiler-generated methods.
             </summary>
         </member>
-        <member name="M:Microsoft.CodeAnalysis.CSharp.MethodBodySynthesizer.MakeSubmissionInitialization(Microsoft.CodeAnalysis.CSharp.CSharpSyntaxNode,Microsoft.CodeAnalysis.CSharp.Symbols.MethodSymbol,Microsoft.CodeAnalysis.CSharp.SynthesizedSubmissionFields,Microsoft.CodeAnalysis.CSharp.CSharpCompilation)">
+        <member name="M:Microsoft.CodeAnalysis.CSharp.MethodBodySynthesizer.MakeSubmissionInitialization(Microsoft.CodeAnalysis.ArrayBuilder{Microsoft.CodeAnalysis.CSharp.BoundStatement},Microsoft.CodeAnalysis.CSharp.CSharpSyntaxNode,Microsoft.CodeAnalysis.CSharp.Symbols.MethodSymbol,Microsoft.CodeAnalysis.CSharp.SynthesizedSubmissionFields,Microsoft.CodeAnalysis.CSharp.CSharpCompilation)">
             <summary>
             Generates a submission initialization part of a Script type constructor that represents an interactive submission.
             </summary>
@@ -21747,7 +21752,7 @@
         </member>
         <member name="P:Microsoft.CodeAnalysis.CSharp.CSharpResources.WRN_UnobservedAwaitableExpression_Description">
             <summary>
-              Looks up a localized string similar to The current method calls an async method that returns a Task or a Task&lt;TResult&gt; and doesn’t apply the await operator to the result. The call to the async method starts an asynchronous task. However, because no await operator is applied, the program continues without waiting for the task to complete. In most cases, that behavior isn&apos;t what you expect. Usually other aspects of the calling method depend on the results of the call or, minimally, the called method is expected to complete before you return from t [rest of string was truncated]&quot;;.
+              Looks up a localized string similar to The current method calls an async method that returns a Task or a Task&lt;TResult&gt; and doesn&apos;t apply the await operator to the result. The call to the async method starts an asynchronous task. However, because no await operator is applied, the program continues without waiting for the task to complete. In most cases, that behavior isn&apos;t what you expect. Usually other aspects of the calling method depend on the results of the call or, minimally, the called method is expected to complete before you return from t [rest of string was truncated]&quot;;.
             </summary>
         </member>
         <member name="P:Microsoft.CodeAnalysis.CSharp.CSharpResources.WRN_UnobservedAwaitableExpression_Title">
@@ -23109,7 +23114,7 @@
              Lower a block of code by performing local rewritings. 
              The goal is to not have exception handlers that contain awaits in them.
              
-             1) Await containing finallies:
+             1) Await containing finally blocks:
                  The general strategy is to rewrite await containing handlers into synthetic handlers.
                  Synthetic handlers are not handlers in IL sense so it is ok to have awaits in them.
                  Since synthetic handlers are just blocks, we have to deal with pending exception/branch/return manually
@@ -23178,7 +23183,7 @@
         </member>
         <member name="T:Microsoft.CodeAnalysis.CSharp.AsyncExceptionHandlerRewriter.AwaitInFinallyAnalysis">
             <summary>
-            Analyses method body for Try blocks with awaits in finallies 
+            Analyses method body for try blocks with awaits in finally blocks 
             Also collects labels that such blocks contain.
             </summary>
         </member>
@@ -23448,7 +23453,7 @@
                         break;
                         
                     case state5:
-                        ... another dispatch of nested states to their finallies ...
+                        ... another dispatch of nested states to their finally blocks ...
                         break;
                 }
             }
@@ -23462,7 +23467,7 @@
         </member>
         <member name="M:Microsoft.CodeAnalysis.CSharp.IteratorMethodToStateMachineRewriter.YieldsInTryAnalysis.ContainsYields(Microsoft.CodeAnalysis.CSharp.BoundTryStatement)">
             <summary>
-            Returns true if given try or any of its nested trys contain yields
+            Returns true if given try or any of its nested try blocks contain yields
             </summary>
         </member>
         <member name="M:Microsoft.CodeAnalysis.CSharp.IteratorMethodToStateMachineRewriter.YieldsInTryAnalysis.ContainsYieldsInTrys">
@@ -23535,7 +23540,7 @@
             Then we make a frame, or compiler-generated class, represented by an instance of
             <see cref="T:Microsoft.CodeAnalysis.CSharp.LambdaFrame"/> for each scope with captured variables.  The generated frames are kept
             in <see cref="F:Microsoft.CodeAnalysis.CSharp.LambdaRewriter._frames"/>.  Each frame is given a single field for each captured
-            variable in the corresponding scope.  These are are maintained in <see cref="F:Microsoft.CodeAnalysis.CSharp.Symbols.MethodToClassRewriter.proxies"/>.
+            variable in the corresponding scope.  These are maintained in <see cref="F:Microsoft.CodeAnalysis.CSharp.Symbols.MethodToClassRewriter.proxies"/>.
             
             Finally, we walk and rewrite the input bound tree, keeping track of the following:
             (1) The current set of active frame pointers, in <see cref="F:Microsoft.CodeAnalysis.CSharp.LambdaRewriter._framePointers"/>
@@ -23752,7 +23757,7 @@
         </member>
         <member name="M:Microsoft.CodeAnalysis.CSharp.LocalRewriter.MergeArgumentsAndSideEffects(Microsoft.CodeAnalysis.CSharp.BoundExpression[],Microsoft.CodeAnalysis.ArrayBuilder{Microsoft.CodeAnalysis.RefKind},Microsoft.CodeAnalysis.ArrayBuilder{Microsoft.CodeAnalysis.CSharp.BoundAssignmentOperator})">
             <summary>
-            Process tempStores and add them as sideeffects to arguments where needed. The return
+            Process tempStores and add them as side-effects to arguments where needed. The return
             value tells how many temps are actually needed. For unnecessary temps the corresponding
             temp store will be cleared.
             </summary>
@@ -24108,6 +24113,13 @@
             <returns>
             true if ToString may be used; false if using ToString could lead to observable differences in behavior.
             </returns>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.CSharp.LocalRewriter.HasSideEffects(Microsoft.CodeAnalysis.CSharp.BoundStatement)">
+            <summary>
+            Is there any code to execute in the given statement that could have side-effects,
+            such as throwing an exception? This implementation is conserviative, in the sense
+            that it may return true when the statement actually may have no side effects.
+            </summary>
         </member>
         <member name="M:Microsoft.CodeAnalysis.CSharp.LocalRewriter.VisitUnaryOperator(Microsoft.CodeAnalysis.CSharp.BoundUnaryOperator)">
             <summary>
@@ -26060,6 +26072,9 @@
         <member name="P:Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax.AttributeListSyntax.OpenBracketToken">
             <summary>Gets the open bracket token.</summary>
         </member>
+        <member name="P:Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax.AttributeListSyntax.Target">
+            <summary>Gets the optional construct targeted by the attribute.</summary>
+        </member>
         <member name="P:Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax.AttributeListSyntax.Attributes">
             <summary>Gets the attribute declaration list.</summary>
         </member>
@@ -27608,6 +27623,9 @@
         <member name="P:Microsoft.CodeAnalysis.CSharp.Syntax.AttributeListSyntax.OpenBracketToken">
             <summary>Gets the open bracket token.</summary>
         </member>
+        <member name="P:Microsoft.CodeAnalysis.CSharp.Syntax.AttributeListSyntax.Target">
+            <summary>Gets the optional construct targeted by the attribute.</summary>
+        </member>
         <member name="P:Microsoft.CodeAnalysis.CSharp.Syntax.AttributeListSyntax.Attributes">
             <summary>Gets the attribute declaration list.</summary>
         </member>
@@ -28088,18 +28106,6 @@
             characters will have been dropped from the search string).
             See DevDiv #14432 for more.
             </summary>
-        </member>
-        <member name="M:Microsoft.CodeAnalysis.CSharp.SyntaxFacts.IsFormattingChar(System.Char)">
-            <summary>
-            Returns true if the Unicode character is a formatting character (Unicode class Cf).
-            </summary>
-            <param name="ch">The Unicode character.</param>
-        </member>
-        <member name="M:Microsoft.CodeAnalysis.CSharp.SyntaxFacts.IsFormattingChar(System.Globalization.UnicodeCategory)">
-            <summary>
-            Returns true if the Unicode character is a formatting character (Unicode class Cf).
-            </summary>
-            <param name="cat">The Unicode character.</param>
         </member>
         <member name="P:Microsoft.CodeAnalysis.CSharp.SyntaxFacts.EqualityComparer">
             <summary>
@@ -30293,7 +30299,7 @@
             </summary>
             <param name="leading">A list of trivia immediately preceding the token.</param>
             <param name="kind">A syntax kind value for a token. These have the suffix Token or Keyword.</param>
-            <param name="text">The text from which this this token was created (e.g. lexed).</param>
+            <param name="text">The text from which this token was created (e.g. lexed).</param>
             <param name="valueText">How C# should interpret the text of this token.</param>
             <param name="trailing">A list of trivia immediately following the token.</param>
         </member>
@@ -30904,7 +30910,7 @@
             <param name="newNode">The new node.</param>
             <param name="ignoreChildNode">
             If specified called for every child syntax node (not token) that is visited during the comparison. 
-            It it returns true the child is recursively visited, otherwise the child and its subtree is disregarded.
+            If it returns true the child is recursively visited, otherwise the child and its subtree is disregarded.
             </param>
         </member>
         <member name="M:Microsoft.CodeAnalysis.CSharp.SyntaxFactory.AreEquivalent(Microsoft.CodeAnalysis.SyntaxToken,Microsoft.CodeAnalysis.SyntaxToken)">
@@ -30941,7 +30947,7 @@
             <param name="newList">The new list.</param>
             <param name="ignoreChildNode">
             If specified called for every child syntax node (not token) that is visited during the comparison. 
-            It it returns true the child is recursively visited, otherwise the child and its subtree is disregarded.
+            If it returns true the child is recursively visited, otherwise the child and its subtree is disregarded.
             </param>
         </member>
         <member name="M:Microsoft.CodeAnalysis.CSharp.SyntaxFactory.AreEquivalent``1(Microsoft.CodeAnalysis.SeparatedSyntaxList{``0},Microsoft.CodeAnalysis.SeparatedSyntaxList{``0},System.Boolean)">
@@ -30964,7 +30970,7 @@
             <param name="newList">The new list.</param>
             <param name="ignoreChildNode">
             If specified called for every child syntax node (not token) that is visited during the comparison. 
-            It it returns true the child is recursively visited, otherwise the child and its subtree is disregarded.
+            If it returns true the child is recursively visited, otherwise the child and its subtree is disregarded.
             </param>
         </member>
         <member name="M:Microsoft.CodeAnalysis.CSharp.SyntaxFactory.GetStandaloneExpression(Microsoft.CodeAnalysis.CSharp.Syntax.ExpressionSyntax)">

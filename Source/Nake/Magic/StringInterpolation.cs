@@ -24,7 +24,7 @@ namespace Nake.Magic
         );
 
         static readonly Regex environmentVariablePattern = new Regex(
-            @"(?<!\$)\$(?<variable>[^\${\r\n]+)\$(?!\$)",
+            @"(?<!\%)\%(?<variable>[^\%{\r\n]+)\%(?!\%)",
             RegexOptions.Compiled | RegexOptions.Singleline
         );
 
@@ -141,7 +141,7 @@ namespace Nake.Magic
 
         string Unescape(string token)
         {
-            var result = token.Replace("$$", "$");
+            var result = token.Replace("%%", "%");
 
             return !constant 
                     ? result.Replace("{{", "{").Replace("}}", "}") 

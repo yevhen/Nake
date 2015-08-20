@@ -4,327 +4,6 @@
         <name>System.Reflection.Metadata</name>
     </assembly>
     <members>
-        <member name="T:System.Reflection.Metadata.MetadataResources">
-            <summary>
-              A strongly-typed resource class, for looking up localized strings, etc.
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.ResourceManager">
-            <summary>
-              Returns the cached ResourceManager instance used by this class.
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.Culture">
-            <summary>
-              Overrides the current thread's CurrentUICulture property for all
-              resource lookups using this strongly typed resource class.
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.AssemblyTableInvalidNumberOfRows">
-            <summary>
-              Looks up a localized string similar to Invalid number of rows of Assembly table: {0}..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.CantGetOffsetForVirtualHeapHandle">
-            <summary>
-              Looks up a localized string similar to Can&apos;t get a heap offset for a virtual heap handle.
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.EnCMapNotSorted">
-            <summary>
-              Looks up a localized string similar to EnCMap table not sorted or has missing records..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.HandleBelongsToFutureGeneration">
-            <summary>
-              Looks up a localized string similar to Handle belongs to a future generation.
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.IllegalTablesInCompressedMetadataStream">
-            <summary>
-              Looks up a localized string similar to Illegal tables in compressed metadata stream..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.ImageTooSmall">
-            <summary>
-              Looks up a localized string similar to Image is too small..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.ImageTooSmallOrContainsInvalidOffsetOrCount">
-            <summary>
-              Looks up a localized string similar to Image is either too small or contains an invalid byte offset or count..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.InvalidCodedIndex">
-            <summary>
-              Looks up a localized string similar to Invalid coded index..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.InvalidCompressedInteger">
-            <summary>
-              Looks up a localized string similar to Invalid compressed integer..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.InvalidCorHeaderSize">
-            <summary>
-              Looks up a localized string similar to Invalid COR header size..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.InvalidHandle">
-            <summary>
-              Looks up a localized string similar to Invalid handle..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.InvalidLocalSignatureToken">
-            <summary>
-              Looks up a localized string similar to Invalid local signature token: 0x{0:X8}.
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.InvalidMetadataSectionSpan">
-            <summary>
-              Looks up a localized string similar to Invalid metadata section span..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.InvalidMetadataStreamFormat">
-            <summary>
-              Looks up a localized string similar to Invalid Metadata stream format..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.InvalidMethodHeader1">
-            <summary>
-              Looks up a localized string similar to Invalid method header: 0x{0:X2}.
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.InvalidMethodHeader2">
-            <summary>
-              Looks up a localized string similar to Invalid method header: 0x{0:X2} 0x{1:X2}.
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.InvalidMethodRva">
-            <summary>
-              Looks up a localized string similar to Invalid relative virtual address (RVA): 0x{0:X8}.
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.InvalidNumberOfSections">
-            <summary>
-              Looks up a localized string similar to Invalid number of sections in declared in PE header..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.InvalidPESignature">
-            <summary>
-              Looks up a localized string similar to Invalid PE signature..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.InvalidRowCount">
-            <summary>
-              Looks up a localized string similar to Invalid row count: {0}.
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.InvalidSectionName">
-            <summary>
-              Looks up a localized string similar to Invalid section name.
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.InvalidSehHeader">
-            <summary>
-              Looks up a localized string similar to Invalid SEH header: 0x{0:X2}.
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.InvalidSerializedString">
-            <summary>
-              Looks up a localized string similar to Invalid serialized string..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.InvalidSignature">
-            <summary>
-              Looks up a localized string similar to Invalid signature..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.InvalidToken">
-            <summary>
-              Looks up a localized string similar to Invalid token..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.InvalidTypeSize">
-            <summary>
-              Looks up a localized string similar to Invalid type size..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.LitteEndianArchitectureRequired">
-            <summary>
-              Looks up a localized string similar to Little-endian architecture required..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.MetadataHeaderTooSmall">
-            <summary>
-              Looks up a localized string similar to Metadata header too small..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.MetadataImageDoesNotRepresentAnAssembly">
-            <summary>
-              Looks up a localized string similar to Metadata image doesn&apos;t represent an assembly..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.MetadataSignature">
-            <summary>
-              Looks up a localized string similar to Invalid COR20 header signature..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.MetadataStringDecoderEncodingMustBeUtf8">
-            <summary>
-              Looks up a localized string similar to The MetadataStringDecoder instance used to instantiate the Metadata reader must have a UTF8 encoding..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.MetadataTableHeaderTooSmall">
-            <summary>
-              Looks up a localized string similar to Metadata table header too small..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.MetadataTableNotSorted">
-            <summary>
-              Looks up a localized string similar to Metadata table 0x{0:x2} not sorted..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.MetadataTablesTooSmall">
-            <summary>
-              Looks up a localized string similar to Metadata tables too small..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.MissingDataDirectory">
-            <summary>
-              Looks up a localized string similar to Missing data directory..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.ModuleTableInvalidNumberOfRows">
-            <summary>
-              Looks up a localized string similar to Invalid number of rows of Module table: {0}..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.NegativeByteCountOrOffset">
-            <summary>
-              Looks up a localized string similar to Negative byte count or offset..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.NotEnoughSpaceForBlobStream">
-            <summary>
-              Looks up a localized string similar to Not enough space for Blob stream..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.NotEnoughSpaceForGUIDStream">
-            <summary>
-              Looks up a localized string similar to Not enough space for GUID stream..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.NotEnoughSpaceForMetadataStream">
-            <summary>
-              Looks up a localized string similar to Not enough space for Metadata stream..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.NotEnoughSpaceForStreamHeaderName">
-            <summary>
-              Looks up a localized string similar to Not enough space for stream header name..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.NotEnoughSpaceForStringStream">
-            <summary>
-              Looks up a localized string similar to Not enough space for String stream..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.NotEnoughSpaceForVersionString">
-            <summary>
-              Looks up a localized string similar to Not enough space for version string..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.NotMetadataHeapHandle">
-            <summary>
-              Looks up a localized string similar to Specified handle is not a valid metadata heap handle..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.NotMetadataTableHandle">
-            <summary>
-              Looks up a localized string similar to Specified handle is not a valid metadata table handle..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.NotMetadataTableOrUserStringHandle">
-            <summary>
-              Looks up a localized string similar to Specified handle is not a valid metadata table or UserString heap handle..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.OutOfBoundsRead">
-            <summary>
-              Looks up a localized string similar to Read out of bounds..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.PEImageDoesNotHaveMetadata">
-            <summary>
-              Looks up a localized string similar to PE image does not have metadata..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.PEImageNotAvailable">
-            <summary>
-              Looks up a localized string similar to PE image not available..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.RowIdOrHeapOffsetTooLarge">
-            <summary>
-              Looks up a localized string similar to Row ID or heap offset is too large..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.SectionTooSmall">
-            <summary>
-              Looks up a localized string similar to Section too small..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.StreamHeaderTooSmall">
-            <summary>
-              Looks up a localized string similar to Stream header too small..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.StreamMustSupportReadAndSeek">
-            <summary>
-              Looks up a localized string similar to Stream must support read and seek operations..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.StreamTooLarge">
-            <summary>
-              Looks up a localized string similar to Stream length minus starting position is too large to hold a PEImage..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.TableRowCountSpaceTooSmall">
-            <summary>
-              Looks up a localized string similar to Table row count space to small..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.UnableToReadMetadataFile">
-            <summary>
-              Looks up a localized string similar to Unable to read metadata file..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.UnexpectedStreamEnd">
-            <summary>
-              Looks up a localized string similar to Unexpected stream end..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.UnknownFileFormat">
-            <summary>
-              Looks up a localized string similar to Unknown file format..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.UnknownPEMagicValue">
-            <summary>
-              Looks up a localized string similar to Unknown PE Magic value..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.UnknownTables">
-            <summary>
-              Looks up a localized string similar to Unknown tables: 0x{0:x16}..
-            </summary>
-        </member>
-        <member name="P:System.Reflection.Metadata.MetadataResources.WinMDMissingMscorlibRef">
-            <summary>
-              Looks up a localized string similar to Missing mscorlib reference in AssemblyRef table..
-            </summary>
-        </member>
         <member name="T:System.Reflection.Internal.AbstractMemoryBlock">
             <summary>
             Represents a disposable blob of memory accessed via unsafe pointer.
@@ -555,6 +234,19 @@
             <param name="numberOfBytesRead">The number of bytes read, which includes the terminator if we did not hit the end of the block.</param>
             <returns>Length (byte count) not including terminator.</returns>
         </member>
+        <member name="M:System.Reflection.Internal.MemoryBlock.BinarySearchForSlot(System.Int32,System.Int32,System.Int32,System.UInt32,System.Boolean)">
+            <summary>
+            In a table that specifies children via a list field (e.g. TypeDef.FieldList, TypeDef.MethodList), 
+            seaches for the parent given a reference to a child.
+            </summary>
+            <returns>Returns row number [0..RowCount).</returns>
+        </member>
+        <member name="M:System.Reflection.Internal.MemoryBlock.BinarySearchReference(System.Int32,System.Int32,System.Int32,System.UInt32,System.Boolean)">
+            <summary>
+            In a table ordered by a column containing entity references seaches for a row with the specified reference.
+            </summary>
+            <returns>Returns row number [0..RowCount) or -1 if not found.</returns>
+        </member>
         <member name="M:System.Reflection.Internal.MemoryBlock.BinarySearchReferenceRange(System.Int32,System.Int32,System.Int32,System.UInt32,System.Boolean,System.Int32@,System.Int32@)">
             <summary>
             Calculates a range of rows that have specified value in the specified column in a table that is sorted by that column.
@@ -563,6 +255,16 @@
         <member name="M:System.Reflection.Internal.MemoryBlock.BinarySearchReferenceRange(System.Int32[],System.Int32,System.Int32,System.UInt32,System.Boolean,System.Int32@,System.Int32@)">
             <summary>
             Calculates a range of rows that have specified value in the specified column in a table that is sorted by that column.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.Internal.PooledStringBuilder">
+            <summary>
+            The usage is:
+                   var inst = PooledStringBuilder.GetInstance();
+                   var sb = inst.builder;
+                   ... Do Stuff...
+                   ... sb.ToString() ...
+                   inst.Free();
             </summary>
         </member>
         <member name="T:System.Reflection.Internal.ObjectPool`1">
@@ -634,8 +336,19 @@
             Corresponds to HashValue field of File table in ECMA-335 Standard.
             </remarks>
         </member>
-        <member name="F:System.Reflection.Metadata.BlobReader._nullCharArray">
+        <member name="F:System.Reflection.Metadata.BlobReader.s_nullCharArray">
             <summary>An array containing the '\0' character.</summary>
+        </member>
+        <member name="M:System.Reflection.Metadata.BlobReader.ReadDecimal">
+            <summary>
+            Reads <see cref="T:System.Decimal"/> number.
+            </summary>
+            <remarks>
+            Decimal number is encoded in 13 bytes as follows:
+            - byte 0: highest bit indicates sign (1 for negative, 0 for non-negative); the remaining 7 bits encode scale
+            - bytes 1..12: 96-bit unsigned integer in little endian encoding.
+            </remarks>
+            <exception cref="T:System.BadImageFormatException">The data at the current position was not a valid <see cref="T:System.Decimal"/> number.</exception>
         </member>
         <member name="M:System.Reflection.Metadata.BlobReader.ReadUTF8(System.Int32)">
             <summary>
@@ -684,6 +397,7 @@
             </summary>
             <param name="value">The value of the compressed integer that was read.</param>
             <returns>true if the value was read successfully. false if the data at the current position was not a valid compressed integer.</returns>
+            <exception cref="T:System.BadImageFormatException">The data at the current position was not a valid compressed integer.</exception>
         </member>
         <member name="M:System.Reflection.Metadata.BlobReader.ReadCompressedSignedInteger">
             <summary>
@@ -719,6 +433,25 @@
             Reads a type handle encoded in a signature as TypeDefOrRefOrSpecEncoded (see ECMA-335 II.23.2.8).
             </summary>
             <returns>The handle or nil if the encoding is invalid.</returns>
+        </member>
+        <member name="M:System.Reflection.Metadata.BlobReader.ReadBlobHandle">
+            <summary>
+            Reads a #Blob heap handle encoded as a compressed integer.
+            </summary>
+            <remarks>
+            Blobs that contain references to other blobs are used in Portable PDB format, for example <see cref="P:System.Reflection.Metadata.Document.Name"/>.
+            </remarks>
+        </member>
+        <member name="M:System.Reflection.Metadata.BlobReader.ReadConstant(System.Reflection.Metadata.ConstantTypeCode)">
+            <summary>
+            Reads a constant value (see ECMA-335 Partition II section 22.9) from the current position.
+            </summary>
+            <exception cref="T:System.BadImageFormatException">Error while reading from the blob.</exception>
+            <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="typeCode"/> is not a valid <see cref="T:System.Reflection.Metadata.ConstantTypeCode"/>.</exception>
+            <returns>
+            Boxed constant value. To avoid allocating the object use Read* methods directly.
+            Constants of type <see cref="F:System.Reflection.Metadata.ConstantTypeCode.String"/> are encoded as UTF16 strings, use <see cref="M:System.Reflection.Metadata.BlobReader.ReadUTF16(System.Int32)"/> to read them.
+            </returns>
         </member>
         <member name="P:System.Reflection.Metadata.Constant.TypeCode">
             <summary>
@@ -767,6 +500,136 @@
             <remarks>
             Corresponds to Value field of CustomAttribute table in ECMA-335 Standard.
             </remarks>
+        </member>
+        <member name="T:System.Reflection.Metadata.Decoding.CustomAttributeDecoder">
+            <summary>
+            Decodes custom attribute blobs.
+            </summary>
+        </member>
+        <member name="M:System.Reflection.Metadata.Decoding.ICustomAttributeTypeProvider`1.GetSystemType">
+            <summary>
+            Gets the TType representation for <see cref="T:System.Type"/>.
+            </summary>
+        </member>
+        <member name="M:System.Reflection.Metadata.Decoding.ICustomAttributeTypeProvider`1.IsSystemType(`0)">
+            <summary>
+            Returns true if the given type represents <see cref="T:System.Type"/>.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.Metadata.Decoding.SignatureDecoder">
+            <summary>
+            Decodes signature blobs.
+            </summary>
+        </member>
+        <member name="M:System.Reflection.Metadata.Decoding.SignatureDecoder.DecodeType``1(System.Reflection.Metadata.Handle,System.Reflection.Metadata.Decoding.ISignatureTypeProvider{``0},System.Nullable{System.Boolean})">
+            <summary>
+            Decodes a type definition, reference or specification to its representation as TType.
+            </summary>
+            <param name="handle">A type definition, reference, or specification handle.</param>
+            <param name="provider">The type provider.</param>
+            <param name="isValueType">Is the type a class or a value type. Null signifies that the current type signature does not have the prefix</param>
+            <exception cref="T:System.BadImageFormatException">The handle does not represent a valid type reference, definition, or specification.</exception>
+        </member>
+        <member name="M:System.Reflection.Metadata.Decoding.SignatureDecoder.DecodeTypeSpecification``1(System.Reflection.Metadata.TypeSpecificationHandle,System.Reflection.Metadata.Decoding.ISignatureTypeProvider{``0})">
+            <summary>
+            Decodes a type specification.
+            </summary>
+            <param name="handle">The type specification handle.</param>
+            <param name="provider">The type provider.</param>
+            <returns>The decoded type.</returns>
+            <exception cref="T:System.BadImageFormatException">The type specification has an invalid signature.</exception>
+        </member>
+        <member name="M:System.Reflection.Metadata.Decoding.SignatureDecoder.DecodeType``1(System.Reflection.Metadata.BlobReader@,System.Reflection.Metadata.Decoding.ISignatureTypeProvider{``0})">
+            <summary>
+            Decodes a type from within a signature from a BlobReader positioned at its leading SignatureTypeCode.
+            </summary>
+            <param name="blobReader">The blob reader.</param>
+            <param name="provider">The type provider.</param>
+            <returns>The decoded type.</returns>
+            <exception cref="T:System.BadImageFormatException">The reader was not positioned at a valid signature type.</exception>
+        </member>
+        <member name="M:System.Reflection.Metadata.Decoding.SignatureDecoder.DecodeType``1(System.Reflection.Metadata.BlobReader@,System.Int32,System.Reflection.Metadata.Decoding.ISignatureTypeProvider{``0})">
+            <summary>
+            Decodes a type from within a signature from a BlobReader positioned immediately past the given SignatureTypeCode.
+            </summary>
+            <param name="blobReader">The blob reader.</param>
+            <param name="typeCode">The SignatureTypeCode that immediately preceded the reader's current position.</param>
+            <param name="provider">The type provider.</param>
+            <returns>The decoded type.</returns>
+            <exception cref="T:System.BadImageFormatException">The reader was not positioned at a valud signature type.</exception>
+        </member>
+        <member name="M:System.Reflection.Metadata.Decoding.SignatureDecoder.DecodeMethodSignature``1(System.Reflection.Metadata.BlobHandle,System.Reflection.Metadata.Decoding.ISignatureTypeProvider{``0})">
+            <summary>
+            Decodes a method signature blob.
+            </summary>
+            <param name="handle">Handle to the method signature.</param>
+            <returns>The decoded method signature.</returns>
+            <param name="provider">The type provider.</param>
+            <exception cref="T:System.BadImageFormatException">The method signature is invalid.</exception>
+        </member>
+        <member name="M:System.Reflection.Metadata.Decoding.SignatureDecoder.DecodeMethodSignature``1(System.Reflection.Metadata.BlobReader@,System.Reflection.Metadata.Decoding.ISignatureTypeProvider{``0})">
+            <summary>
+            Decodes a method signature blob.
+            </summary>
+            <param name="blobReader">BlobReader positioned at a method signature.</param>
+            <param name="provider">The type provider.</param>
+            <returns>The decoded method signature.</returns>
+            <exception cref="T:System.BadImageFormatException">The method signature is invalid.</exception>
+        </member>
+        <member name="M:System.Reflection.Metadata.Decoding.SignatureDecoder.DecodeMethodSpecificationSignature``1(System.Reflection.Metadata.BlobHandle,System.Reflection.Metadata.Decoding.ISignatureTypeProvider{``0})">
+            <summary>
+            Decodes a method specification signature blob.
+            </summary>
+            <param name="handle">The handle to the method specification signature blob. See <see cref="P:System.Reflection.Metadata.MethodSpecification.Signature"/>.</param>
+            <param name="provider">The type provider.</param>
+            <returns>The types used to instantiate a generic method via a method specification.</returns>
+            <exception cref="T:System.BadImageFormatException">The method specification signature is invalid.</exception>
+        </member>
+        <member name="M:System.Reflection.Metadata.Decoding.SignatureDecoder.DecodeMethodSpecificationSignature``1(System.Reflection.Metadata.BlobReader@,System.Reflection.Metadata.Decoding.ISignatureTypeProvider{``0})">
+            <summary>
+            Decodes a method specification signature blob.
+            </summary>
+            <param name="blobReader">A BlobReader positioned at a valid method specification signature.</param>
+            <param name="provider">The type provider.</param>
+            <returns>The types used to instantiate a generic method via the method specification.</returns>
+        </member>
+        <member name="M:System.Reflection.Metadata.Decoding.SignatureDecoder.DecodeLocalSignature``1(System.Reflection.Metadata.StandaloneSignatureHandle,System.Reflection.Metadata.Decoding.ISignatureTypeProvider{``0})">
+            <summary>
+            Decodes a local variable signature blob.
+            </summary>
+            <param name="handle">The local variable signature handle.</param>
+            <param name="provider">The type provider.</param>
+            <returns>The local variable types.</returns>
+            <exception cref="T:System.BadImageFormatException">The local variable signature is invalid.</exception>
+        </member>
+        <member name="M:System.Reflection.Metadata.Decoding.SignatureDecoder.DecodeLocalSignature``1(System.Reflection.Metadata.BlobReader@,System.Reflection.Metadata.Decoding.ISignatureTypeProvider{``0})">
+            <summary>
+            Decodes a local variable signature blob and advances the reader past the signature.
+            </summary>
+            <param name="blobReader">The blob reader.</param>
+            <param name="provider">The type provider.</param>
+            <returns>The local variable types.</returns>
+            <exception cref="T:System.BadImageFormatException">The local variable signature is invalid.</exception>
+        </member>
+        <member name="M:System.Reflection.Metadata.Decoding.SignatureDecoder.DecodeFieldSignature``1(System.Reflection.Metadata.BlobHandle,System.Reflection.Metadata.Decoding.ISignatureTypeProvider{``0})">
+            <summary>
+            Decodes a field signature.
+            </summary>
+            <param name="handle">The field signature handle.</param>
+            <param name="provider">The type provider.</param>
+            <returns>The decoded field type.</returns>
+            <exception cref="T:System.BadImageFormatException">The field signature is invalid.</exception>
+        </member>
+        <member name="M:System.Reflection.Metadata.Decoding.SignatureDecoder.DecodeFieldSignature``1(System.Reflection.Metadata.BlobReader@,System.Reflection.Metadata.Decoding.ISignatureTypeProvider{``0})">
+            <summary>
+            Decodes a field signature.
+            </summary>
+            <returns>The decoded field type.</returns>
+        </member>
+        <member name="T:System.Reflection.Metadata.PrimitiveTypeCode">
+            <summary>
+            Represents a primitive type found in metadata signatures.
+            </summary>
         </member>
         <member name="T:System.Reflection.Metadata.Ecma335.ExportedTypeExtensions">
             <summary>
@@ -1315,7 +1178,7 @@
         <member name="M:System.Reflection.Metadata.Ecma335.NamespaceCache.LinkChildToParentNamespace(System.Collections.Generic.Dictionary{System.String,System.Reflection.Metadata.Ecma335.NamespaceCache.NamespaceDataBuilder},System.Reflection.Metadata.Ecma335.NamespaceCache.NamespaceDataBuilder,System.Collections.Generic.List{System.Reflection.Metadata.Ecma335.NamespaceCache.NamespaceDataBuilder}@)">
             <summary>
             Links a child to its parent namespace. If the parent namespace doesn't exist, this will create a
-            synthetic one. This will automatically link any synthetic namespaces it creates up to its parents.
+            virtual one. This will automatically link any virtual namespaces it creates up to its parents.
             </summary>
         </member>
         <member name="M:System.Reflection.Metadata.Ecma335.NamespaceCache.ResolveParentChildRelationships(System.Collections.Generic.Dictionary{System.String,System.Reflection.Metadata.Ecma335.NamespaceCache.NamespaceDataBuilder},System.Collections.Generic.List{System.Reflection.Metadata.Ecma335.NamespaceCache.NamespaceDataBuilder}@)">
@@ -1323,7 +1186,7 @@
             This will link all parents/children in the given namespaces dictionary up to each other.
             
             In some cases, we need to synthesize namespaces that do not have any type definitions or forwarders
-            of their own, but do have child namespaces. These are returned via the syntheticNamespaces out
+            of their own, but do have child namespaces. These are returned via the virtualNamespaces out
             parameter.
             </summary>
         </member>
@@ -1508,7 +1371,7 @@
             with the original full metadata heaps.
             </remarks>
         </member>
-        <member name="M:System.Reflection.Metadata.MetadataReader.ReadMetadataHeader(System.Reflection.Metadata.BlobReader@)">
+        <member name="M:System.Reflection.Metadata.MetadataReader.ReadMetadataHeader(System.Reflection.Metadata.BlobReader@,System.String@)">
             <summary>
             Looks like this function reads beginning of the header described in
             Ecma-335 24.2.1 Metadata root
@@ -1558,6 +1421,11 @@
             Returns the type definition or reference handle of the attribute type.
             </summary>
             <returns><see cref="T:System.Reflection.Metadata.TypeDefinitionHandle"/> or <see cref="T:System.Reflection.Metadata.TypeReferenceHandle"/> or nil token if the metadata is invalid and the type can't be determined.</returns>
+        </member>
+        <member name="P:System.Reflection.Metadata.MetadataReader.DebugMetadataHeader">
+            <summary>
+            Information decoded from #Pdb stream, or null if the stream is not present.
+            </summary>
         </member>
         <member name="F:System.Reflection.Metadata.MetadataReaderOptions.None">
             <summary>
@@ -1708,6 +1576,44 @@
         <member name="P:System.Reflection.Metadata.NamespaceDefinition.ExportedTypes">
             <summary>
             Gets all exported types that reside directly in a namespace.
+            </summary>
+        </member>
+        <member name="P:System.Reflection.Metadata.Document.Name">
+            <summary>
+            Returns Document Name Blob.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.Metadata.DocumentNameBlobHandle">
+            <summary>
+            <see cref="T:System.Reflection.Metadata.BlobHandle"/> representing a blob on #Blob heap in Portable PDB 
+            structured as Document Name. 
+            </summary>
+            <remarks>
+            The kind of the handle is <see cref="F:System.Reflection.Metadata.HandleKind.Blob"/>. 
+            The handle is a specialization of <see cref="T:System.Reflection.Metadata.BlobHandle"/> and doesn't have a distinct kind. 
+            </remarks>
+        </member>
+        <member name="M:System.Reflection.Metadata.ImportsBlobReader.MoveNext">
+            <exception cref="T:System.BadImageFormatException">Invalid blob format.</exception>
+        </member>
+        <member name="P:System.Reflection.Metadata.LocalConstant.Signature">
+            <summary>
+            The constant signature.
+            </summary>
+        </member>
+        <member name="M:System.Reflection.Metadata.MethodBody.GetStateMachineKickoffMethod">
+            <summary>
+            If the method is a MoveNext method of a state machine returns the kickoff method of the state machine, otherwise returns nil handle.
+            </summary>
+        </member>
+        <member name="P:System.Reflection.Metadata.MethodBody.SequencePoints">
+            <summary>
+            Returns a blob encoding sequence points.
+            </summary>
+        </member>
+        <member name="P:System.Reflection.Metadata.MethodBody.LocalSignature">
+            <summary>
+            Returns local signature handle.
             </summary>
         </member>
         <member name="M:System.Reflection.Metadata.PEReaderExtensions.GetMethodBody(System.Reflection.PortableExecutable.PEReader,System.Int32)">
@@ -2339,6 +2245,16 @@
              Only methods that are needed to read PE headers are implemented.
              </summary>
         </member>
+        <member name="M:System.Reflection.PortableExecutable.PEBinaryReader.ReadNullPaddedUTF8(System.Int32)">
+            <summary>
+            Reads a fixed-length byte block as a null-padded UTF8-encoded string.
+            The padding is not included in the returned string.
+            
+            Note that it is legal for UTF8 strings to contain NUL; if NUL occurs
+            between non-NUL codepoints, it is not considered to be padding and
+            is included in the result.
+            </summary>
+        </member>
         <member name="M:System.Reflection.PortableExecutable.PEBinaryReader.GetAndValidateSize(System.IO.Stream,System.Nullable{System.Int32})">
             <summary>
             Resolve image size as either the given user-specified size or distance from current position to end-of-stream.
@@ -2798,7 +2714,7 @@
         </member>
         <member name="P:System.Reflection.PortableExecutable.SectionHeader.Name">
             <summary>
-            An 8-byte, null-padded UTF-8 encoded string. If the string is exactly 8 characters long, there is no terminating null. 
+            The name of the section.
             </summary>
         </member>
         <member name="P:System.Reflection.PortableExecutable.SectionHeader.VirtualSize">

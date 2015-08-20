@@ -1,5 +1,4 @@
-﻿using Nake;
-using Nake.Log;
+﻿using static Nake.Log;
 
 /// Compile the application code
 [Step] void Default()

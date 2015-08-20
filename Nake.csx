@@ -1,22 +1,21 @@
 ﻿#r "System.Xml"
 #r "System.Xml.Linq"
 
-using Nake;
-using Nake.FS;
-using Nake.Log;
-using Nake.Env;
-using Nake.Run;
-
 using System.IO;
 using System.Net;
 using System.Linq;
 using System.Xml.Linq;
 using System.Diagnostics;
 
-const string RootPath = "$NakeScriptDirectory$";
+using static Nake.FS;
+using static Nake.Log;
+using static Nake.Env;
+using static Nake.Run;
+
+const string RootPath = "%NakeScriptDirectory%";
 const string OutputPath = RootPath + @"\Output";
 
-var MSBuildExe = @"$ProgramFiles(x86)$\MSBuild\14.0\Bin\MSBuild.exe";
+var MSBuildExe = @"%ProgramFiles(x86)%\MSBuild\14.0\Bin\MSBuild.exe";
 var AppVeyor = Var["APPVEYOR"] == "True";
 
 /// Builds sources in debug mode 
@@ -36,7 +35,7 @@ var AppVeyor = Var["APPVEYOR"] == "True";
 /// Builds sources using specified configuration and output path
 [Step] void Build(string config = "Debug", string outDir = OutputPath)
 {
-    Restore();
+    Info(MSBuildExe);
     Exec(MSBuildExe, 
         "Nake.sln /p:Configuration={config};OutDir={outDir};ReferencePath={outDir} /m");
 }
@@ -53,7 +52,7 @@ var AppVeyor = Var["APPVEYOR"] == "True";
     	@"/xml:{results} /framework:net-4.0 /noshadow /nologo {tests}");
 
     if (AppVeyor)
-    	new WebClient().UploadFile("https://ci.appveyor.com/api/testresults/nunit/$APPVEYOR_JOB_ID$", results);
+    	new WebClient().UploadFile("https://ci.appveyor.com/api/testresults/nunit/%APPVEYOR_JOB_ID%", results);
 }
 
 /// Builds official NuGet package 

@@ -14,7 +14,7 @@ namespace Nake
                     
                 [Task] public static void Interpolate()
                 {
-                    Env.Var[""DoubledDollarSign""] = ""$$whatever$$"";
+                    Env.Var[""DoubledDollarSign""] = ""%%whatever%%"";
                     Env.Var[""DoubledCurlyBraces""] = ""{{whatever}}"";
                 }
                     
@@ -22,7 +22,7 @@ namespace Nake
 
             Invoke("Interpolate");
 
-            Assert.That(Env.Var["DoubledDollarSign"], Is.EqualTo("$whatever$"));
+            Assert.That(Env.Var["DoubledDollarSign"], Is.EqualTo("%whatever%"));
             Assert.That(Env.Var["DoubledCurlyBraces"], Is.EqualTo("{whatever}"));
         }
 
@@ -33,8 +33,8 @@ namespace Nake
                     
                 [Task] public static void Interpolate()
                 {
-                    Env.Var[""StartsFromDoubledDollarSign""] = ""$$1"";
-                    Env.Var[""EndsWithDoubledDollarSign""] = ""1$$"";
+                    Env.Var[""StartsFromDoubledDollarSign""] = ""%%1"";
+                    Env.Var[""EndsWithDoubledDollarSign""] = ""1%%"";
                     Env.Var[""StartsFromDoubledCurlyBrace""] = ""{{1"";
                     Env.Var[""EndsWithDoubledCurlyBrace""] = ""1}}"";
                 }
@@ -43,8 +43,8 @@ namespace Nake
 
             Invoke("Interpolate");
 
-            Assert.That(Env.Var["StartsFromDoubledDollarSign"], Is.EqualTo("$1"));
-            Assert.That(Env.Var["EndsWithDoubledDollarSign"], Is.EqualTo("1$"));
+            Assert.That(Env.Var["StartsFromDoubledDollarSign"], Is.EqualTo("%1"));
+            Assert.That(Env.Var["EndsWithDoubledDollarSign"], Is.EqualTo("1%"));
             Assert.That(Env.Var["StartsFromDoubledCurlyBrace"], Is.EqualTo("{1"));
             Assert.That(Env.Var["EndsWithDoubledCurlyBrace"], Is.EqualTo("1}"));
         }
@@ -165,17 +165,17 @@ namespace Nake
 
             Build(@"
 
-                const string fieldConst = ""$var$"";
+                const string fieldConst = ""%var%"";
                     
                 [Task] 
-                public static void Interpolate(string optionalParameterDefaultValue = ""$var$"")
+                public static void Interpolate(string optionalParameterDefaultValue = ""%var%"")
                 {
-                    const string localConst = ""$var$"";
+                    const string localConst = ""%var%"";
 
                     Env.Var[""LocalConst""] = localConst;
                     Env.Var[""FieldConst""] = fieldConst;
                     Env.Var[""OptionalParameterDefaultValue""] = optionalParameterDefaultValue;
-                    Env.Var[""AnyLiteral""] = ""$var$"";                    
+                    Env.Var[""AnyLiteral""] = ""%var%"";                    
                 }
                              
             ");
@@ -195,8 +195,8 @@ namespace Nake
 
             Build(@"
 
-                const string RootPath = ""$var$\\Root"";
-                const string RootPathVerbatim = @""$var$\Root"";
+                const string RootPath = ""%var%\\Root"";
+                const string RootPathVerbatim = @""%var%\Root"";
                    
                 [Task] 
                 public static void Interpolate()
@@ -230,8 +230,8 @@ namespace Nake
                 [Task] 
                 public static void Interpolate()
                 {
-                    Env.Var[""Quotes""] = ""\""$var$\"""";
-                    Env.Var[""QuotesVerbatim""] = @""""""$var$"""""";
+                    Env.Var[""Quotes""] = ""\""%var%\"""";
+                    Env.Var[""QuotesVerbatim""] = @""""""%var%"""""";
                 }
                              
             ");
@@ -320,7 +320,7 @@ namespace Nake
                 
                 [Task] public static void Interpolate()
                 {
-                    Env.Var[""Result""] = @""$undefined$"";
+                    Env.Var[""Result""] = @""%undefined%"";
                 }                    
                     
             ");
