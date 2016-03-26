@@ -24,16 +24,16 @@ namespace Nake
         /// <returns> Exit code </returns>
         /// <exception cref="System.ApplicationException">If command fails</exception>
         public static int Cmd(
-            string command, 
-            string[] environmentVariables = null, 
-            string workingDirectory = null, 
+            string command,
+            string[] environmentVariables = null,
+            string workingDirectory = null,
             bool echoOff = true,
-            bool ignoreStdOutErrors = false, 
+            bool ignoreStdOutErrors = false,
             bool ignoreExitCode = false,
             bool disableStdOutLogging = false)
         {
             var task = new Exec
-            {   
+            {
                 Command = command,
                 EchoOff = echoOff,
                 WorkingDirectory = workingDirectory ?? Location.CurrentDirectory(),
@@ -46,7 +46,7 @@ namespace Nake
 
             if (!task.Execute() || task.Log.HasLoggedErrors)
                 throw new ApplicationException(string.Format("{0} failed", task.GetType()));
-            
+
             return task.ExitCode;
         }
 
@@ -59,22 +59,39 @@ namespace Nake
         /// <param name="ignoreExitCode">if set to <c>true</c> ignores exit code</param>
         /// <returns> Exit code </returns>
         public static int Exec(
-            string fileName, 
-            string arguments, 
-            string workingDirectory = null, 
+            string fileName,
+            string arguments,
+            string workingDirectory = null,
             bool ignoreExitCode = false)
         {
             var info = new ProcessStartInfo(fileName, arguments)
             {
                 WorkingDirectory = workingDirectory ?? Location.CurrentDirectory(),
                 UseShellExecute = false,
+                RedirectStandardError = true,
+                RedirectStandardOutput = true,
             };
 
             using (var process = new Process())
             {
                 process.StartInfo = info;
-                
+
+                process.OutputDataReceived += (sender, e) =>
+                {
+                    if (!string.IsNullOrEmpty(e.Data))
+                        Log.Message(e.Data);
+                };
+                process.ErrorDataReceived += (sender, e) =>
+                {
+                    if (!string.IsNullOrEmpty(e.Data))
+                        Log.Error(e.Data);
+                };
+
                 process.Start();
+
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
+
                 process.WaitForExit();
 
                 if (process.ExitCode != 0 && !ignoreExitCode)
@@ -94,7 +111,7 @@ namespace Nake
         /// <returns>The executed task. Allows to get value of any OUT property</returns>
         /// <exception cref="System.ApplicationException">If tasks fails</exception>
         public static TTask Exec<TTask>(
-            TTask task, 
+            TTask task,
             bool ignoreStdOutErrors = true,
             bool disableStdOutLogging = false) where TTask : Task
         {

@@ -13,7 +13,22 @@ namespace Nake
         /// <remarks>
         ///  Could be substituted in order to redirect messages
         /// </remarks>
-        public static Action<string> Out = text => Console.WriteLine(text);
+        public static Action<string> Out = Console.WriteLine;
+
+        /// <summary>
+        /// Enables tracing of all messages sent to <code>Log.Out</code>. 
+        /// </summary>
+        /// <example>
+        /// using (var trace = Log.TraceOut())
+        /// {
+        ///     Run.Cmd("NuGet.exe list");
+        ///     var nugetOutput = trace.Out; // we traced all nuget console output
+        /// }
+        /// </example>
+        public static Tracer TraceOut()
+        {
+            return new Tracer(ref Out);
+        }
 
         static readonly bool QuietMode = Env.Var.Defined("NakeQuietMode");
         static readonly bool SilentMode = Env.Var.Defined("NakeSilentMode");
@@ -107,6 +122,51 @@ namespace Nake
         public static void Error(string message)
         {
             Color.With(ConsoleColor.DarkRed, () => Out(message));
+        }
+    }
+
+    /// <summary>
+    /// Collects all incoming calls for some action
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// <![CDATA[
+    /// Action<string> Log = (log) => Console.WriteLine(log);
+    /// using (var logTrace = new Tracer(someAction))
+    /// {
+    ///     Log("Something important.");
+    ///     var textWrittenToLog = logTrace.Trace;
+    /// }
+    /// ]]>
+    /// </code>
+    /// </example>
+    public class Tracer : IDisposable
+    {
+        public string Trace = string.Empty;
+
+        // ReSharper disable once NotAccessedField.Local
+        Action<string> initialRef;
+        readonly Action<string> initialAction;
+
+        internal Tracer(ref Action<string> initialRef)
+        {
+            this.initialRef = initialRef;
+            initialAction = initialRef;
+            initialRef = (l) =>
+            {
+                Record(l);
+                initialAction(l);
+            };
+        }
+
+        void Record(string log)
+        {
+            Trace += log + Environment.NewLine;
+        }
+
+        public void Dispose()
+        {
+            initialRef = initialAction;
         }
     }
 }
