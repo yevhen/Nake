@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections;
-
+using System.Linq;
 using Microsoft.Build.BuildEngine;
 using Microsoft.Build.Framework;
 
@@ -8,11 +8,11 @@ namespace Nake
 {
     class MSBuildEngineStub : IBuildEngine
     {
-        readonly ConsoleLogger logger;
+        readonly NakeLogger logger;
 
         public MSBuildEngineStub(bool quiet = false)
         {
-            logger = new ConsoleLogger(quiet ? LoggerVerbosity.Quiet : LoggerVerbosity.Normal);
+            logger = new NakeLogger(quiet ? LoggerVerbosity.Quiet : LoggerVerbosity.Normal);
         }
 
         public void LogErrorEvent(BuildErrorEventArgs e)
@@ -58,6 +58,25 @@ namespace Nake
         public string ProjectFileOfTaskNode
         {
             get; set;
+        }
+
+        private class NakeLogger : ConsoleLogger
+        {
+            public NakeLogger(LoggerVerbosity verbosity)
+                : base(verbosity, new WriteHandler(Log.Out), SetColor, Console.ResetColor)
+            {
+
+            }
+
+            private static void SetColor(ConsoleColor color)
+            {
+                var background = Console.BackgroundColor;
+                var alternativeColor = new[] { ConsoleColor.Gray, ConsoleColor.Black }.First(c => background != c);
+
+                Console.ForegroundColor = color != background
+                    ? color
+                    : alternativeColor;
+            }
         }
     }
 }
