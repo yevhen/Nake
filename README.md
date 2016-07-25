@@ -37,8 +37,8 @@ using System.Linq;                  //     (these are imported by default)
 using System.Text;                  //  
 using System.Collections.Generic;   //  
 
-using System.IO.Path;               //    C# V6 "using static members" feature 
-using System.Console;               //      will make you scripts more terse
+using static System.IO.Path;        //    C# V6 "using static members" feature 
+using static System.Console;        //      will make you scripts more terse
 
 WriteLine("Are you ready? Y/N:");   //      any code you put on the script level 
 if (ReadLine() == "N")              //  will run before any of the tasks are executed
