@@ -94,7 +94,7 @@ var AppVeyor = Var["APPVEYOR"] == "True";
 [Step] void Publish()
 {
     var packageFile = @"{PackagePath}\Nake.{Version()}.nupkg";
-    Cmd(@"Tools\Nuget.exe push {packageFile} %NuGetApiKey%");
+    Cmd(@"Tools\Nuget.exe push {packageFile} %NuGetApiKey% -Source https://nuget.org/");
 }
 
 string Version()

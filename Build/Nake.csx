@@ -1,4 +1,4 @@
-using Nake.Log;
+using static Nake.Log;
 
 /// Calls Greeting() task
 [Task] void Default()
