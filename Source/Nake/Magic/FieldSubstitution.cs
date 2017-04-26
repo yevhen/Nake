@@ -55,7 +55,7 @@ namespace Nake.Magic
             var kind = value ? SyntaxKind.TrueLiteralExpression : SyntaxKind.FalseLiteralExpression;
 
             return SyntaxFactory.LiteralExpression(kind)
-                         .WithLeadingTrivia(new[] {SyntaxFactory.Space});            
+                         .WithLeadingTrivia(new[] {SyntaxFactory.Space});
         }
 
         LiteralExpressionSyntax IntegerLiteral()
@@ -67,7 +67,7 @@ namespace Nake.Magic
             return SyntaxFactory.LiteralExpression(
                         SyntaxKind.NumericLiteralExpression,
                         SyntaxFactory.Literal(value))
-                              .WithLeadingTrivia(new[] {SyntaxFactory.Space});            
+                              .WithLeadingTrivia(new[] {SyntaxFactory.Space});
         }
 
         LiteralExpressionSyntax StringLiteral()

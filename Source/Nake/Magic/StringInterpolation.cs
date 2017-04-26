@@ -19,7 +19,7 @@ namespace Nake.Magic
         }
 
         static readonly Regex expressionPattern = new Regex(
-            @"(?<!{){(?<expression>[^}{\r\n]+)}(?!})",
+            @"\$(?<!{){(?<expression>[^}{\r\n]+)}(?!})",
             RegexOptions.Compiled | RegexOptions.Singleline
         );
 
@@ -38,14 +38,14 @@ namespace Nake.Magic
             this.model = model;
             this.node = node;
             this.constant = constant;
-                
+
             literal  = node.Token.ValueText;
         }
 
         public SyntaxNode Interpolate()
         {
-            return constant 
-                    ? InterpolateConstant() 
+            return constant
+                    ? InterpolateConstant()
                     : InterpolateNonConstant();
         }
 
@@ -57,48 +57,9 @@ namespace Nake.Magic
 
         SyntaxNode InterpolateNonConstant()
         {
-            string interpolated;
+            var inlined = InlineEnvironmentVariables(literal);
 
-            var expressions = InterpolateExpressions(literal, out interpolated);
-            var inlined = InlineEnvironmentVariables(interpolated);
-
-            if (expressions.Count == 0)
-                return CreateStringLiteral(Unescape(inlined));
-
-            return SyntaxFactory.ParseExpression(
-                    string.Format(@"string.Format(@""{0}"", {1})",
-                                    Unescape(Verbatimize(inlined)), 
-                                    string.Join(",", expressions)));
-        }
-
-        List<string> InterpolateExpressions(string token, out string interpolated)
-        {
-            var expressions = new List<string>();
-
-            var index = 0;
-            interpolated = expressionPattern.Replace(token, match =>
-            {
-                var expression = match.Groups["expression"].Value;
-
-                var syntax = SyntaxFactory.ParseExpression(expression);
-                if (syntax.Span.Length != expression.Length)
-                    throw new ExpressionSyntaxException(expression, LocationDiagnostics(match.Index));
-
-                var type = model.GetSpeculativeTypeInfo(
-                    node.FullSpan.End, syntax, 
-                    SpeculativeBindingOption.BindAsExpression);
-
-                if (type.Type.TypeKind == TypeKind.Error)
-                    throw new ExpressionResolutionFailedException(expression, LocationDiagnostics(match.Index));
-                
-                if (type.Type.SpecialType == SpecialType.System_Void)
-                    throw new ExpressionReturnTypeIsVoidException(expression, LocationDiagnostics(match.Index));
-
-                expressions.Add(string.Format("({0})", expression));
-                return string.Format("{{{0}}}", index++);
-            });
-
-            return expressions;
+			return CreateStringLiteral(Unescape(inlined));
         }
 
         static SyntaxNode CreateStringLiteral(string value)
@@ -116,8 +77,8 @@ namespace Nake.Magic
             var span = node.GetLocation().GetLineSpan();
 
             return string.Format(
-                "{0} ({1},{2})", 
-                span.Path, 
+                "{0} ({1},{2})",
+                span.Path,
                 span.StartLinePosition.Line + 1,
                 span.StartLinePosition.Character + 1 + matchPosition);
         }
@@ -128,7 +89,7 @@ namespace Nake.Magic
             {
                 var name = match.Groups["variable"].Value;
                 var value = Env.Var[name] ?? "?UNDEFINED?";
-                
+
                 Captured.Add(new EnvironmentVariable(name, value));
                 return value;
             });
@@ -143,8 +104,8 @@ namespace Nake.Magic
         {
             var result = token.Replace("%%", "%");
 
-            return !constant 
-                    ? result.Replace("{{", "{").Replace("}}", "}") 
+            return !constant
+                    ? result.Replace("{{", "{").Replace("}}", "}")
                     : result;
         }
     }

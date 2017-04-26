@@ -18,7 +18,7 @@ namespace Nake.Magic
         bool visitingConstant;
         bool visitingStringFormat;
         AnalyzerResult result;
-        
+
         public Analyzer(CSharpCompilation compilation, IDictionary<string, string> substitutions)
         {
             tree = (CSharpSyntaxTree) compilation.SyntaxTrees.Single();
@@ -63,12 +63,12 @@ namespace Nake.Magic
         static bool IsTask(ISymbol symbol)
         {
             return symbol.GetAttributes().SingleOrDefault(x => x.AttributeClass.Name == "TaskAttribute") != null;
-        }     
+        }
 
         static bool IsStep(ISymbol symbol)
         {
             return symbol.GetAttributes().SingleOrDefault(x => x.AttributeClass.Name == "StepAttribute") != null;
-        }     
+        }
 
         public override void VisitInvocationExpression(InvocationExpressionSyntax node)
         {
@@ -126,7 +126,7 @@ namespace Nake.Magic
         public override void VisitLocalDeclarationStatement(LocalDeclarationStatementSyntax node)
         {
             visitingConstant = node.Modifiers.Any(SyntaxKind.ConstKeyword);
-            
+
             base.VisitLocalDeclarationStatement(node);
             visitingConstant = false;
         }
@@ -151,7 +151,7 @@ namespace Nake.Magic
         {
             if (!visitingStringFormat && StringInterpolation.Qualifies(node))
                 result.Add(node, new StringInterpolation(model, node, visitingConstant));
-            
+
             base.VisitLiteralExpression(node);
         }
     }

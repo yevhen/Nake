@@ -12,19 +12,19 @@ namespace Nake
         public void String_arguments_within_proxied_method_call_should_be_expanded_correctly()
         {
             Build(@"
-                
+
                 static string Variable = ""1"";
- 
+
                 [Task] public static void Task(string arg)
                 {
                     Env.Var[""TaskArgumentValue""] = arg;
-                }                    
+                }
 
                 [Task] public static void Test()
                 {
-                    Task(1 + ""{Variable}"");
+                    Task(1 + $""{Variable}"");
                 }
-                    
+
             ");
 
             Invoke("Test");
@@ -36,18 +36,18 @@ namespace Nake
         public void String_arguments_within_proxied_method_call_should_not_be_expanded_when_surrounded_with_string_format()
         {
             Build(@"
-                
+
                 static string Variable = ""1"";
- 
+
                 [Task] public static void Task(string arg)
-                {}                    
+                {}
 
                 [Task] public static void Test()
                 {
                     // the call below should fail in runtime with FormatException, rather than being expanded
                     Task(string.Format(""{Variable}"", """"));
                 }
-                    
+
             ");
 
             var exception = Assert.Throws<TaskInvocationException>(()=> Invoke("Test"));

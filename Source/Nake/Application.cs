@@ -12,7 +12,7 @@ namespace Nake
     class Application
     {
         readonly Options options;
-        
+
         public Application(Options options)
         {
             this.options = options;
@@ -27,7 +27,7 @@ namespace Nake
 
             if (options.ShowVersion)
                 ShowVersion();
-            
+
             if (options.QuietMode)
                 SetQuiet();
 
@@ -72,7 +72,7 @@ namespace Nake
         {
             if (options.ScriptFile != null)
             {
-                var absoluteFilePath = !Path.IsPathRooted(options.ScriptFile) 
+                var absoluteFilePath = !Path.IsPathRooted(options.ScriptFile)
                     ? Path.GetFullPath(Path.Combine(Location.CurrentDirectory(), options.ScriptFile))
                     : options.ScriptFile;
 
@@ -93,13 +93,13 @@ namespace Nake
         BuildResult Build(PreprocessedScript script, IEnumerable<TaskDeclaration> declarations)
         {
             var engine = new Engine(
-                script.References, 
-                script.AbsoluteReferences, 
+                script.References,
+                script.AbsoluteReferences,
                 script.Namespaces
             );
 
             var cachingEngine = new CachingEngine(
-                engine, script.File, declarations.Select(x => new Task(x)).ToArray(), options.ResetCache              
+                engine, script.File, declarations.Select(x => new Task(x)).ToArray(), options.ResetCache
             );
 
             var result = cachingEngine.Build(
@@ -146,8 +146,8 @@ namespace Nake
 
             tasks = tasks
                 .OrderBy(x => x.DisplayName)
-                .Where(x => filter == null || 
-                            x.DisplayName.Contains(filter.ToLower()) || 
+                .Where(x => filter == null ||
+                            x.DisplayName.Contains(filter.ToLower()) ||
                             x.Summary.Contains(filter.ToLower()))
                 .ToArray();
 
@@ -200,7 +200,7 @@ namespace Nake
             foreach (var task in tasks)
                 TaskRegistry.Invoke(task.Name, task.Arguments);
         }
-        
+
         static void SetQuiet()
         {
             Env.Var["NakeQuietMode"] = "true";

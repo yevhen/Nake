@@ -17,7 +17,7 @@ namespace Nake.Magic
         readonly SemanticModel model;
         readonly CSharpCompilation compilation;
         readonly AnalyzerResult result;
-        
+
         public Rewriter(CSharpCompilation compilation, AnalyzerResult result)
         {
             tree = (CSharpSyntaxTree) compilation.SyntaxTrees.Single();
@@ -46,10 +46,10 @@ namespace Nake.Magic
         {
             var visited = (InvocationExpressionSyntax)
                 base.VisitInvocationExpression(node);
-            
+
             var invocation = result.Find(node);
-            return invocation != null 
-                              ? invocation.Replace(visited) 
+            return invocation != null
+                              ? invocation.Replace(visited)
                               : visited;
         }
 
@@ -69,9 +69,9 @@ namespace Nake.Magic
         public override SyntaxNode VisitVariableDeclarator(VariableDeclaratorSyntax node)
         {
             var substitution = result.Find(node);
-    
-            return substitution != null 
-                                ? substitution.Substitute() 
+
+            return substitution != null
+                                ? substitution.Substitute()
                                 : base.VisitVariableDeclarator(node);
         }
     }

@@ -13,18 +13,18 @@ namespace Nake
         {
             Build(@"
                 
-                var scriptLevelVar = ""0"";                
+                var scriptLevelVar = ""0"";
 
                 public const string PublicConstField = ""0"";
                 public static string PublicStaticField = ""0"";
-                
+
                 const string PrivateConstField = ""0"";
                 static string PrivateStaticField = ""0"";
-                
+
                 class NestedClass
                 {
                     public static string PublicField = ""0"";
-                }          
+                }
 
                 [Task] void Test()
                 {
@@ -34,8 +34,8 @@ namespace Nake
                     Env.Var[""PrivateConstField""]         = PrivateConstField;
                     Env.Var[""PrivateStaticField""]        = PrivateStaticField;
                     Env.Var[""NestedClass.PublicField""]   = NestedClass.PublicField;
-                }                    
-            ", 
+                }
+            ",
 
             Substitute()
                 .Var("ScriptLevelVar",          "1")
@@ -65,15 +65,15 @@ namespace Nake
                 public static bool BooleanField = false;
                 public static int IntField = 0;
                 public static decimal UnsupportedField = 0;
-                                                
+
                 [Task] public static void Test()
                 {
                     Env.Var[""StringField""] = StringField;
                     Env.Var[""BooleanField""] = BooleanField.ToString();
                     Env.Var[""IntField""] = IntField.ToString();
                     Env.Var[""UnsupportedField""] = UnsupportedField.ToString();
-                }                    
-            ", 
+                }
+            ",
 
             Substitute()
                 .Var("StringField", "1")
@@ -102,8 +102,8 @@ namespace Nake
                 {
                     Env.Var[""BooleanField""] = BooleanField.ToString();
                     Env.Var[""IntField""] = IntField.ToString();
-                }                    
-            ", 
+                }
+            ",
 
             Substitute()
                 .Var("BooleanField", "yes")
@@ -128,8 +128,8 @@ namespace Nake
                 {
                     Env.Var[""PascalCaseField""] = Field.ToString();
                     Env.Var[""LowerCaseField""] = field.ToString();
-                }                    
-            ", 
+                }
+            ",
 
             Substitute()
                 .Var("Field", "1")
@@ -148,13 +148,13 @@ namespace Nake
 
                 public static string Path = ""path"";
                 public static string Quoted = ""quoted"";
-                                                
+
                 [Task] public static void Test()
                 {
                     Env.Var[""Path""] = Path;
                     Env.Var[""Quoted""] = Quoted;
-                }                    
-            ", 
+                }
+            ",
 
             Substitute()
                 .Var("Path", @"C:\Tools\Nake")
@@ -178,8 +178,8 @@ namespace Nake
                 {
                     Env.Var[""Field1""] = Field1.ToString();
                     Env.Var[""Field2""] = Field2.ToString();
-                }                    
-            ", 
+                }
+            ",
 
             Substitute()
                 .Var("Field1", "1")

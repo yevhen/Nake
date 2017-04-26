@@ -76,11 +76,11 @@ namespace Nake
                 Emit(rewritten, out assembly);
 
             return new BuildResult(
-                analyzed.Tasks.ToArray(), 
-                script.References.ToArray(), 
-                rewriter.Captured.ToArray(), 
+                analyzed.Tasks.ToArray(),
+                script.References.ToArray(),
+                rewriter.Captured.ToArray(),
                 assembly, symbols
-            );            
+            );
         }
 
         static void Emit(Compilation compilation, out byte[] assembly)

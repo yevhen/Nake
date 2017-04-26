@@ -10,10 +10,10 @@ using System.Xml.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Scripting;
-using Microsoft.CodeAnalysis.Scripting.CSharp;
 using Microsoft.CSharp.RuntimeBinder;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
+using Microsoft.CodeAnalysis.CSharp.Scripting;
 
 namespace Nake.Scripting
 {
@@ -28,7 +28,7 @@ namespace Nake.Scripting
 
         static readonly Dictionary<string, MetadataReference> DefaultReferences = new Dictionary<string, MetadataReference>
         {
-            {"mscorlib",                        Reference(typeof(object))},          
+            {"mscorlib",                        Reference(typeof(object))},
             {"System",                          Reference(typeof(Component))},
             {"System.Core",                     Reference(typeof(IQueryable))},
             {"System.Data",                     Reference(typeof(DataSet))},
@@ -47,7 +47,7 @@ namespace Nake.Scripting
             "System.Linq",
             "System.Text",
             "System.IO",
-            "System.Collections.Generic", 
+            "System.Collections.Generic",
             "Microsoft.Build.Framework",
             "Microsoft.Build.Utilities"
         };
@@ -70,7 +70,7 @@ namespace Nake.Scripting
         public CompiledScript Compile(string code)
         {
             var options = ScriptOptions.Default
-                .AddNamespaces(namespaces)
+				.AddImports(namespaces)
                 .AddReferences(references);
 
             var script = CSharpScript.Create(code, options);
@@ -92,7 +92,7 @@ namespace Nake.Scripting
             string fullPath;
             if (!GAC.AssemblyExist(reference.AssemblyName, out fullPath))
                 throw new NakeException(
-                    "Assembly reference {0} defined in script {1} cannot be found", 
+                    "Assembly reference {0} defined in script {1} cannot be found",
                     reference.AssemblyName, reference.ScriptFile);
 
             AddReference(MetadataReference.CreateFromFile(fullPath));
@@ -112,7 +112,7 @@ namespace Nake.Scripting
         {
             if (references.Any(x => x == reference))
                 return;
-            
+
             references.Add(reference);
         }
 
