@@ -15,9 +15,9 @@ using static Nake.Run;
 const string RootPath = "%NakeScriptDirectory%";
 const string OutputPath = RootPath + @"\Output";
 
-var PackagePath = @"{OutputPath}\Package";
-var DebugOutputPath = @"{PackagePath}\Debug";
-var ReleaseOutputPath = @"{PackagePath}\Release";
+var PackagePath = $@"{OutputPath}\Package";
+var DebugOutputPath = $@"{PackagePath}\Debug";
+var ReleaseOutputPath = $@"{PackagePath}\Release";
 
 var MSBuildExe = @"%ProgramFiles(x86)%\MSBuild\14.0\Bin\MSBuild.exe";
 var AppVeyor = Var["APPVEYOR"] == "True";
@@ -25,7 +25,6 @@ var AppVeyor = Var["APPVEYOR"] == "True";
 /// Builds sources in debug mode 
 [Task] void Default()
 {
-    Restore();
     Clean();
     Build();
 }
@@ -33,21 +32,21 @@ var AppVeyor = Var["APPVEYOR"] == "True";
 /// Restores dependencies (packages) from NuGet 
 [Task] void Restore()
 {
-    Cmd(@"Tools\NuGet.exe restore {RootPath}\Tools\Packages.config -o {RootPath}\Packages");
-    Cmd(@"Tools\NuGet.exe restore {RootPath}\Nake.sln -o {RootPath}\Packages");
+    Cmd($@"Tools\NuGet.exe restore {RootPath}\Tools\Packages.config -o {RootPath}\Packages");
+    Cmd($@"Tools\NuGet.exe restore {RootPath}\Nake.sln -o {RootPath}\Packages");
 }
 
 /// Wipeout all build output and temporary build files 
 [Task] void Clean(string path = OutputPath)
 {
-    Delete(@"{path}\*.*|-:*.vshost.exe");
-    RemoveDir(@"**\bin|**\obj|{path}\*");    
+    Delete($@"{path}\*.*|-:*.vshost.exe");
+    RemoveDir($@"**\bin|**\obj|{path}\*");    
 }
 
 /// Builds sources using specified configuration and output path
 [Step] void Build(string config = "Debug", string outDir = OutputPath)
 {
-    Exec(MSBuildExe, "Nake.sln /p:Configuration={config};OutDir={outDir};ReferencePath={outDir} /m");
+    Exec(MSBuildExe, $"Nake.sln /p:Configuration={config};OutDir={outDir};ReferencePath={outDir} /m");
 }
 
 /// Runs unit tests 
@@ -55,11 +54,11 @@ var AppVeyor = Var["APPVEYOR"] == "True";
 {
     Build("Debug", outputPath);
 
-    var tests = new FileSet{@"{outputPath}\*.Tests.dll"}.ToString(" ");
-    var results = @"{outputPath}\nunit-test-results.xml";
+    var tests = new FileSet{$@"{outputPath}\*.Tests.dll"}.ToString(" ");
+    var results = $@"{outputPath}\nunit-test-results.xml";
 
     Cmd(@"Packages\NUnit.Runners.2.6.2\tools\nunit-console.exe " + 
-    	@"/xml:{results} /framework:net-4.0 /noshadow /nologo {tests}");
+    	$@"/xml:{results} /framework:net-4.0 /noshadow /nologo {tests}");
 
     if (AppVeyor)
     	new WebClient().UploadFile("https://ci.appveyor.com/api/testresults/nunit/%APPVEYOR_JOB_ID%", results);
@@ -74,27 +73,27 @@ var AppVeyor = Var["APPVEYOR"] == "True";
     Build("Release", ReleaseOutputPath);
 
     var version = FileVersionInfo
-        .GetVersionInfo(@"{ReleaseOutputPath}\Nake.exe")
+        .GetVersionInfo($@"{ReleaseOutputPath}\Nake.exe")
         .ProductVersion;
 
     File.WriteAllText(
-        @"{ReleaseOutputPath}\Nake.bat",
+        $@"{ReleaseOutputPath}\Nake.bat",
         "@ECHO OFF \r\n" +
-        @"Packages\Nake.{version}\tools\net45\Nake.exe %*"
+        $@"Packages\Nake.{version}\tools\net45\Nake.exe %*"
     );
 
-    string readme = File.ReadAllText(@"{RootPath}\Build\Readme.txt");
-    File.WriteAllText(@"{ReleaseOutputPath}\Readme.txt", readme.Replace("###", "Nake.{version}"));
+    string readme = File.ReadAllText($@"{RootPath}\Build\Readme.txt");
+    File.WriteAllText($@"{ReleaseOutputPath}\Readme.txt", readme.Replace("###", $"Nake.{version}"));
     
-    Cmd(@"Tools\Nuget.exe pack Build\Nake.nuspec -Version {version} " +
-         "-OutputDirectory {PackagePath} -BasePath {RootPath} -NoPackageAnalysis");
+    Cmd($@"Tools\Nuget.exe pack Build\Nake.nuspec -Version {version} " +
+         $"-OutputDirectory {PackagePath} -BasePath {RootPath} -NoPackageAnalysis");
 }
 
 /// Publishes package to NuGet gallery
 [Step] void Publish()
 {
-    var packageFile = @"{PackagePath}\Nake.{Version()}.nupkg";
-    Cmd(@"Tools\Nuget.exe push {packageFile} %NuGetApiKey% -Source https://nuget.org/");
+    var packageFile = $@"{PackagePath}\Nake.{Version()}.nupkg";
+    Cmd($@"Tools\Nuget.exe push {packageFile} %NuGetApiKey% -Source https://nuget.org/");
 }
 
 string Version()
