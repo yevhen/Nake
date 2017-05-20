@@ -7,63 +7,63 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Nake.Magic
 {
-    class AnalyzerResult : SyntaxWalker
-    {
-        readonly IDictionary<IMethodSymbol, Task> tasksBySymbol = new Dictionary<IMethodSymbol, Task>();
-        readonly IDictionary<string, Task> tasksByName = new Dictionary<string, Task>(new CaseInsensitiveEqualityComparer());
-        
-        readonly IDictionary<InvocationExpressionSyntax, ProxyInvocation> invocations = new Dictionary<InvocationExpressionSyntax, ProxyInvocation>();
-        readonly IDictionary<VariableDeclaratorSyntax, FieldSubstitution> substitutions = new Dictionary<VariableDeclaratorSyntax, FieldSubstitution>();
-        readonly IDictionary<LiteralExpressionSyntax, StringInterpolation> interpolations = new Dictionary<LiteralExpressionSyntax, StringInterpolation>();        
-        
-        public IEnumerable<Task> Tasks
-        {
-            get { return tasksBySymbol.Values; }
-        }
+	class AnalyzerResult : SyntaxWalker
+	{
+		readonly IDictionary<IMethodSymbol, Task> tasksBySymbol = new Dictionary<IMethodSymbol, Task>();
+		readonly IDictionary<string, Task> tasksByName = new Dictionary<string, Task>(new CaseInsensitiveEqualityComparer());
 
-        public Task Find(IMethodSymbol symbol)
-        {
-            return tasksBySymbol.Find(symbol);
-        }
+		readonly IDictionary<InvocationExpressionSyntax, ProxyInvocation> invocations = new Dictionary<InvocationExpressionSyntax, ProxyInvocation>();
+		readonly IDictionary<VariableDeclaratorSyntax, FieldSubstitution> substitutions = new Dictionary<VariableDeclaratorSyntax, FieldSubstitution>();
+		readonly IDictionary<LiteralExpressionSyntax, StringInterpolation> interpolations = new Dictionary<LiteralExpressionSyntax, StringInterpolation>();
 
-        public void Add(IMethodSymbol symbol, Task task)
-        {
-            var existent = tasksByName.Find(task.FullName);
-            if (existent != null)
-                throw DuplicateTaskException.Create(existent, task);
+		public IEnumerable<Task> Tasks
+		{
+			get { return tasksBySymbol.Values; }
+		}
 
-            tasksBySymbol.Add(symbol, task);
-            tasksByName.Add(task.FullName, task);
-        }
+		public Task Find(IMethodSymbol symbol)
+		{
+			return tasksBySymbol.Find(symbol);
+		}
 
-        public void Add(InvocationExpressionSyntax node, ProxyInvocation invocation)
-        {
-            invocations.Add(node, invocation);
-        }
+		public void Add(IMethodSymbol symbol, Task task)
+		{
+			var existent = tasksByName.Find(task.FullName);
+			if (existent != null)
+				throw DuplicateTaskException.Create(existent, task);
 
-        public ProxyInvocation Find(InvocationExpressionSyntax node)
-        {
-            return invocations.Find(node);
-        }
+			tasksBySymbol.Add(symbol, task);
+			tasksByName.Add(task.FullName, task);
+		}
 
-        public void Add(VariableDeclaratorSyntax node, FieldSubstitution substitution)
-        {
-            substitutions.Add(node, substitution);
-        }
+		public void Add(InvocationExpressionSyntax node, ProxyInvocation invocation)
+		{
+			invocations.Add(node, invocation);
+		}
 
-        public FieldSubstitution Find(VariableDeclaratorSyntax node)
-        {
-            return substitutions.Find(node);
-        }
+		public ProxyInvocation Find(InvocationExpressionSyntax node)
+		{
+			return invocations.Find(node);
+		}
 
-        public void Add(LiteralExpressionSyntax node, StringInterpolation interpolation)
-        {
-            interpolations.Add(node, interpolation);
-        }
-        
-        public StringInterpolation Find(LiteralExpressionSyntax node)
-        {
-            return interpolations.Find(node);
-        }
-    }
+		public void Add(VariableDeclaratorSyntax node, FieldSubstitution substitution)
+		{
+			substitutions.Add(node, substitution);
+		}
+
+		public FieldSubstitution Find(VariableDeclaratorSyntax node)
+		{
+			return substitutions.Find(node);
+		}
+
+		public void Add(LiteralExpressionSyntax node, StringInterpolation interpolation)
+		{
+			interpolations.Add(node, interpolation);
+		}
+
+		public StringInterpolation Find(LiteralExpressionSyntax node)
+		{
+			return interpolations.Find(node);
+		}
+	}
 }

@@ -1,16 +1,17 @@
 ﻿using System;
 
 using NUnit.Framework;
+using Nake.Utility;
 
-namespace Nake
+namespace Nake.Tests
 {
-    [TestFixture]
-    class String_interpolation : CodeFixture
-    {
-        [Test]
-        public void Should_unescape_doubled_interpolation_markers()
-        {
-            Build(@"
+	[TestFixture]
+	class String_interpolation : CodeFixture
+	{
+		[Test]
+		public void Should_unescape_doubled_interpolation_markers()
+		{
+			Build(@"
 
                 [Task] public static void Interpolate()
                 {
@@ -20,16 +21,16 @@ namespace Nake
 
             ");
 
-            Invoke("Interpolate");
+			Invoke("Interpolate");
 
-            Assert.That(Env.Var["DoubledDollarSign"], Is.EqualTo("%whatever%"));
-            Assert.That(Env.Var["DoubledCurlyBraces"], Is.EqualTo("{whatever}"));
-        }
+			Assert.That(Env.Var["DoubledDollarSign"], Is.EqualTo("%whatever%"));
+			Assert.That(Env.Var["DoubledCurlyBraces"], Is.EqualTo("{whatever}"));
+		}
 
-        [Test]
-        public void Replaces_doubled_escapes_even_for_incomplete_surroundings()
-        {
-            Build(@"
+		[Test]
+		public void Replaces_doubled_escapes_even_for_incomplete_surroundings()
+		{
+			Build(@"
 
                 [Task] public static void Interpolate()
                 {
@@ -41,35 +42,18 @@ namespace Nake
 
             ");
 
-            Invoke("Interpolate");
+			Invoke("Interpolate");
 
-            Assert.That(Env.Var["StartsFromDoubledDollarSign"], Is.EqualTo("%1"));
-            Assert.That(Env.Var["EndsWithDoubledDollarSign"], Is.EqualTo("1%"));
-            Assert.That(Env.Var["StartsFromDoubledCurlyBrace"], Is.EqualTo("{1"));
-            Assert.That(Env.Var["EndsWithDoubledCurlyBrace"], Is.EqualTo("1}"));
-        }
+			Assert.That(Env.Var["StartsFromDoubledDollarSign"], Is.EqualTo("%1"));
+			Assert.That(Env.Var["EndsWithDoubledDollarSign"], Is.EqualTo("1%"));
+			Assert.That(Env.Var["StartsFromDoubledCurlyBrace"], Is.EqualTo("{1"));
+			Assert.That(Env.Var["EndsWithDoubledCurlyBrace"], Is.EqualTo("1}"));
+		}
 
-        [Test]
-        public void Interpolating_expressions()
-        {
-            Build(@"
-
-                [Task] public static void Interpolate()
-                {
-                    Env.Var[""Expression""] = $""{2 + 2}"";
-                }
-
-            ");
-
-            Invoke("Interpolate");
-
-            Assert.That(Env.Var["Expression"], Is.EqualTo("4"));
-        }
-
-        [Test]
-        public void Native_interpolation_syntax()
-        {
-            Build(@"
+		[Test]
+		public void Interpolating_expressions()
+		{
+			Build(@"
 
                 [Task] public static void Interpolate()
                 {
@@ -78,15 +62,32 @@ namespace Nake
 
             ");
 
-            Invoke("Interpolate");
+			Invoke("Interpolate");
 
-            Assert.That(Env.Var["Expression"], Is.EqualTo("4"));
-        }
+			Assert.That(Env.Var["Expression"], Is.EqualTo("4"));
+		}
 
-        [Test]
-        public void Multiple_expressions_in_single_literal()
-        {
-            Build(@"
+		[Test]
+		public void Native_interpolation_syntax()
+		{
+			Build(@"
+
+                [Task] public static void Interpolate()
+                {
+                    Env.Var[""Expression""] = $""{2 + 2}"";
+                }
+
+            ");
+
+			Invoke("Interpolate");
+
+			Assert.That(Env.Var["Expression"], Is.EqualTo("4"));
+		}
+
+		[Test]
+		public void Multiple_expressions_in_single_literal()
+		{
+			Build(@"
 
                 [Task] public static void Interpolate()
                 {
@@ -95,15 +96,15 @@ namespace Nake
 
             ");
 
-            Invoke("Interpolate");
+			Invoke("Interpolate");
 
-            Assert.That(Env.Var["Expression"], Is.EqualTo("44"));
-        }
+			Assert.That(Env.Var["Expression"], Is.EqualTo("44"));
+		}
 
-        [Test]
-        public void Should_completely_ignore_expression_interpolation_where_constant_value_is_expected()
-        {
-            Build(@"
+		[Test]
+		public void Should_completely_ignore_expression_interpolation_where_constant_value_is_expected()
+		{
+			Build(@"
 
                 using System.ComponentModel;
 
@@ -131,18 +132,18 @@ namespace Nake
                 }
             ");
 
-            Invoke("Interpolate");
+			Invoke("Interpolate");
 
-            Assert.That(Env.Var["LocalConst"], Is.EqualTo("{expr}"));
-            Assert.That(Env.Var["FieldConst"], Is.EqualTo("{expr}"));
-            Assert.That(Env.Var["OptionalParameterDefaultValue"], Is.EqualTo("{expr}"));
-            Assert.That(Env.Var["AttributeValue"], Is.EqualTo("{expr}"));
-        }
+			Assert.That(Env.Var["LocalConst"], Is.EqualTo("{expr}"));
+			Assert.That(Env.Var["FieldConst"], Is.EqualTo("{expr}"));
+			Assert.That(Env.Var["OptionalParameterDefaultValue"], Is.EqualTo("{expr}"));
+			Assert.That(Env.Var["AttributeValue"], Is.EqualTo("{expr}"));
+		}
 
-        [Test]
-        public void Should_not_interpolate_literals_surrounded_within_string_format_function()
-        {
-            Build(@"
+		[Test]
+		public void Should_not_interpolate_literals_surrounded_within_string_format_function()
+		{
+			Build(@"
 
                 static string Variable = ""1"";
 
@@ -154,16 +155,16 @@ namespace Nake
 
             ");
 
-            var exception = Assert.Throws<TaskInvocationException>(() => Invoke("Interpolate"));
-            Assert.That(exception.SourceException.GetType() == typeof(FormatException));
-        }
+			var exception = Assert.Throws<TaskInvocationException>(() => Invoke("Interpolate"));
+			Assert.That(exception.SourceException.GetType() == typeof(FormatException));
+		}
 
-        [Test]
-        public void Should_inline_environment_variables_in_any_literal()
-        {
-            Env.Var["var"] = "var";
+		[Test]
+		public void Should_inline_environment_variables_in_any_literal()
+		{
+			Env.Var["var"] = "var";
 
-            Build(@"
+			Build(@"
 
                 const string fieldConst = ""%var%"";
 
@@ -180,20 +181,20 @@ namespace Nake
 
             ");
 
-            Invoke("Interpolate");
+			Invoke("Interpolate");
 
-            Assert.That(Env.Var["LocalConst"], Is.EqualTo("var"));
-            Assert.That(Env.Var["FieldConst"], Is.EqualTo("var"));
-            Assert.That(Env.Var["OptionalParameterDefaultValue"], Is.EqualTo("var"));
-            Assert.That(Env.Var["AnyLiteral"], Is.EqualTo("var"));
-        }
+			Assert.That(Env.Var["LocalConst"], Is.EqualTo("var"));
+			Assert.That(Env.Var["FieldConst"], Is.EqualTo("var"));
+			Assert.That(Env.Var["OptionalParameterDefaultValue"], Is.EqualTo("var"));
+			Assert.That(Env.Var["AnyLiteral"], Is.EqualTo("var"));
+		}
 
-        [Test]
-        public void Verbatim_strings_are_respected()
-        {
-            Env.Var["var"] = @"C:\Tools\Nake";
+		[Test]
+		public void Verbatim_strings_are_respected()
+		{
+			Env.Var["var"] = @"C:\Tools\Nake";
 
-            Build(@"
+			Build(@"
 
                 const string RootPath = ""%var%\\Root"";
                 const string RootPathVerbatim = @""%var%\Root"";
@@ -212,20 +213,20 @@ namespace Nake
 
             ");
 
-            Invoke("Interpolate");
+			Invoke("Interpolate");
 
-            Assert.That(Env.Var["RootPath"], Is.EqualTo(@"C:\Tools\Nake\Root"));
-            Assert.That(Env.Var["RootPathVerbatim"], Is.EqualTo(@"C:\Tools\Nake\Root"));
-            Assert.That(Env.Var["OutputPath"], Is.EqualTo(@"C:\Tools\Nake\Root\Output"));
-            Assert.That(Env.Var["OutputPathVerbatim"], Is.EqualTo(@"C:\Tools\Nake\Root\Output"));
-        }
+			Assert.That(Env.Var["RootPath"], Is.EqualTo(@"C:\Tools\Nake\Root"));
+			Assert.That(Env.Var["RootPathVerbatim"], Is.EqualTo(@"C:\Tools\Nake\Root"));
+			Assert.That(Env.Var["OutputPath"], Is.EqualTo(@"C:\Tools\Nake\Root\Output"));
+			Assert.That(Env.Var["OutputPathVerbatim"], Is.EqualTo(@"C:\Tools\Nake\Root\Output"));
+		}
 
-        [Test]
-        public void Quotes_are_respected_as_well()
-        {
-            Env.Var["var"] = @"C:\Tools\Nake";
+		[Test]
+		public void Quotes_are_respected_as_well()
+		{
+			Env.Var["var"] = @"C:\Tools\Nake";
 
-            Build(@"
+			Build(@"
 
                 [Task]
                 public static void Interpolate()
@@ -236,16 +237,16 @@ namespace Nake
 
             ");
 
-            Invoke("Interpolate");
+			Invoke("Interpolate");
 
-            Assert.That(Env.Var["Quotes"], Is.EqualTo(@"""C:\Tools\Nake"""));
-            Assert.That(Env.Var["QuotesVerbatim"], Is.EqualTo(@"""C:\Tools\Nake"""));
-        }
+			Assert.That(Env.Var["Quotes"], Is.EqualTo(@"""C:\Tools\Nake"""));
+			Assert.That(Env.Var["QuotesVerbatim"], Is.EqualTo(@"""C:\Tools\Nake"""));
+		}
 
-        [Test]
-        public void Should_check_whether_expression_has_valid_syntax()
-        {
-            Assert.Throws<NakeException>(()=> Build(@"
+		[Test]
+		public void Should_check_whether_expression_has_valid_syntax()
+		{
+			Assert.Throws<NakeException>(() => Build(@"
 
                 const int I = 1;
 
@@ -255,12 +256,12 @@ namespace Nake
                 }
 
             "));
-        }
+		}
 
-        [Test]
-        public void Should_check_whether_expression_return_type_is_void()
-        {
-            Assert.Throws<NakeException>(()=> Build(@"
+		[Test]
+		public void Should_check_whether_expression_return_type_is_void()
+		{
+			Assert.Throws<NakeException>(() => Build(@"
 
                 [Task] public static void Task()
                 {}
@@ -271,12 +272,12 @@ namespace Nake
                 }
 
             "));
-        }
+		}
 
-        [Test]
-        public void Should_check_whether_expression_could_be_resolved()
-        {
-            Assert.Throws<NakeException>(()=> Build(@"
+		[Test]
+		public void Should_check_whether_expression_could_be_resolved()
+		{
+			Assert.Throws<NakeException>(() => Build(@"
 
                 [Task] public static void Interpolate1()
                 {
@@ -284,12 +285,12 @@ namespace Nake
                 }
 
             "));
-        }
+		}
 
-        [Test]
-        public void Should_correctly_resolve_expression_when_used_as_argument_to_step()
-        {
-            Build(@"
+		[Test]
+		public void Should_correctly_resolve_expression_when_used_as_argument_to_step()
+		{
+			Build(@"
 
                 const string RootPath = @""C:\Temp"";
                 const string OutputPath = RootPath + @""\Output"";
@@ -309,14 +310,14 @@ namespace Nake
 
             ");
 
-            Assert.DoesNotThrow(() => Invoke("Interpolate"));
-            Assert.That(Env.Var["Result"], Is.EqualTo(@"C:\Temp\Output\Package\Debug"));
-        }
+			Assert.DoesNotThrow(() => Invoke("Interpolate"));
+			Assert.That(Env.Var["Result"], Is.EqualTo(@"C:\Temp\Output\Package\Debug"));
+		}
 
-        [Test]
-        public void Should_inline_UNDEFINED_value_if_inlined_environment_variable_is_undefined()
-        {
-            Build(@"
+		[Test]
+		public void Should_inline_UNDEFINED_value_if_inlined_environment_variable_is_undefined()
+		{
+			Build(@"
                 
                 [Task] public static void Interpolate()
                 {
@@ -325,9 +326,9 @@ namespace Nake
 
             ");
 
-            Invoke("Interpolate");
+			Invoke("Interpolate");
 
-            Assert.That(Env.Var["Result"], Is.EqualTo("?UNDEFINED?"));
-        }
-    }
+			Assert.That(Env.Var["Result"], Is.EqualTo("?UNDEFINED?"));
+		}
+	}
 }

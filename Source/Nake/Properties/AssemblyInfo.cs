@@ -1,7 +1,3 @@
-﻿using System.Reflection;
-using System.Runtime.CompilerServices;
-
-[assembly: AssemblyTitle("Nake")]
-[assembly: AssemblyDescription("C# based build automation tool")]
+﻿using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("Nake.Tests")]
