@@ -7,21 +7,21 @@ using Microsoft.CodeAnalysis;
 
 namespace Nake.Scripting
 {
-    public class AssemblyReference
-    {
-        public readonly string FullPath;
-        public readonly string Name;
+	public class AssemblyReference
+	{
+		public readonly string FullPath;
+		public readonly string Name;
 
-        public AssemblyReference(MetadataReference reference)
-            : this(reference.Display)
-        {}
+		public AssemblyReference(MetadataReference reference)
+			: this(reference.Display)
+		{ }
 
-        public AssemblyReference(string fullPath)
-        {
-            Debug.Assert(!string.IsNullOrEmpty(fullPath));
+		public AssemblyReference(string fullPath)
+		{
+			Debug.Assert(!string.IsNullOrEmpty(fullPath));
 
-            FullPath = fullPath;
-            Name = Path.GetFileNameWithoutExtension(fullPath);
-        }
-    }
+			FullPath = fullPath;
+			Name = Path.GetFileNameWithoutExtension(fullPath);
+		}
+	}
 }

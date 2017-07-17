@@ -1,16 +1,16 @@
-using System;
+﻿using System;
 
 using NUnit.Framework;
 
-namespace Nake
+namespace Nake.Tests
 {
-    [TestFixture]
-    class Cyclic_dependencies : CodeFixture
-    {
-        [Test]
-        public void Recursive_call()
-        {
-            Assert.Throws<RecursiveTaskCallException>(() => Build(@"
+	[TestFixture]
+	class Cyclic_dependencies : CodeFixture
+	{
+		[Test]
+		public void Recursive_call()
+		{
+			Assert.Throws<RecursiveTaskCallException>(() => Build(@"
             
                 [Step] void Step() 
                 {
@@ -18,12 +18,12 @@ namespace Nake
                 }
 
             "));
-        }
+		}
 
-        [Test]
-        public void Simplest_case_no_intermediaries()
-        {
-            Assert.Throws<CyclicDependencyException>(() => Build(@"
+		[Test]
+		public void Simplest_case_no_intermediaries()
+		{
+			Assert.Throws<CyclicDependencyException>(() => Build(@"
             
                 [Step] void Step1() 
                 {
@@ -36,12 +36,12 @@ namespace Nake
                 }
 
             "));
-        }
+		}
 
-        [Test]
-        public void Via_intermediaries()
-        {
-            Assert.Throws<CyclicDependencyException>(() => Build(@"
+		[Test]
+		public void Via_intermediaries()
+		{
+			Assert.Throws<CyclicDependencyException>(() => Build(@"
             
                 [Step] public static void Step1() 
                 {
@@ -59,6 +59,6 @@ namespace Nake
                 }
 
             "));
-        }
-    }
+		}
+	}
 }

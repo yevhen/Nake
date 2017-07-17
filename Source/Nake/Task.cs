@@ -9,124 +9,124 @@ using Nake.Magic;
 
 namespace Nake
 {
-    class Task
-    {
-        internal const string ScriptClass = "Submission#0";
+	public class Task
+	{
+		internal const string ScriptClass = "Submission#0";
 
-        readonly List<Task> dependencies = new List<Task>();
-        readonly HashSet<TaskInvocation> invocations = new HashSet<TaskInvocation>();
+		readonly List<Task> dependencies = new List<Task>();
+		readonly HashSet<TaskInvocation> invocations = new HashSet<TaskInvocation>();
 
-        readonly string signature;
-        readonly bool step;
-        MethodInfo reflected;
+		readonly string signature;
+		readonly bool step;
+		MethodInfo reflected;
 
-        public Task(IMethodSymbol symbol, bool step)
-        {
-            CheckSignature(symbol);
-            signature = symbol.ToString();
-            this.step = step;
-        }
+		public Task(IMethodSymbol symbol, bool step)
+		{
+			CheckSignature(symbol);
+			signature = symbol.ToString();
+			this.step = step;
+		}
 
-        public Task(TaskDeclaration declaration)
-        {
-            signature = declaration.Signature;
-            step = declaration.IsStep;
-        }
+		public Task(TaskDeclaration declaration)
+		{
+			signature = declaration.Signature;
+			step = declaration.IsStep;
+		}
 
-        static void CheckSignature(IMethodSymbol symbol)
-        {
-            bool hasDuplicateParameters = symbol.Parameters
-                .GroupBy(p => p.Name, StringComparer.OrdinalIgnoreCase)
-                .Any(p => p.Count() > 1);
+		static void CheckSignature(IMethodSymbol symbol)
+		{
+			bool hasDuplicateParameters = symbol.Parameters
+				.GroupBy(p => p.Name, StringComparer.OrdinalIgnoreCase)
+				.Any(p => p.Count() > 1);
 
-            if (!symbol.ReturnsVoid ||                
-                symbol.IsGenericMethod ||
-                symbol.Parameters.Any(p => p.RefKind != RefKind.None || !TypeConverter.IsSupported(p.Type)) ||
-                hasDuplicateParameters)
-                throw new TaskSignatureViolationException(symbol.ToString());
-        }  
+			if (!symbol.ReturnsVoid ||
+				symbol.IsGenericMethod ||
+				symbol.Parameters.Any(p => p.RefKind != RefKind.None || !TypeConverter.IsSupported(p.Type)) ||
+				hasDuplicateParameters)
+				throw new TaskSignatureViolationException(symbol.ToString());
+		}
 
-        internal bool IsGlobal
-        {
-            get { return !FullName.Contains("."); }
-        }
+		internal bool IsGlobal
+		{
+			get { return !FullName.Contains("."); }
+		}
 
-        string Name
-        {
-            get
-            {
-                return IsGlobal
-                        ? FullName
-                        : FullName.Substring(FullName.LastIndexOf(".", StringComparison.Ordinal) + 1);
-            }
-        }
+		string Name
+		{
+			get
+			{
+				return IsGlobal
+						? FullName
+						: FullName.Substring(FullName.LastIndexOf(".", StringComparison.Ordinal) + 1);
+			}
+		}
 
-        public string FullName
-        {
-            get { return Signature.Substring(0, Signature.IndexOf("(", StringComparison.Ordinal)); }
-        }
+		public string FullName
+		{
+			get { return Signature.Substring(0, Signature.IndexOf("(", StringComparison.Ordinal)); }
+		}
 
-        string DeclaringType
-        {
-            get
-            {
-                return !IsGlobal
-                        ? ScriptClass + "+" + FullName.Substring(0, FullName.LastIndexOf(".", StringComparison.Ordinal)).Replace(".", "+")
-                        : ScriptClass;
-            }
-        }
+		string DeclaringType
+		{
+			get
+			{
+				return !IsGlobal
+						? ScriptClass + "+" + FullName.Substring(0, FullName.LastIndexOf(".", StringComparison.Ordinal)).Replace(".", "+")
+						: ScriptClass;
+			}
+		}
 
-        public string Signature
-        {
-            get { return signature; }
-        }
+		public string Signature
+		{
+			get { return signature; }
+		}
 
-        public void AddDependency(Task dependency)
-        {
-            if (dependency == this)
-                throw new RecursiveTaskCallException(this);
+		public void AddDependency(Task dependency)
+		{
+			if (dependency == this)
+				throw new RecursiveTaskCallException(this);
 
-            var via = new List<string>();
+			var via = new List<string>();
 
-            if (dependency.IsDependantUpon(this, via))
-                throw new CyclicDependencyException(this, dependency, string.Join(" -> ", via) + " -> " + FullName);
+			if (dependency.IsDependantUpon(this, via))
+				throw new CyclicDependencyException(this, dependency, string.Join(" -> ", via) + " -> " + FullName);
 
-            dependencies.Add(dependency);
-        }
+			dependencies.Add(dependency);
+		}
 
-        bool IsDependantUpon(Task other, ICollection<string> chain)
-        {
-            chain.Add(FullName);
+		bool IsDependantUpon(Task other, ICollection<string> chain)
+		{
+			chain.Add(FullName);
 
-            return dependencies.Contains(other) ||
-                   dependencies.Any(dependency => dependency.IsDependantUpon(other, chain));
-        }
-        
-        public void Reflect(Assembly assembly)
-        {
-            reflected = assembly.GetType(DeclaringType)
-                .GetMethod(Name, BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+			return dependencies.Contains(other) ||
+				   dependencies.Any(dependency => dependency.IsDependantUpon(other, chain));
+		}
 
-            Debug.Assert(reflected != null);            
-        }
+		public void Reflect(Assembly assembly)
+		{
+			reflected = assembly.GetType(DeclaringType)
+				.GetMethod(Name, BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
-        public void Invoke(object script, TaskArgument[] arguments)
-        {
-            var invocation = new TaskInvocation(script, this, reflected, arguments);
+			Debug.Assert(reflected != null);
+		}
 
-            if (step)
-            {
-                var alreadyInvoked = !invocations.Add(invocation);
-                if (alreadyInvoked)
-                    return;
-            }
+		public void Invoke(object script, TaskArgument[] arguments)
+		{
+			var invocation = new TaskInvocation(script, this, reflected, arguments);
 
-            invocation.Invoke();
-        }       
+			if (step)
+			{
+				var alreadyInvoked = !invocations.Add(invocation);
+				if (alreadyInvoked)
+					return;
+			}
 
-        public override string ToString()
-        {
-            return Signature;
-        }
-    }
+			invocation.Invoke();
+		}
+
+		public override string ToString()
+		{
+			return Signature;
+		}
+	}
 }

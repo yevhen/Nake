@@ -9,70 +9,70 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Nake.Magic
 {
-    class Rewriter : CSharpSyntaxRewriter
-    {
-        public readonly HashSet<EnvironmentVariable> Captured = new HashSet<EnvironmentVariable>();
+	class Rewriter : CSharpSyntaxRewriter
+	{
+		public readonly HashSet<EnvironmentVariable> Captured = new HashSet<EnvironmentVariable>();
 
-        readonly CSharpSyntaxTree tree;
-        readonly SemanticModel model;
-        readonly CSharpCompilation compilation;
-        readonly AnalyzerResult result;
-        
-        public Rewriter(CSharpCompilation compilation, AnalyzerResult result)
-        {
-            tree = (CSharpSyntaxTree) compilation.SyntaxTrees.Single();
-            model = compilation.GetSemanticModel(tree, ignoreAccessibility: true);
+		readonly CSharpSyntaxTree tree;
+		readonly SemanticModel model;
+		readonly CSharpCompilation compilation;
+		readonly AnalyzerResult result;
 
-            this.compilation = compilation;
-            this.result = result;
-        }
+		public Rewriter(CSharpCompilation compilation, AnalyzerResult result)
+		{
+			tree = (CSharpSyntaxTree)compilation.SyntaxTrees.Single();
+			model = compilation.GetSemanticModel(tree, ignoreAccessibility: true);
 
-        public CSharpCompilation Rewrite()
-        {
-            var newRoot = tree.GetRoot().Accept(this);
-            return compilation.ReplaceSyntaxTree(tree, CreateTree(newRoot));
-        }
+			this.compilation = compilation;
+			this.result = result;
+		}
 
-        SyntaxTree CreateTree(SyntaxNode root)
-        {
-            var options = new CSharpParseOptions(
-                documentationMode: DocumentationMode.None,
-                kind: SourceCodeKind.Script);
+		public CSharpCompilation Rewrite()
+		{
+			var newRoot = tree.GetRoot().Accept(this);
+			return compilation.ReplaceSyntaxTree(tree, CreateTree(newRoot));
+		}
 
-            return CSharpSyntaxTree.Create((CompilationUnitSyntax) root, options, tree.FilePath, Encoding.UTF8);
-        }
+		SyntaxTree CreateTree(SyntaxNode root)
+		{
+			var options = new CSharpParseOptions(
+				documentationMode: DocumentationMode.None,
+				kind: SourceCodeKind.Script);
 
-        public override SyntaxNode VisitInvocationExpression(InvocationExpressionSyntax node)
-        {
-            var visited = (InvocationExpressionSyntax)
-                base.VisitInvocationExpression(node);
-            
-            var invocation = result.Find(node);
-            return invocation != null 
-                              ? invocation.Replace(visited) 
-                              : visited;
-        }
+			return CSharpSyntaxTree.Create((CompilationUnitSyntax)root, options, tree.FilePath, Encoding.UTF8);
+		}
 
-        public override SyntaxNode VisitLiteralExpression(LiteralExpressionSyntax node)
-        {
-            var interpolation = result.Find(node);
-            if (interpolation == null)
-                return base.VisitLiteralExpression(node);
+		public override SyntaxNode VisitInvocationExpression(InvocationExpressionSyntax node)
+		{
+			var visited = (InvocationExpressionSyntax)
+				base.VisitInvocationExpression(node);
 
-            var interpolated = interpolation.Interpolate();
-            foreach (var variable in interpolation.Captured)
-                Captured.Add(variable);
+			var invocation = result.Find(node);
+			return invocation != null
+							  ? invocation.Replace(visited)
+							  : visited;
+		}
 
-            return interpolated;
-        }
+		public override SyntaxNode VisitLiteralExpression(LiteralExpressionSyntax node)
+		{
+			var interpolation = result.Find(node);
+			if (interpolation == null)
+				return base.VisitLiteralExpression(node);
 
-        public override SyntaxNode VisitVariableDeclarator(VariableDeclaratorSyntax node)
-        {
-            var substitution = result.Find(node);
-    
-            return substitution != null 
-                                ? substitution.Substitute() 
-                                : base.VisitVariableDeclarator(node);
-        }
-    }
+			var interpolated = interpolation.Interpolate();
+			foreach (var variable in interpolation.Captured)
+				Captured.Add(variable);
+
+			return interpolated;
+		}
+
+		public override SyntaxNode VisitVariableDeclarator(VariableDeclaratorSyntax node)
+		{
+			var substitution = result.Find(node);
+
+			return substitution != null
+								? substitution.Substitute()
+								: base.VisitVariableDeclarator(node);
+		}
+	}
 }

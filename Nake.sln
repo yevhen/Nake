@@ -1,26 +1,21 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30324.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nake", "Source\Nake\Nake.csproj", "{FF2BA5A8-F9DC-468E-B77F-698D9C141EBB}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nake.Tests", "Source\Nake.Tests\Nake.Tests.csproj", "{2444EB4E-C1B8-47E0-9D2E-E4C59C30FFFE}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utility", "Source\Utility\Utility.csproj", "{E6106638-A952-4CA6-8C3D-438046AD4EAC}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utility.Tests", "Source\Utility.Tests\Utility.Tests.csproj", "{37E87FCF-AD98-4220-9D71-F9EE56ED4620}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{016CC421-89F5-43B3-BD78-B63D9562E884}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{13491127-6D32-47B8-9496-27807E816E75}"
 	ProjectSection(SolutionItems) = preProject
-		Fowler.csx = Fowler.csx
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		LICENSE.md = LICENSE.md
 		Nake.csx = Nake.csx
-		Build\NuGet\Nake.nuspec = Build\NuGet\Nake.nuspec
-		Source\ProductAssemblyInfo.cs = Source\ProductAssemblyInfo.cs
-		Publish.csx = Publish.csx
+		Nake.sln.DotSettings = Nake.sln.DotSettings
+		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Meta", "Source\Meta\Meta.csproj", "{B12EB89E-0C86-4D2E-866D-BBF1E6890806}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nake", "Source\Nake\Nake.csproj", "{D11182DB-4EF0-495D-92CB-04AE90C488A3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nake.Tests", "Source\Nake.Tests\Nake.Tests.csproj", "{58D07EC3-82DC-4872-8DE3-FEBCDAFF2FC8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -28,24 +23,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{FF2BA5A8-F9DC-468E-B77F-698D9C141EBB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FF2BA5A8-F9DC-468E-B77F-698D9C141EBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FF2BA5A8-F9DC-468E-B77F-698D9C141EBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FF2BA5A8-F9DC-468E-B77F-698D9C141EBB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2444EB4E-C1B8-47E0-9D2E-E4C59C30FFFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2444EB4E-C1B8-47E0-9D2E-E4C59C30FFFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2444EB4E-C1B8-47E0-9D2E-E4C59C30FFFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E6106638-A952-4CA6-8C3D-438046AD4EAC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E6106638-A952-4CA6-8C3D-438046AD4EAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E6106638-A952-4CA6-8C3D-438046AD4EAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E6106638-A952-4CA6-8C3D-438046AD4EAC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{37E87FCF-AD98-4220-9D71-F9EE56ED4620}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{37E87FCF-AD98-4220-9D71-F9EE56ED4620}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{37E87FCF-AD98-4220-9D71-F9EE56ED4620}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B12EB89E-0C86-4D2E-866D-BBF1E6890806}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B12EB89E-0C86-4D2E-866D-BBF1E6890806}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B12EB89E-0C86-4D2E-866D-BBF1E6890806}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B12EB89E-0C86-4D2E-866D-BBF1E6890806}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D11182DB-4EF0-495D-92CB-04AE90C488A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D11182DB-4EF0-495D-92CB-04AE90C488A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D11182DB-4EF0-495D-92CB-04AE90C488A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D11182DB-4EF0-495D-92CB-04AE90C488A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58D07EC3-82DC-4872-8DE3-FEBCDAFF2FC8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58D07EC3-82DC-4872-8DE3-FEBCDAFF2FC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58D07EC3-82DC-4872-8DE3-FEBCDAFF2FC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58D07EC3-82DC-4872-8DE3-FEBCDAFF2FC8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

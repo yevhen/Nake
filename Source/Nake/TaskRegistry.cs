@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
@@ -6,58 +6,58 @@ using System.Threading.Tasks;
 
 namespace Nake
 {
-    public class TaskRegistry
-    {
-        internal static TaskRegistry Global;
+	public class TaskRegistry
+	{
+		internal static TaskRegistry Global;
 
-        public static void Invoke(string taskFullName, params TaskArgument[] arguments)
-        {
-            var task = Global.Find(taskFullName);
+		public static void Invoke(string taskFullName, params TaskArgument[] arguments)
+		{
+			var task = Global.Find(taskFullName);
 
-            if (task == null)
-                throw new TaskNotFoundException(taskFullName);
+			if (task == null)
+				throw new TaskNotFoundException(taskFullName);
 
-            task.Invoke(Global.script, arguments);
-        }
+			task.Invoke(Global.script, arguments);
+		}
 
-        readonly Dictionary<string, Task> tasks = new Dictionary<string, Task>(new CaseInsensitiveEqualityComparer());
-        readonly object script;
+		readonly Dictionary<string, Task> tasks = new Dictionary<string, Task>(new CaseInsensitiveEqualityComparer());
+		readonly object script;
 
-        internal TaskRegistry()
-        {}
+		internal TaskRegistry()
+		{ }
 
-        internal TaskRegistry(BuildResult result)
-        {
-            script = CreateScriptInstance(result.Assembly);
+		internal TaskRegistry(BuildResult result)
+		{
+			script = CreateScriptInstance(result.Assembly);
 
-            foreach (var task in result.Tasks)
-                tasks.Add(task.FullName, task);
-        }
+			foreach (var task in result.Tasks)
+				tasks.Add(task.FullName, task);
+		}
 
-        static object CreateScriptInstance(Assembly assembly)
-        {
-            var submission = assembly.GetType(Task.ScriptClass);
+		static object CreateScriptInstance(Assembly assembly)
+		{
+			var submission = assembly.GetType(Task.ScriptClass);
 
-            var ctor = submission.GetConstructor(new[] {typeof(object[])});
-            Debug.Assert(ctor != null);
+			var ctor = submission.GetConstructor(new[] { typeof(object[]) });
+			Debug.Assert(ctor != null);
 
-            var submissionStates = new object[2];
-            submissionStates[0] = new object();
+			var submissionStates = new object[2];
+			submissionStates[0] = new object();
 
-            var instance = ctor.Invoke(new object[] {submissionStates});
-            submission.GetMethod("<Initialize>").Invoke(instance, new object[0]);
+			var instance = ctor.Invoke(new object[] { submissionStates });
+			submission.GetMethod("<Initialize>").Invoke(instance, new object[0]);
 
-            return instance;
-        }
+			return instance;
+		}
 
-        internal Task Find(string taskFullName)
-        {
-            return tasks.Find(taskFullName);
-        }
-        
-        internal IEnumerable<Task> Tasks
-        {
-            get { return tasks.Values; }
-        }
-    }
+		internal Task Find(string taskFullName)
+		{
+			return tasks.Find(taskFullName);
+		}
+
+		internal IEnumerable<Task> Tasks
+		{
+			get { return tasks.Values; }
+		}
+	}
 }

@@ -8,151 +8,151 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Nake.Magic
 {
-    class Analyzer : CSharpSyntaxWalker
-    {
-        readonly CSharpSyntaxTree tree;
-        readonly SemanticModel model;
-        readonly IDictionary<string, string> substitutions;
+	class Analyzer : CSharpSyntaxWalker
+	{
+		readonly CSharpSyntaxTree tree;
+		readonly SemanticModel model;
+		readonly IDictionary<string, string> substitutions;
 
-        Task current;
-        bool visitingConstant;
-        bool visitingStringFormat;
-        AnalyzerResult result;
-        
-        public Analyzer(CSharpCompilation compilation, IDictionary<string, string> substitutions)
-        {
-            tree = (CSharpSyntaxTree) compilation.SyntaxTrees.Single();
-            model = compilation.GetSemanticModel(tree, ignoreAccessibility: false);
+		Task current;
+		bool visitingConstant;
+		bool visitingStringFormat;
+		AnalyzerResult result;
 
-            this.substitutions = new Dictionary<string, string>(
-                substitutions, new CaseInsensitiveEqualityComparer());
-        }
+		public Analyzer(CSharpCompilation compilation, IDictionary<string, string> substitutions)
+		{
+			tree = (CSharpSyntaxTree)compilation.SyntaxTrees.Single();
+			model = compilation.GetSemanticModel(tree, ignoreAccessibility: false);
 
-        public AnalyzerResult Analyze()
-        {
-            result = new AnalyzerResult();
-            tree.GetRoot().Accept(this);
-            return result;
-        }
+			this.substitutions = new Dictionary<string, string>(
+				substitutions, new CaseInsensitiveEqualityComparer());
+		}
 
-        public override void VisitMethodDeclaration(MethodDeclarationSyntax node)
-        {
-            var symbol = model.GetDeclaredSymbol(node);
+		public AnalyzerResult Analyze()
+		{
+			result = new AnalyzerResult();
+			tree.GetRoot().Accept(this);
+			return result;
+		}
 
-            var isTask = IsTask(symbol);
-            var isStep = IsStep(symbol);
+		public override void VisitMethodDeclaration(MethodDeclarationSyntax node)
+		{
+			var symbol = model.GetDeclaredSymbol(node);
 
-            if (!isTask && !isStep)
-            {
-                base.VisitMethodDeclaration(node);
-                return;
-            }
+			var isTask = IsTask(symbol);
+			var isStep = IsStep(symbol);
 
-            current = result.Find(symbol);
+			if (!isTask && !isStep)
+			{
+				base.VisitMethodDeclaration(node);
+				return;
+			}
 
-            if (current == null)
-            {
-                current = new Task(symbol, isStep);
-                result.Add(symbol, current);
-            }
+			current = result.Find(symbol);
 
-            base.VisitMethodDeclaration(node);
-            current = null;
-        }
+			if (current == null)
+			{
+				current = new Task(symbol, isStep);
+				result.Add(symbol, current);
+			}
 
-        static bool IsTask(ISymbol symbol)
-        {
-            return symbol.GetAttributes().SingleOrDefault(x => x.AttributeClass.Name == "TaskAttribute") != null;
-        }     
+			base.VisitMethodDeclaration(node);
+			current = null;
+		}
 
-        static bool IsStep(ISymbol symbol)
-        {
-            return symbol.GetAttributes().SingleOrDefault(x => x.AttributeClass.Name == "StepAttribute") != null;
-        }     
+		static bool IsTask(ISymbol symbol)
+		{
+			return symbol.GetAttributes().SingleOrDefault(x => x.AttributeClass.Name == "TaskAttribute") != null;
+		}
 
-        public override void VisitInvocationExpression(InvocationExpressionSyntax node)
-        {
-            var symbol = ModelExtensions.GetSymbolInfo(model, node).Symbol as IMethodSymbol;
+		static bool IsStep(ISymbol symbol)
+		{
+			return symbol.GetAttributes().SingleOrDefault(x => x.AttributeClass.Name == "StepAttribute") != null;
+		}
 
-            if (symbol != null)
-            {
-                visitingStringFormat = IsStringFormatInvocation(symbol);
+		public override void VisitInvocationExpression(InvocationExpressionSyntax node)
+		{
+			var symbol = ModelExtensions.GetSymbolInfo(model, node).Symbol as IMethodSymbol;
 
-                if (IsStep(symbol))
-                {
-                    var task = result.Find(symbol);
-                    if (task == null)
-                    {
-                        task = new Task(symbol, true);
-                        result.Add(symbol, task);
-                    }
+			if (symbol != null)
+			{
+				visitingStringFormat = IsStringFormatInvocation(symbol);
 
-                    result.Add(node, new ProxyInvocation(task));
+				if (IsStep(symbol))
+				{
+					var task = result.Find(symbol);
+					if (task == null)
+					{
+						task = new Task(symbol, true);
+						result.Add(symbol, task);
+					}
 
-                    if (current != null)
-                        current.AddDependency(task);
-                }
-            }
+					result.Add(node, new ProxyInvocation(task));
 
-            base.VisitInvocationExpression(node);
-            visitingStringFormat = false;
-        }
+					if (current != null)
+						current.AddDependency(task);
+				}
+			}
 
-        static bool IsStringFormatInvocation(IMethodSymbol symbol)
-        {
-            return symbol.ToString().StartsWith("string.Format(");
-        }
+			base.VisitInvocationExpression(node);
+			visitingStringFormat = false;
+		}
 
-        public override void VisitFieldDeclaration(FieldDeclarationSyntax node)
-        {
-            visitingConstant = node.Modifiers.Any(SyntaxKind.ConstKeyword);
+		static bool IsStringFormatInvocation(IMethodSymbol symbol)
+		{
+			return symbol.ToString().StartsWith("string.Format(");
+		}
 
-            foreach (var variable in node.Declaration.Variables)
-            {
-                var symbol = (IFieldSymbol) ModelExtensions.GetDeclaredSymbol(model, variable);
+		public override void VisitFieldDeclaration(FieldDeclarationSyntax node)
+		{
+			visitingConstant = node.Modifiers.Any(SyntaxKind.ConstKeyword);
 
-                var fullName = symbol.ToString();
-                if (!substitutions.ContainsKey(fullName))
-                    continue;
+			foreach (var variable in node.Declaration.Variables)
+			{
+				var symbol = (IFieldSymbol)ModelExtensions.GetDeclaredSymbol(model, variable);
 
-                if (FieldSubstitution.Qualifies(symbol))
-                    result.Add(variable, new FieldSubstitution(variable, symbol, substitutions[fullName]));
-            }
+				var fullName = symbol.ToString();
+				if (!substitutions.ContainsKey(fullName))
+					continue;
 
-            base.VisitFieldDeclaration(node);
-            visitingConstant = false;
-        }
+				if (FieldSubstitution.Qualifies(symbol))
+					result.Add(variable, new FieldSubstitution(variable, symbol, substitutions[fullName]));
+			}
 
-        public override void VisitLocalDeclarationStatement(LocalDeclarationStatementSyntax node)
-        {
-            visitingConstant = node.Modifiers.Any(SyntaxKind.ConstKeyword);
-            
-            base.VisitLocalDeclarationStatement(node);
-            visitingConstant = false;
-        }
+			base.VisitFieldDeclaration(node);
+			visitingConstant = false;
+		}
 
-        public override void VisitParameter(ParameterSyntax node)
-        {
-            visitingConstant = true;
+		public override void VisitLocalDeclarationStatement(LocalDeclarationStatementSyntax node)
+		{
+			visitingConstant = node.Modifiers.Any(SyntaxKind.ConstKeyword);
 
-            base.VisitParameter(node);
-            visitingConstant = false;
-        }
+			base.VisitLocalDeclarationStatement(node);
+			visitingConstant = false;
+		}
 
-        public override void VisitAttribute(AttributeSyntax node)
-        {
-            visitingConstant = true;
+		public override void VisitParameter(ParameterSyntax node)
+		{
+			visitingConstant = true;
 
-            base.VisitAttribute(node);
-            visitingConstant = false;
-        }
+			base.VisitParameter(node);
+			visitingConstant = false;
+		}
 
-        public override void VisitLiteralExpression(LiteralExpressionSyntax node)
-        {
-            if (!visitingStringFormat && StringInterpolation.Qualifies(node))
-                result.Add(node, new StringInterpolation(model, node, visitingConstant));
-            
-            base.VisitLiteralExpression(node);
-        }
-    }
+		public override void VisitAttribute(AttributeSyntax node)
+		{
+			visitingConstant = true;
+
+			base.VisitAttribute(node);
+			visitingConstant = false;
+		}
+
+		public override void VisitLiteralExpression(LiteralExpressionSyntax node)
+		{
+			if (!visitingStringFormat && StringInterpolation.Qualifies(node))
+				result.Add(node, new StringInterpolation(model, node, visitingConstant));
+
+			base.VisitLiteralExpression(node);
+		}
+	}
 }

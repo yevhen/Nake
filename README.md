@@ -6,14 +6,19 @@ Nake is a magic task runner tool for .NET. It's a hybrid of Shovel and Rake. The
 [![Build status](https://ci.appveyor.com/api/projects/status/kors8n8y4r4xklop/branch/master?svg=true)](https://ci.appveyor.com/project/yevhen/nake/branch/master)
 [![NuGet](https://img.shields.io/nuget/v/Nake.svg?style=flat)](https://www.nuget.org/packages/Nake/)
 
-
 ### How to install
 
-There multiple ways in which Nake could be installed. You can install it by using NuGet [package](https://www.nuget.org/packages/Nake), or you can get it by downloading a [standalone](https://github.com/yevhen/Nake/releases) executable from GitHub releases page, and of course you can always build it from sources. 
+There multiple ways in which Nake could be installed.
 
-To install Nake via NuGet, run this command in NuGet package manager console:
+#### [NuGet](https://www.nuget.org/packages/Nake)
 
-	PM> Install-Package Nake
+`PM> Install-Package Nake`
+
+#### [Standalone](https://github.com/yevhen/Nake/releases)
+
+#### [Chocolatey](https://chocolatey.org/packages/Nake)
+
+`PM> chocolatey install Nake`
 
 ## Scripting reference
 
@@ -210,11 +215,14 @@ Gimme your pull requests!
 
 ## Samples and Documentation
 
-Have a look at [Nake.csx](https://github.com/yevhen/Nake/blob/master/Nake.csx). It's a Nake file used to build and publish Nake itself (ye, we're eating our own dog food).
+Have a look at [Nake.csx](https://github.com/yevhen/Nake/blob/master/Nake.csx). 
+It's a Nake file used to build and publish Nake itself (ye, we're eating our own dog food).
 
 ## Community
 
-General discussion group could be found [here](https://groups.google.com/forum/#!forum/naketool). Also, for news you can follow Nake's [official](https://twitter.com/NakeTool) twitter account (or [my](https://twitter.com/yevhen) account for that matter). The twitter's hashtag is `#naketool`.
+General discussion group could be found [here](https://groups.google.com/forum/#!forum/naketool). 
+Also, for news you can follow Nake's [official](https://twitter.com/NakeTool) twitter account (or [my](https://twitter.com/yevhen) account for that matter). 
+The twitter's hashtag is `#naketool`.
 
 ## Credits
 - Thanks to everyone in the Roslyn compiler team for making this happen
