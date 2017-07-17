@@ -1,7 +1,10 @@
 {
   "profiles": {
     "Nake": {
-      "commandName": "Project"
+      "commandName": "Executable",
+      "executablePath": "F:\\repositories\\liazon\\Active\\Nake\\Source\\Nake\\bin\\Publish\\Nake.exe",
+      "commandLineArgs": "Build",
+      "workingDirectory": "F:\\repositories\\liazon\\Active\\Nake"
     }
   }
 }

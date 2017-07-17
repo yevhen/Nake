@@ -14,6 +14,8 @@ namespace Nake.Utility
 			public string Stdout { get; set; }
 			public string Stderr { get; set; }
 		}
+		
+		public static void Exec(string command) { Exec(command, (e, stdout, stderr) => { }); }
 
 		public static void Exec(string command, Action<Exception, string, string> action)
 		{

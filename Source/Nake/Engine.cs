@@ -15,16 +15,13 @@ namespace Nake
 {
 	class Engine
 	{
-		readonly IEnumerable<AssemblyNameReference> assemblyNameReferences;
 		readonly IEnumerable<AssemblyAbsoluteReference> assemblyAbsoluteReferences;
 		readonly IEnumerable<string> namespaces;
 
 		public Engine(
-			IEnumerable<AssemblyNameReference> assemblyNameReferences = null,
 			IEnumerable<AssemblyAbsoluteReference> assemblyAbsoluteReferences = null,
 			IEnumerable<string> namespaces = null)
 		{
-			this.assemblyNameReferences = assemblyNameReferences ?? Enumerable.Empty<AssemblyNameReference>();
 			this.assemblyAbsoluteReferences = assemblyAbsoluteReferences ?? Enumerable.Empty<AssemblyAbsoluteReference>();
 			this.namespaces = namespaces ?? Enumerable.Empty<string>();
 		}
@@ -38,9 +35,6 @@ namespace Nake
 		CompiledScript Compile(string code)
 		{
 			var script = new Script();
-
-			foreach (var reference in assemblyNameReferences)
-				script.AddReference(reference);
 
 			foreach (var reference in assemblyAbsoluteReferences)
 				script.AddReference(reference);

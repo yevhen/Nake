@@ -1,7 +1,6 @@
 ﻿using Nake.Utility;
 using System;
 using System.Diagnostics;
-using System.Runtime.Loader;
 using System.Threading.Tasks;
 
 namespace Nake
@@ -53,13 +52,14 @@ namespace Nake
 			}
 			catch (OptionParseException e)
 			{
-				Log.Error(e.Message);
+				Log.Error(e);
 				Options.PrintUsage();
 				App.Fail(e);
 			}
 			catch (TaskInvocationException e)
 			{
-				Log.Error(e.GetBaseException());
+				var baseException = e.GetBaseException();
+				Log.Error(baseException);
 				App.Fail(e);
 			}
 		}

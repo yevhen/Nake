@@ -82,16 +82,9 @@ namespace Nake.Scripting
 				{
 					var reference = GetPath(RString, line);
 
-					if (reference.EndsWith(@".dll") || reference.EndsWith(@".exe"))
-					{
-						result.AbsoluteReferences.Add(
-							new AssemblyAbsoluteReference(currentScriptFilePath, reference));
+					result.AbsoluteReferences.Add(new AssemblyAbsoluteReference(currentScriptFilePath, reference));
 
-						return;
-					}
-
-					result.References.Add(
-						new AssemblyNameReference(currentScriptFilePath, reference));
+					return;
 				}
 
 				return;
@@ -143,7 +136,6 @@ namespace Nake.Scripting
 	class PreprocessedScript
 	{
 		public readonly HashSet<string> Namespaces = new HashSet<string>();
-		public readonly HashSet<AssemblyNameReference> References = new HashSet<AssemblyNameReference>();
 		public readonly HashSet<AssemblyAbsoluteReference> AbsoluteReferences = new HashSet<AssemblyAbsoluteReference>();
 		public readonly List<string> LoadedScripts = new List<string>();
 		public readonly List<string> Body = new List<string>();
@@ -232,56 +224,6 @@ namespace Nake.Scripting
 		public static implicit operator string(AssemblyAbsoluteReference obj)
 		{
 			return obj.AssemblyPath;
-		}
-	}
-
-	internal struct AssemblyNameReference : IEquatable<AssemblyNameReference>
-	{
-		public readonly string AssemblyName;
-		public string ScriptFile;
-
-		public AssemblyNameReference(string scriptFile, string assemblyName)
-		{
-			ScriptFile = scriptFile;
-			AssemblyName = assemblyName;
-		}
-
-		public bool Equals(AssemblyNameReference other)
-		{
-			return String.Equals(AssemblyName, other.AssemblyName);
-		}
-
-		public override bool Equals(object obj)
-		{
-			if (ReferenceEquals(null, obj))
-				return false;
-
-			return obj is AssemblyNameReference && Equals((AssemblyNameReference)obj);
-		}
-
-		public override int GetHashCode()
-		{
-			return AssemblyName.GetHashCode();
-		}
-
-		public override string ToString()
-		{
-			return AssemblyName;
-		}
-
-		public static bool operator ==(AssemblyNameReference left, AssemblyNameReference right)
-		{
-			return left.Equals(right);
-		}
-
-		public static bool operator !=(AssemblyNameReference left, AssemblyNameReference right)
-		{
-			return !left.Equals(right);
-		}
-
-		public static implicit operator string(AssemblyNameReference obj)
-		{
-			return obj.AssemblyName;
 		}
 	}
 }

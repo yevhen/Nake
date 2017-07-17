@@ -10,8 +10,8 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.CSharp.RuntimeBinder;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
-using Nake.Utility;
 using System.Reflection;
+using System.Net.Http;
 
 namespace Nake.Scripting
 {
@@ -19,15 +19,14 @@ namespace Nake.Scripting
 	{
 		static readonly List<MetadataReference> NakeReferences = new List<MetadataReference>
 		{
-			Reference(typeof(Engine)),
-			Reference(typeof(TaskAttribute)),
-			Reference(typeof(Env))
+			Reference(typeof(Program))
 		};
 
 		static readonly Dictionary<string, MetadataReference> DefaultReferences = new Dictionary<string, MetadataReference>
 		{
 			{"mscorlib",                        Reference(typeof(object))},
 			{"System",                          Reference(typeof(string))},
+			{"System.Net.Http",                      Reference(typeof(HttpClient))},
 			{"System.Core",                     Reference(typeof(IQueryable))},
 			{"System.Xml",                      Reference(typeof(XmlElement))},
 			{"System.Xml.Linq",                 Reference(typeof(XElement))},
@@ -48,8 +47,10 @@ namespace Nake.Scripting
 
 		static MetadataReference Reference(Type type)
 		{
-			// HALP
-			return MetadataReference.CreateFromFile(Assembly.GetEntryAssembly().CodeBase + type.FullName);
+			var location = type.GetTypeInfo().Assembly.Location;
+
+			try { return MetadataReference.CreateFromFile(location); }
+			catch (Exception exception) { throw; }
 		}
 
 		readonly HashSet<string> namespaces;
@@ -77,20 +78,6 @@ namespace Nake.Scripting
 										string.Join("\n", diagnostics.Where(x => x.Severity == DiagnosticSeverity.Error)));
 
 			return new CompiledScript(references.Select(x => new AssemblyReference(x)), compilation);
-		}
-
-		public void AddReference(AssemblyNameReference reference)
-		{
-			if (DefaultReferences.ContainsKey(reference.AssemblyName))
-				return;
-
-			string fullPath;
-			if (!GAC.AssemblyExist(reference.AssemblyName, out fullPath))
-				throw new NakeException(
-					"Assembly reference {0} defined in script {1} cannot be found",
-					reference.AssemblyName, reference.ScriptFile);
-
-			AddReference(MetadataReference.CreateFromFile(fullPath));
 		}
 
 		public void AddReference(AssemblyAbsoluteReference reference)

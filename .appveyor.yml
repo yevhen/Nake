@@ -1,0 +1,38 @@
+version: '{build}'
+max_jobs: 1
+image: Visual Studio 2017
+
+environment:
+  chocolatey_api_key:
+    secure: 1Xcy3lMBF45S5yprAYisJud5OkM6yJl2JE5mcrlOC8m+IAbq0zN2QHU2CdnGRV+Q
+
+init:
+  - git config --global core.autocrlf false
+
+before_build:
+  - nuget restore Nake.sln
+  - cmd: echo %appveyor_build_version%
+  - ps: gitversion /l console /output buildserver /updateAssemblyInfo
+  - cmd: echo %GitVersion_MajorMinorPatch%
+  
+platform: Any CPU
+configuration: Release
+  
+build:
+  parallel: false
+  project: Nake.sln
+  verbosity: normal    
+
+after_build:
+  nuget pack %APPVEYOR_BUILD_FOLDER%\Nake.nuspec -Properties="version=%GitVersion_MajorMinorPatch%"
+  choco push %APPVEYOR_BUILD_FOLDER%\Nake.%GitVersion_MajorMinorPatch%.nupkg -k="%chocolatey_api_key%"
+  
+artifacts:
+- path: '*.nupkg'
+  name: 'ChocolateyPackage-%GitVersion_MajorMinorPatch%
+
+notifications:
+  - provider: GitHubPullRequest
+    github_auth_token:
+      secure: SDw1gs4noXA0eUpBoBcbT2XNYwf0Bg7gHR/TpP2Y/gQS/QYST7toE0oRzoKV/2U6
+    template: "{{#passed}}:white_check_mark:{{/passed}}{{#failed}}:x:{{/failed}} [Build {{&projectName}} {{buildVersion}} {{status}}]({{buildUrl}}) (commit {{commitUrl}} by @{{&commitAuthorUsername}})"

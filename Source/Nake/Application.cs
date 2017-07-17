@@ -94,7 +94,6 @@ namespace Nake
 		BuildResult Build(PreprocessedScript script, IEnumerable<TaskDeclaration> declarations)
 		{
 			var engine = new Engine(
-				script.References,
 				script.AbsoluteReferences,
 				script.Namespaces
 			);

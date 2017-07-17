@@ -1,29 +1,30 @@
-﻿using System.IO;
-using System.Net;
-using System.Diagnostics;
+﻿using System;
+using System.IO;
+using System.Net.Http;
 
-using static Nake.FS;
-using static Nake.Log;
-using static Nake.Env;
-using static Nake.Run;
-
-var MSBuildExe    = @"%ProgramFiles(x86)%\MSBuild\14.0\Bin\MSBuild.exe";
-var NugetExe      = @".nuget/nuget.exe";
+using Nake.Utility;
+using static Nake.Utility.FS;
+using static Nake.Utility.Log;
+using static Nake.Utility.Env;
+using static Nake.Utility.Run;
 
 var AppVeyor      = Var["APPVEYOR"] == "True";
-var Configuration = Var["Configuration"] = "Debug";
+var Configuration = Var["Configuration"];
 
-[Task] void Default() { Restore(); Clean(); Build(); }
+if (string.IsNullOrEmpty(Configuration)) { Configuration = "Debug"; }
 
-[Task] void Restore()
+[Step] public void Build()
 {
-	Cmd($@"{NugetExe} restore packages.config");
-	Cmd($@"{NugetExe} restore Nake.sln");
+	Exec($"dotnet build --configuration {Configuration}");
+	Exec(@"cd ""Source/Nake"" && dotnet publish --runtime win10-x64");
 }
 
-[Task] void Clean() { Delete(@"**\bin\*|**\obj\*|-:*.vshost.exe"); }
+[Task] public void Default() { Restore(); Clean(); Build(); }
 
-[Step] void Build() { Exec(MSBuildExe, $"Nake.sln /p:Configuration={Configuration} /m"); }
+[Task] void Restore() { Exec("dotnet restore"); }
+
+[Task] void Clean() { Exec("dotnet clean"); }
+
 
 [Step] void Test()
 {
@@ -32,11 +33,10 @@ var Configuration = Var["Configuration"] = "Debug";
 	var tests = new FileSet { @"**\bin\*.Tests.dll" }.ToString(" ");
 	var results = "nunit-test-results.xml";
 
-	Cmd(@"Packages\NUnit.Runners.2.6.2\tools\nunit-console.exe " +
-		$@"/xml:{results} /framework:net-4.0 /noshadow /nologo {tests}");
+	Exec(@"Packages\NUnit.Runners.2.6.2\tools\nunit-console.exe " + $@"/xml:{results} /framework:net-4.0 /noshadow /nologo {tests}");
 
 	if (AppVeyor)
-		new WebClient().UploadFile("https://ci.appveyor.com/api/testresults/nunit/%APPVEYOR_JOB_ID%", results);
+		new HttpClient().PostAsync("https://ci.appveyor.com/api/testresults/nunit/%APPVEYOR_JOB_ID%", new StreamContent(File.OpenRead(results)));
 }
 
 [Step] void Package()
@@ -45,24 +45,15 @@ var Configuration = Var["Configuration"] = "Debug";
 	Test();
 	Build();
 
-	var version = Version();
+	var version = Var["GitVersion_MajorMinorPatch"];
 
-	File.WriteAllText(
-		"Nake.bat",
-		"@ECHO OFF \r\n" +
-		@"packages\Nake.{version}\tools\net45\Nake.exe %*");
+	File.WriteAllText("Nake.bat", "@ECHO OFF \r\n" +
+		$@"packages\Nake.{version}\tools\net45\Nake.exe %*");
+	File.WriteAllText($@"bin/{Configuration}/README.md", $"### Nake ({version})\r\n" + File.ReadAllText(@"README.md"));
 
-	string readme = File.ReadAllText(@"README.md");
-	File.WriteAllText($@"bin/{Configuration}/README.md", $"### Nake ({version})\r\n" + readme);
-
-	Cmd($@"{NugetExe} pack Nake.nuspec -Version {version} -NoPackageAnalysis");
+	Exec($@"gitversion /l console /output buildserver /updateAssemblyInfo");
+	Exec($@"nuget pack Nake.nuspec -Version %GitVersion_MajorMinorPatch% -NoPackageAnalysis");
 }
 
-[Step] void Publish() { Cmd($@"{NugetExe} push Nake.{Version()}.nupkg %NuGetApiKey% -Source https://nuget.org/"); }
+[Step] void Publish() { Exec($@"nuget push Nake.%GitVersion_MajorMinorPatch%.nupkg %NuGetApiKey% -Source https://nuget.org/"); }
 
-string Version()
-{
-	return FileVersionInfo
-		.GetVersionInfo($@"Nake/bin/{Configuration}/Nake.exe")
-		.ProductVersion;
-}
