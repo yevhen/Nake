@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Security.Permissions;
 using System.Threading.Tasks;
 
 namespace Nake
 {
     public class Program
     {
-        [SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.ControlAppDomain)]
         public static void Main(string[] args)
         {
             BreakInDebuggerIfRequested();

@@ -10,10 +10,10 @@ using System.Xml.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Scripting;
-using Microsoft.CodeAnalysis.Scripting.CSharp;
 using Microsoft.CSharp.RuntimeBinder;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
+using Microsoft.CodeAnalysis.CSharp.Scripting;
 
 namespace Nake.Scripting
 {
@@ -69,7 +69,7 @@ namespace Nake.Scripting
         public CompiledScript Compile(string code)
         {
             var options = ScriptOptions.Default
-                .AddNamespaces(namespaces)
+                .AddImports(namespaces)
                 .AddReferences(references);
 
             var script = CSharpScript.Create(code, options);

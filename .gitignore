@@ -49,3 +49,5 @@ TestResults/
 /Tools/Nake/Roslyn
 /Packages/!Repositories.config
 /Source/Utility/Help
+
+.idea

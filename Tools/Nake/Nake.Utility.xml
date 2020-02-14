@@ -1,0 +1,557 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Nake.Utility</name>
+    </assembly>
+    <members>
+        <member name="T:Nake.App">
+            <summary>
+            Helper methods to control Nake runner
+            </summary>
+        </member>
+        <member name="M:Nake.App.Exit(System.String)">
+            <summary>
+            Exits Nake runner with optional printing of the given message.
+            </summary>
+            <param name="message">The message.</param>
+        </member>
+        <member name="M:Nake.App.Fail(System.String)">
+            <summary>
+            Exits Nake runner with failure code (-1), optionally printing the given message.
+            </summary>
+            <param name="message">The message.</param>
+        </member>
+        <member name="T:Nake.Color">
+            <summary>
+            Helps printing console messages with given color
+            </summary>
+        </member>
+        <member name="M:Nake.Color.With(System.ConsoleColor,System.Action)">
+            <summary>
+            Temporarily switches console color to the given one, while executing specified action
+            </summary>
+            <param name="color">The color to switch to.</param>
+            <param name="action">The action to execute.</param>
+        </member>
+        <member name="T:Nake.Env">
+            <summary>
+            Helper methods to deal with environment variables. Default level is Process.
+            </summary>
+        </member>
+        <member name="F:Nake.Env.Var">
+            <summary>
+            An entry point for set of helper methods to deal with environment variables
+            </summary>
+        </member>
+        <member name="T:Nake.Env.Variables">
+            <summary>
+            An entry point for set of helper methods to deal with environment variables
+            </summary>
+        </member>
+        <member name="F:Nake.Env.Variables.User">
+            <summary>
+            Allows to manipulate environment variables on the user-level
+            </summary>
+        </member>
+        <member name="F:Nake.Env.Variables.Machine">
+            <summary>
+            Allows to manipulate environment variables on the machine-level
+            </summary>
+        </member>
+        <member name="T:Nake.EnvironmentScope">
+            <summary>
+            Contains actual methods to deal with environment variables
+            </summary>
+        </member>
+        <member name="P:Nake.EnvironmentScope.Item(System.String)">
+            <summary>
+            Gets or sets the envrionment variable with the specified name.
+            </summary>
+            <value> The string value. </value>
+            <param name="name">The variable name.</param>
+            <returns>Value or <c>null</c> if environment variable does not exists</returns>
+        </member>
+        <member name="M:Nake.EnvironmentScope.Defined(System.String)">
+            <summary>
+            Checks whether there is an environment variable with the specified name is defined (exists).
+            </summary>
+            <param name="name">The name of variable.</param>
+            <returns><c>true</c> if defined, <c>false</c> otherwise</returns>
+        </member>
+        <member name="M:Nake.EnvironmentScope.All">
+            <summary>
+            Returns all environment varaibles as name=value pairs
+            </summary>
+            <returns>Array of environment variable pairs</returns>
+        </member>
+        <member name="T:Nake.FileSet">
+            <summary>
+            Helper class to deal with file selections
+            </summary>
+        </member>
+        <member name="M:Nake.FileSet.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Nake.FileSet"/> with the given base path.
+            </summary>
+            <param name="basePath">The base path to be used for relative paths, instead of CurrentDirectory.</param>
+        </member>
+        <member name="M:Nake.FileSet.Add(System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Adds specified file patterns.
+            </summary>
+            <param name="patterns">The patterns.</param>
+            <returns>This instance</returns>
+        </member>
+        <member name="M:Nake.FileSet.Add(System.String)">
+            <summary>
+            Adds specified file pattern.
+            </summary>
+            <param name="pattern">The pattern.</param>
+            <returns>This instance</returns>
+        </member>
+        <member name="M:Nake.FileSet.Include(System.String)">
+            <summary>
+            Adds the specified file inclusion pattern.
+            </summary>
+            <param name="pattern">The pattern.</param>
+            <returns>This instance</returns>
+            <exception cref="T:System.ArgumentException">
+            Pattern cannot be null or contain whitespace only, contain forward slashes of exclusion pattern markers
+            </exception>
+        </member>
+        <member name="M:Nake.FileSet.Exclude(System.String)">
+            <summary>
+            Adds the specified file exclusion pattern.
+            </summary>
+            <param name="pattern">The pattern.</param>
+            <returns>This instance</returns>
+            <exception cref="T:System.ArgumentException">
+            Pattern cannot be null or contain whitespace only, contain forward slashes of inclusion pattern markers
+            </exception>
+        </member>
+        <member name="M:Nake.FileSet.Exclude(System.Text.RegularExpressions.Regex)">
+            <summary>
+            Registers the specified regex to be used as exclusion matcher.
+            </summary>
+            <param name="regex">The regex.</param>
+            <returns>This insance</returns>
+            <exception cref="T:System.ArgumentNullException">regex is null</exception>
+        </member>
+        <member name="M:Nake.FileSet.Exclude(System.Func{System.String,System.Boolean})">
+            <summary>
+            Registers the specified predicate to be used as exclusion matcher.
+            </summary>
+            <param name="predicate">The predicate.</param>
+            <returns>This instance</returns>
+            <exception cref="T:System.ArgumentNullException">predicate is null</exception>
+        </member>
+        <member name="M:Nake.FileSet.GetEnumerator">
+            <summary>
+            Returns an enumerator that iterates through the collection.
+            </summary>
+            <returns>
+            A <see cref="T:System.Collections.Generic.IEnumerator`1"/> that can be used to iterate through the collection.
+            </returns>
+            <filterpriority>1</filterpriority>
+        </member>
+        <member name="M:Nake.FileSet.Resolve">
+            <summary>
+            Resolves all file patterns in this file set to absolute paths.
+            </summary>
+            <returns>A sequence of file items with additional information</returns>
+        </member>
+        <member name="M:Nake.FileSet.Mirror(System.String)">
+            <summary>
+            Mirrors this file set onto detination path.
+            </summary>
+            <param name="destination">The destination path.</param>
+            <returns>New set of paths</returns>
+        </member>
+        <member name="M:Nake.FileSet.Flatten(System.String)">
+            <summary>
+            Flattens this file set onto destination path.
+            </summary>
+            <param name="destination">The destination path.</param>
+            <returns>New set of paths</returns>
+        </member>
+        <member name="M:Nake.FileSet.Transform(System.Func{Nake.FileSet.Item,System.String})">
+            <summary>
+            Transforms this file set using the given transform function.
+            </summary>
+            <param name="transform">The transform function.</param>
+            <returns>New set of paths</returns>
+            <exception cref="T:System.ArgumentNullException">Transform function is <c>null</c></exception>
+        </member>
+        <member name="M:Nake.FileSet.AsTaskItems">
+            <summary>
+            Performs conversion from file set to array of <see cref="T:Microsoft.Build.Framework.ITaskItem"/>.
+            </summary>
+            <returns> The sequence of MSBuild task items </returns>
+        </member>
+        <member name="M:Nake.FileSet.op_Implicit(System.String[])~Nake.FileSet">
+            <summary>
+            Performs an implicit conversion from string array to <see cref="T:Nake.FileSet"/>.
+            </summary>
+            <param name="arg">The argument.</param>
+            <returns>
+            The result of the conversion.
+            </returns>
+        </member>
+        <member name="M:Nake.FileSet.op_Implicit(System.String)~Nake.FileSet">
+            <summary>
+            Performs an implicit conversion from string to file set.
+            </summary>
+            <param name="arg">The argument.</param>
+            <returns> The new file set </returns>
+        </member>
+        <member name="M:Nake.FileSet.op_Implicit(Nake.FileSet)~System.String[]">
+            <summary>
+            Performs an implicit conversion from file set to string array.
+            </summary>
+            <param name="arg">The argument.</param>
+            <returns> The array of the resolved file set paths </returns>
+        </member>
+        <member name="M:Nake.FileSet.ToString">
+            <summary>
+            Returns a string that represents the current object.
+            </summary>
+            <returns>
+            A string that represents the current object.
+            </returns>
+            <filterpriority>2</filterpriority>
+        </member>
+        <member name="M:Nake.FileSet.ToString(System.String)">
+            <summary>
+            Returns a string of resolved concatenated file paths using given separator.
+            </summary>
+            <param name="separator">Path separator</param>
+            <returns>  The string with resolved file set paths separated by given  separator </returns>
+        </member>
+        <member name="T:Nake.FileSet.Item">
+            <summary>
+            Represent fully resolved file set item
+            </summary>
+        </member>
+        <member name="F:Nake.FileSet.Item.BasePath">
+            <summary>
+            The base path
+            </summary>
+        </member>
+        <member name="F:Nake.FileSet.Item.FullPath">
+            <summary>
+            The full path
+            </summary>
+        </member>
+        <member name="F:Nake.FileSet.Item.RecursivePath">
+            <summary>
+            The recursive path
+            </summary>
+        </member>
+        <member name="F:Nake.FileSet.Item.FileName">
+            <summary>
+            The full file name
+            </summary>
+        </member>
+        <member name="F:Nake.FileSet.Item.Name">
+            <summary>
+            The file name
+            </summary>
+        </member>
+        <member name="F:Nake.FileSet.Item.Extension">
+            <summary>
+            The file extension
+            </summary>
+        </member>
+        <member name="M:Nake.FileSet.Item.op_Explicit(Nake.FileSet.Item)~System.String">
+            <summary>
+            Performs an explicit conversion from <see cref="T:Nake.FileSet.Item"/> to <see cref="T:System.String"/>.
+            </summary>
+            <param name="arg">The argument.</param>
+            <returns>
+            The full path of the item.
+            </returns>
+        </member>
+        <member name="M:Nake.FileSet.Item.Equals(Nake.FileSet.Item)">
+            <summary>
+            Checks whether this item is equal to other item, by performing case-insensitive comparison of full path.
+            </summary>
+            <param name="other">The other item.</param>
+            <returns><c>true</c> if items are equal by full path</returns>
+        </member>
+        <member name="M:Nake.FileSet.Item.Equals(System.Object)">
+            <summary>
+            Indicates whether this instance and a specified object are equal.
+            </summary>
+            <returns>
+            true if <paramref name="obj"/> and this instance are the same type and represent the same value; otherwise, false.
+            </returns>
+            <param name="obj">Another object to compare to. </param><filterpriority>2</filterpriority>
+        </member>
+        <member name="M:Nake.FileSet.Item.GetHashCode">
+            <summary>
+            Returns the hash code for this instance.
+            </summary>
+            <returns>
+            A 32-bit signed integer that is the hash code for this instance.
+            </returns>
+            <filterpriority>2</filterpriority>
+        </member>
+        <member name="M:Nake.FileSet.Item.op_Equality(Nake.FileSet.Item,Nake.FileSet.Item)">
+            <summary>
+            Checks whether this item is equal to other item, by performing case-insensitive comparison of full path.
+            </summary>
+            <param name="left">The left.</param>
+            <param name="right">The right.</param>
+            <returns><c>true</c> if items are equal by full path</returns>
+        </member>
+        <member name="M:Nake.FileSet.Item.op_Inequality(Nake.FileSet.Item,Nake.FileSet.Item)">
+            <summary>
+            Checks whether this item is not equal to other item, by performing case-insensitive comparison of full path.
+            </summary>
+            <param name="left">The left.</param>
+            <param name="right">The right.</param>
+            <returns><c>true</c> if items are not equal by full path</returns>
+        </member>
+        <member name="T:Nake.FS">
+            <summary>
+            File-system convenience methods
+            </summary>
+        </member>
+        <member name="M:Nake.FS.Copy(System.String[],System.String[],System.Boolean,System.Boolean)">
+            <summary>
+            Copies the specified files into specified destination files.
+            </summary>
+            <param name="sourceFiles">The source files.</param>
+            <param name="destinationFiles">The destination files.</param>
+            <param name="overwriteReadOnlyFiles">if set to <c>true</c> will overwrite read only files. Default is <c>false</c></param>
+            <param name="skipUnchangedFiles">if set to <c>true</c> will skip unchanged files. Default is <c>true</c></param>
+        </member>
+        <member name="M:Nake.FS.Copy(System.String[],System.String,System.Boolean,System.Boolean)">
+            <summary>
+            Copies the specified files into a specifed destination folder.
+            </summary>
+            <param name="sourceFiles">The source files.</param>
+            <param name="destinationFolder">The destination folder.</param>
+            <param name="overwriteReadOnlyFiles">if set to <c>true</c> will overwrite read only files. Default is <c>false</c></param>
+            <param name="skipUnchangedFiles">if set to <c>true</c> will skip unchanged files. Default is <c>true</c></param>
+        </member>
+        <member name="M:Nake.FS.Copy(System.String,System.String,System.Boolean,System.Boolean)">
+            <summary>
+            Copies the files, specified as file selection patterns, into a specifed destination folder.
+            </summary>
+            <param name="sourceFiles">The source file selection patterns</param>
+            <param name="destinationFolder">The destination folder.</param>
+            <param name="overwriteReadOnlyFiles">if set to <c>true</c> will overwrite read only files. Default is <c>false</c></param>
+            <param name="skipUnchangedFiles">if set to <c>true</c> will skip unchanged files. Default is <c>true</c></param>
+        </member>
+        <member name="M:Nake.FS.Move(System.String[],System.String[],System.Boolean)">
+            <summary>
+            Moves the specified files into specified destination files.
+            </summary>
+            <param name="sourceFiles">The source files.</param>
+            <param name="destinationFiles">The destination files.</param>
+            <param name="overwriteReadOnlyFiles">if set to <c>true</c> will overwrite read only files. Default is <c>false</c></param>
+        </member>
+        <member name="M:Nake.FS.Move(System.String[],System.String,System.Boolean)">
+            <summary>
+            Moves the specified files into a specifed destination folder..
+            </summary>
+            <param name="sourceFiles">The source files.</param>
+            <param name="destinationFolder">The destination folder.</param>
+            <param name="overwriteReadOnlyFiles">if set to <c>true</c> will overwrite read only files. Default is <c>false</c></param>
+        </member>
+        <member name="M:Nake.FS.Move(System.String,System.String,System.Boolean)">
+            <summary>
+            Moves the files, specified as file selection patterns, into a specifed destination folder.
+            </summary>
+            <param name="sourceFiles">The source file selection patterns</param>
+            <param name="destinationFolder">The destination folder.</param>
+            <param name="overwriteReadOnlyFiles">if set to <c>true</c> will overwrite read only files. Default is <c>false</c></param>
+        </member>
+        <member name="M:Nake.FS.Delete(System.String[])">
+            <summary>
+            Deletes the specified files.
+            </summary>
+            <param name="files">The file selection patterns.</param>
+            <returns>Array of actually deleted files</returns>
+        </member>
+        <member name="M:Nake.FS.MakeDir(System.String[])">
+            <summary>
+            Makes specified directories.
+            </summary>
+            <param name="directories">The directories.</param>
+        </member>
+        <member name="M:Nake.FS.RemoveDir(System.String[])">
+            <summary>
+            Removes specified directories.
+            </summary>
+            <param name="directories">The directories.</param>
+            <returns>Array of actually removed directories</returns>
+        </member>
+        <member name="M:Nake.FS.UpToDate(System.String,System.String[])">
+            <summary>
+            Checks that specified output file is up to date in respect to specified set of input files.
+            </summary>
+            <param name="outputFile">The output file</param>
+            <param name="inputFiles">The input files.</param>
+            <returns><c>true</c> if output file is up to date or doesn't exists, <c>false</c> otherwise</returns>
+            <exception cref="T:System.ArgumentException">Specified input files do not exist</exception>
+        </member>
+        <member name="T:Nake.Location">
+            <summary>
+            Convinience helper methods for working with file system paths
+            </summary>
+        </member>
+        <member name="F:Nake.Location.CurrentDirectory">
+            <summary>
+            Returns path to the current directory. By default it is a directory in which Nake was started.
+            </summary>
+            <remarks>Could be substituted dynamically</remarks>
+        </member>
+        <member name="P:Nake.Location.NakeScriptDirectory">
+            <summary>
+            Gets the script directory.
+            </summary>
+            <value> The directory in which entry script is residing. </value>
+        </member>
+        <member name="P:Nake.Location.NakeStartupDirectory">
+            <summary> 
+            Gets the startup directory. 
+            </summary>
+            <value> The directory in which Nake was started. </value>
+        </member>
+        <member name="T:Nake.Log">
+            <summary>
+            Shortcut methods for outputting messages to std out
+            </summary>
+        </member>
+        <member name="F:Nake.Log.Out">
+            <summary>
+            Controls actual printing to Console.Out.
+            </summary>
+            <remarks>
+             Could be substituted in order to redirect messages
+            </remarks>
+        </member>
+        <member name="M:Nake.Log.TraceFormat(System.String,System.Object[])">
+            <summary>
+            Prints trace-level message using specified format string and arguments. The message will be printed in DarkGreen color.
+            The message will be printed only if Nake is called with --trace switch.
+            </summary>
+            <param name="message">The message.</param>
+            <param name="args">The arguments.</param>
+        </member>
+        <member name="M:Nake.Log.Trace(System.String)">
+            <summary>
+            Prints trace-level message. The message will be printed in DarkGreen color.
+            The message will be printed only if Nake is called with --trace switch.
+            </summary>
+            <param name="message">The message.</param>
+        </member>
+        <member name="M:Nake.Log.MessageFormat(System.String,System.Object[])">
+            <summary>
+            Prints simple message using specified format string and arguments. The message will be printed in DarkCyan color.
+            </summary>
+            <param name="message">The message.</param>
+            <param name="args">The arguments.</param>
+        </member>
+        <member name="M:Nake.Log.Message(System.String)">
+            <summary>
+            Prints simple message. The message will be printed in DarkCyan color.
+            </summary>
+            <param name="message">The message.</param>
+        </member>
+        <member name="M:Nake.Log.InfoFormat(System.String,System.Object[])">
+            <summary>
+            Prints informational message using specified format string and arguments. The message will be printed in DarkGray color.
+            </summary>
+            <param name="message">The message.</param>
+            <param name="args">The arguments.</param>
+        </member>
+        <member name="M:Nake.Log.Info(System.String)">
+            <summary>
+            Prints informational message. The message will be printed in DarkGray color.
+            </summary>
+            <param name="message">The message.</param>
+        </member>
+        <member name="M:Nake.Log.Error(System.Exception)">
+            <summary>
+            Prints error message using specified exception as input. The message will be printed in DarkRed color.
+            The stack trace will be printed only if Nake is called with --trace switch.
+            </summary>
+            <param name="exception">The exception.</param>
+        </member>
+        <member name="M:Nake.Log.Error(System.String)">
+            <summary>
+            Prints error message. The message will be printed in DarkRed color.
+            </summary>
+            <param name="message">The message.</param>
+        </member>
+        <member name="T:Nake.MSBuildExtensions">
+            <summary>
+            Set of extension methods to make interoperating with MSBuild easier
+            </summary>
+        </member>
+        <member name="M:Nake.MSBuildExtensions.AsStrings(System.Collections.Generic.IEnumerable{Microsoft.Build.Framework.ITaskItem})">
+            <summary>
+            Converts sequence of <see cref="T:Microsoft.Build.Framework.ITaskItem"/> to string array
+            </summary>
+            <param name="sequence">Sequence of MSBuild task items</param>
+            <returns>Array of strings</returns>
+        </member>
+        <member name="M:Nake.MSBuildExtensions.AsTaskItems(System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Converts sequence of strings to array of <see cref="T:Microsoft.Build.Framework.ITaskItem"/>
+            </summary>
+            <param name="sequence">Sequence of strings</param>
+            <returns>Array of MSBuild task items</returns>
+        </member>
+        <member name="M:Nake.MSBuildExtensions.AsTaskItem(System.String)">
+            <summary>
+            Converts string to <see cref="T:Microsoft.Build.Framework.ITaskItem"/>
+            </summary>
+            <param name="s">string</param>
+            <returns>Task item</returns>
+        </member>
+        <member name="T:Nake.Run">
+            <summary>
+            Shortcuts for running external tools
+            </summary>
+        </member>
+        <member name="M:Nake.Run.Cmd(System.String,System.String[],System.String,System.Boolean,System.Boolean,System.Boolean,System.Boolean)">
+            <summary>
+            Executes specified command within a standard OS command-line interpreter.
+            </summary>
+            <param name="command">The command.</param>
+            <param name="environmentVariables">The environment variables pairs to pass. Default is all vars defined within a process</param>
+            <param name="workingDirectory">The working directory. Default is current directory</param>
+            <param name="echoOff">if set to <c>true</c>disables echoing command output to std out</param>
+            <param name="ignoreStdOutErrors">if set to <c>true</c> ignores errors logged to std out</param>
+            <param name="ignoreExitCode">if set to <c>true</c> ignores exit code</param>
+            <param name="disableStdOutLogging">if set to <c>true</c> completely disable any std out logging</param>
+            <returns> Exit code </returns>
+            <exception cref="T:System.ApplicationException">If command fails</exception>
+        </member>
+        <member name="M:Nake.Run.Exec(System.String,System.String,System.String,System.Boolean)">
+            <summary>
+            Executes the specified file with given argument string.
+            </summary>
+            <param name="fileName">Name of the executable file.</param>
+            <param name="arguments">The arguments.</param>
+            <param name="workingDirectory">The working directory. Default is current directory</param>
+            <param name="ignoreExitCode">if set to <c>true</c> ignores exit code</param>
+            <returns> Exit code </returns>
+        </member>
+        <member name="M:Nake.Run.Exec``1(``0,System.Boolean,System.Boolean)">
+            <summary>
+            Executes MSBuild task.
+            </summary>
+            <typeparam name="TTask">The type of the task.</typeparam>
+            <param name="task">The task.</param>
+            <param name="ignoreStdOutErrors">if set to <c>true</c> ignores errors logged to std out</param>
+            <param name="disableStdOutLogging">if set to <c>true</c> completely disable any std out logging</param>
+            <returns>The executed task. Allows to get value of any OUT property</returns>
+            <exception cref="T:System.ApplicationException">If tasks fails</exception>
+        </member>
+    </members>
+</doc>
