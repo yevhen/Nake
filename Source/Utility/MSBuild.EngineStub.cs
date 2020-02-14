@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections;
 
-using Microsoft.Build.BuildEngine;
 using Microsoft.Build.Framework;
+using Microsoft.Build.Logging;
 
 namespace Nake
 {
