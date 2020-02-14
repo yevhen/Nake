@@ -3,6 +3,7 @@
     <!-- Set the repository root into a variable -->
     <PropertyGroup>
         <SourceRoot>$(MSBuildThisFileDirectory)</SourceRoot>
+        <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     </PropertyGroup>
 
     <!-- Set common properties regarding assembly information and nuget packages -->

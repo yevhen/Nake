@@ -1,10 +1,6 @@
-﻿#r "System.Xml"
-#r "System.Xml.Linq"
-
-using System.IO;
+﻿using System.IO;
 using System.Net;
 using System.Linq;
-using System.Xml.Linq;
 using System.Diagnostics;
 
 using static Nake.FS;
@@ -19,9 +15,6 @@ var PackagePath = @"{OutputPath}\Package";
 var DebugOutputPath = @"{PackagePath}\Debug";
 var ReleaseOutputPath = @"{PackagePath}\Release";
 
-var MSBuildExe = @"%ProgramFiles(x86)%\MSBuild\14.0\Bin\MSBuild.exe";
-var AppVeyor = Var["APPVEYOR"] == "True";
-
 /// Builds sources in debug mode 
 [Task] void Default()
 {
@@ -33,7 +26,7 @@ var AppVeyor = Var["APPVEYOR"] == "True";
 /// Restores dependencies (packages) from NuGet 
 [Task] void Restore()
 {
-    Cmd(@"dotnet restore {RootPath}\Nake.sln");
+    Cmd(@"dotnet restore {RootPath}/Nake.sln");
 }
 
 /// Wipeout all build output and temporary build files 
@@ -46,7 +39,7 @@ var AppVeyor = Var["APPVEYOR"] == "True";
 /// Builds sources using specified configuration and output path
 [Step] void Build(string config = "Debug", string outDir = OutputPath)
 {
-    Exec(MSBuildExe, "Nake.sln /p:Configuration={config};OutDir={outDir};ReferencePath={outDir} /m");
+    Exec("dotnet", " build Nake.sln -c {config}");
 }
 
 /// Runs unit tests 
@@ -59,9 +52,6 @@ var AppVeyor = Var["APPVEYOR"] == "True";
 
     Cmd(@"Packages\NUnit.Runners.2.6.2\tools\nunit-console.exe " + 
     	@"/xml:{results} /framework:net-4.0 /noshadow /nologo {tests}");
-
-    if (AppVeyor)
-    	new WebClient().UploadFile("https://ci.appveyor.com/api/testresults/nunit/%APPVEYOR_JOB_ID%", results);
 }
 
 /// Builds official NuGet package 
@@ -72,9 +62,7 @@ var AppVeyor = Var["APPVEYOR"] == "True";
     Test(DebugOutputPath);
     Build("Release", ReleaseOutputPath);
 
-    var version = FileVersionInfo
-        .GetVersionInfo(@"{ReleaseOutputPath}\Nake.exe")
-        .ProductVersion;
+    var version = Version();
 
     File.WriteAllText(
         @"{ReleaseOutputPath}\Nake.bat",
@@ -98,7 +86,5 @@ var AppVeyor = Var["APPVEYOR"] == "True";
 
 string Version()
 {
-    return FileVersionInfo
-            .GetVersionInfo(@"{ReleaseOutputPath}\Nake.exe")
-            .ProductVersion;
+    return "3.0.0";
 }
