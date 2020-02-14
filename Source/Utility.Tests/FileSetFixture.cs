@@ -137,7 +137,7 @@ namespace Nake.Utility
 
         static string File(string fileName)
         {
-            return Path.Combine(BaseDirectory(), fileName);
+            return Path.Combine(BaseDirectory(), fileName.NormalizePath());
         }
 
         static string BaseDirectory()
@@ -145,7 +145,7 @@ namespace Nake.Utility
             var assemblyLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             Debug.Assert(assemblyLocation != null);
 
-            return Path.Combine(assemblyLocation, @"Testing\FileList");
+            return Path.Combine(assemblyLocation, "Testing", "FileList");
         }
     }
 }

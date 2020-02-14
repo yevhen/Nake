@@ -80,10 +80,9 @@ namespace Nake
             if (string.IsNullOrWhiteSpace(pattern))
                 throw new ArgumentException("Pattern cannot be null or contain whitespace only", "pattern");
 
-            if (ContainsForwardSlashes(pattern))
-                throw new ArgumentException("Forward slashes are not allowed in include pattern: " + pattern);
+            pattern = pattern.Replace('/', '\\');
 
-            foreach (var part in pattern.Split(patternSeparator, StringSplitOptions.RemoveEmptyEntries))
+            foreach (var part in pattern.NormalizePath().Split(patternSeparator, StringSplitOptions.RemoveEmptyEntries))
             {
                 if (part.StartsWith("-:"))
                     throw new ArgumentException("Include does not accept patterns with exclusion markers : " + part, pattern);
@@ -115,10 +114,9 @@ namespace Nake
             if (string.IsNullOrWhiteSpace(pattern))
                 throw new ArgumentException("Pattern cannot be null or contain whitespace only", "pattern");
 
-            if (ContainsForwardSlashes(pattern))
-                throw new ArgumentException("Forward slashes are not allowed in exclude pattern: " + pattern);
+            pattern = pattern.Replace('/', '\\');
 
-            foreach (var part in pattern.Split(patternSeparator, StringSplitOptions.RemoveEmptyEntries))
+            foreach (var part in pattern.NormalizePath().Split(patternSeparator, StringSplitOptions.RemoveEmptyEntries))
             {
                 if (part.StartsWith("-:"))
                     throw new ArgumentException("Exclude does not accept patterns with exclusion markers : " + part, pattern);
@@ -340,15 +338,16 @@ namespace Nake
 
             public Inclusion(string pattern)
             {
+                pattern = pattern.NormalizePath();
                 var baseDirectory = Path.GetDirectoryName(pattern);
 
                 if (!string.IsNullOrEmpty(baseDirectory))
                 {
-                    var recursivePathIndex = baseDirectory.IndexOf(@"\**", StringComparison.Ordinal);
+                    var recursivePathIndex = baseDirectory.IndexOf($@"{Path.DirectorySeparatorChar}**", StringComparison.Ordinal);
                     basePath = baseDirectory.Substring(0, recursivePathIndex != -1 ? recursivePathIndex : baseDirectory.Length);
                 }
 
-                this.pattern = pattern.Replace(@"\", "/");
+                this.pattern = pattern;
             }
 
             public string Pattern
@@ -358,7 +357,7 @@ namespace Nake
 
             public Item Create(string file)
             {
-                return new Item(basePath, file.Replace("/", @"\"));
+                return new Item(basePath, file.NormalizePath());
             }
         }
 
@@ -391,7 +390,7 @@ namespace Nake
 
             public bool Match(string file)
             {
-                return predicate(file.Replace("/", @"\"));
+                return predicate(file.NormalizePath());
             }
         }
 
@@ -529,5 +528,11 @@ namespace Nake
                 return !left.Equals(right);
             }
         }
+    }
+
+    static class PathExtension
+    {
+        public static string NormalizePath(this string path) =>
+            path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar);
     }
 }

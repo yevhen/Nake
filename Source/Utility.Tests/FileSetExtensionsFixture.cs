@@ -67,10 +67,10 @@ namespace Nake.Utility
 
             var expected = new List<string>
             {
-                Path.Combine(destination, @"A\A3.tmp"),
-                Path.Combine(destination, @"A\C\AC3.tmp"),
-                Path.Combine(destination, @"B\B3.tmp"),
-                Path.Combine(destination, @"B\C\BC3.tmp"),
+                Path.Combine(destination, "A", "A3.tmp"),
+                Path.Combine(destination, "A", "C", "AC3.tmp"),
+                Path.Combine(destination, "B", "B3.tmp"),
+                Path.Combine(destination, "B", "C", "BC3.tmp"),
             };
 
             Assert.That(result, Is.EquivalentTo(expected));
@@ -81,7 +81,7 @@ namespace Nake.Utility
             var assemblyLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             Debug.Assert(assemblyLocation != null);
 
-            return Path.Combine(assemblyLocation, @"Testing\FileList");
+            return Path.Combine(assemblyLocation, "Testing", "FileList");
         }
     }
 }

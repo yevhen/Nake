@@ -32,12 +32,12 @@
     <!-- Common project props -->
     <PropertyGroup>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-        <LangVersion>7.3</LangVersion>
+        <LangVersion>8.0</LangVersion>
     </PropertyGroup>
 
     <PropertyGroup>
-        <TargetFramework>net472</TargetFramework>
-        <ConsoleProjectTargetFramework>netcoreapp3.0</ConsoleProjectTargetFramework>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <ConsoleProjectTargetFramework>netcoreapp3.1</ConsoleProjectTargetFramework>
         <TestProjectTargetFramework>$(ConsoleProjectTargetFramework)</TestProjectTargetFramework>
     </PropertyGroup>
 
@@ -49,6 +49,9 @@
         <MicrosoftBuildTasksCoreVersion>16.4.0</MicrosoftBuildTasksCoreVersion>
         <MicrosoftBuildUtilitiesCoreVersion>16.4.0</MicrosoftBuildUtilitiesCoreVersion>
 
+        <!-- Roslyn packages -->
+        <MicrosoftCodeAnalysisScriptingVersion>3.4.0</MicrosoftCodeAnalysisScriptingVersion>
+
         <!-- Microsoft extensions -->
         <MicrosoftExtensionsLoggingVersion>2.1.1</MicrosoftExtensionsLoggingVersion>
         <MicrosoftExtensionsLoggingConsoleVersion>2.1.1</MicrosoftExtensionsLoggingConsoleVersion>
@@ -59,26 +62,10 @@
         <MicrosoftNETTestSdkVersion>16.5.0</MicrosoftNETTestSdkVersion>
         <PowerAssertVersion>1.0.79</PowerAssertVersion>
 
-        <!-- 3rd party packages -->
-        <GlobDirVersion>0.0.1.1</GlobDirVersion>
-
         <!-- Tooling related packages -->
         <SourceLinkVersion>2.7.6</SourceLinkVersion>
 
     </PropertyGroup>
-
-    <!-- 
-        netstandard2.0 and net462 requires this reference implicitly. 
-        netcoreapp2.1 already references this package  
-    -->
-
-    <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-        <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
-    </ItemGroup>
-    
-    <ItemGroup Condition=" '$(TargetFramework)' == 'net472' ">
-        <Reference Include="Microsoft.CSharp" />
-    </ItemGroup>
 
     <!-- Versioning properties -->
     <PropertyGroup>
