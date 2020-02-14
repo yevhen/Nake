@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30324.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29519.87
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nake", "Source\Nake\Nake.csproj", "{FF2BA5A8-F9DC-468E-B77F-698D9C141EBB}"
 EndProject
@@ -15,7 +15,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		Fowler.csx = Fowler.csx
 		Nake.csx = Nake.csx
-		Build\NuGet\Nake.nuspec = Build\NuGet\Nake.nuspec
 		Source\ProductAssemblyInfo.cs = Source\ProductAssemblyInfo.cs
 		Publish.csx = Publish.csx
 	EndProjectSection
@@ -49,5 +48,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4CB3833B-9BEC-4935-9848-EB7247BB073E}
 	EndGlobalSection
 EndGlobal
