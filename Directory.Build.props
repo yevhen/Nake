@@ -1,0 +1,131 @@
+<Project>
+
+    <!-- Set the repository root into a variable -->
+    <PropertyGroup>
+        <SourceRoot>$(MSBuildThisFileDirectory)</SourceRoot>
+    </PropertyGroup>
+
+    <!-- Set common properties regarding assembly information and nuget packages -->
+    <PropertyGroup>
+        <Authors>Yevhen Bobrov</Authors>
+        <Product>Nake</Product>
+        <Copyright>since 2013 © Yevhen Bobrov. All rights reserved.</Copyright>
+        <PackageLicenseUrl>https://github.com/yevhen/Nake/blob/master/LICENSE</PackageLicenseUrl>
+        <PackageProjectUrl>https://github.com/yevhen/Nake</PackageProjectUrl>
+        <PackageIconUrl>https://github.com/yevhen/Nake/raw/master/Logo.png</PackageIconUrl>
+        <PackageTags>C# Scripting Build Automation Task Runner</PackageTags>
+        <PackageReleaseNotes></PackageReleaseNotes>
+        <RepositoryUrl>https://github.com/yevhen/Nake</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <IncludeSymbols>true</IncludeSymbols>
+        <IncludeSource>true</IncludeSource>
+    </PropertyGroup>
+
+    <!-- Common compile parameters -->
+    <PropertyGroup>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <NoWarn>$(NoWarn);1591</NoWarn>
+        <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+        <DebugType>portable</DebugType>
+    </PropertyGroup>
+
+    <!-- Common project props -->
+    <PropertyGroup>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <LangVersion>7.3</LangVersion>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <TargetFramework>net472</TargetFramework>
+        <ConsoleProjectTargetFramework>netcoreapp3.0</ConsoleProjectTargetFramework>
+        <TestProjectTargetFramework>$(ConsoleProjectTargetFramework)</TestProjectTargetFramework>
+    </PropertyGroup>
+
+    <!-- Shared Package Versions -->
+    <PropertyGroup>
+
+        <!-- MSBuild packages -->
+        <MicrosoftBuildVersion>16.4.0</MicrosoftBuildVersion>
+        <MicrosoftBuildTasksCoreVersion>16.4.0</MicrosoftBuildTasksCoreVersion>
+        <MicrosoftBuildUtilitiesCoreVersion>16.4.0</MicrosoftBuildUtilitiesCoreVersion>
+
+        <!-- Microsoft extensions -->
+        <MicrosoftExtensionsLoggingVersion>2.1.1</MicrosoftExtensionsLoggingVersion>
+        <MicrosoftExtensionsLoggingConsoleVersion>2.1.1</MicrosoftExtensionsLoggingConsoleVersion>
+
+        <!-- Testing packages -->
+        <NUnitVersion>3.12.0</NUnitVersion>
+        <NUnit3TestAdapterVersion>3.16.1</NUnit3TestAdapterVersion>
+        <MicrosoftNETTestSdkVersion>16.5.0</MicrosoftNETTestSdkVersion>
+        <PowerAssertVersion>1.0.79</PowerAssertVersion>
+
+        <!-- 3rd party packages -->
+        <GlobDirVersion>0.0.1.1</GlobDirVersion>
+
+        <!-- Tooling related packages -->
+        <SourceLinkVersion>2.7.6</SourceLinkVersion>
+
+    </PropertyGroup>
+
+    <!-- 
+        netstandard2.0 and net462 requires this reference implicitly. 
+        netcoreapp2.1 already references this package  
+    -->
+
+    <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+        <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
+    </ItemGroup>
+    
+    <ItemGroup Condition=" '$(TargetFramework)' == 'net472' ">
+        <Reference Include="Microsoft.CSharp" />
+    </ItemGroup>
+
+    <!-- Versioning properties -->
+    <PropertyGroup>
+        <VersionPrefix Condition=" '$(VersionPrefix)'=='' ">3.0.0</VersionPrefix>
+        <VersionSuffix Condition=" '$(VersionSuffix)'=='' ">dev</VersionSuffix>
+    </PropertyGroup>
+
+    <!-- For Debug builds generated a date/time dependent version suffix -->
+    <PropertyGroup Condition=" '$(Configuration)'=='Debug' ">
+        <VersionSuffix Condition=" '$(VersionSuffix)'=='' ">dev</VersionSuffix>
+        <VersionSuffix Condition=" '$(VersionDateSuffix)'!='' ">$(VersionSuffix)-$(VersionDateSuffix)</VersionSuffix>
+    </PropertyGroup>
+
+    <!-- Set output folder for created NuGet packages -->
+    <PropertyGroup>
+        <PackageOutputPath Condition=" '$(PackageOutputPath)'=='' ">$(SourceRoot)Artifacts\$(Configuration)</PackageOutputPath>
+    </PropertyGroup>
+
+    <Choose>
+        <When Condition="'$(OfficialBuild)' != 'true'">
+            <!-- On non-official builds we don't burn in a git sha.  In large part because it
+                 hurts our determinism efforts as binaries which should be the same between
+                builds will not (due to developers building against different HEAD values -->
+            <PropertyGroup>
+                <GitHeadSha>&lt;developer build&gt;</GitHeadSha>
+            </PropertyGroup>
+        </When>
+        <When Condition="'$(BUILD_SOURCEVERSION)' != ''">
+            <PropertyGroup>
+                <GitHeadSha>$(BUILD_SOURCEVERSION)</GitHeadSha>
+            </PropertyGroup>
+        </When>
+        <When Condition="'$(BUILD_SOURCEVERSION)' == '' AND '$(GIT_COMMIT)' != ''">
+            <PropertyGroup>
+                <GitHeadSha>$(GIT_COMMIT)</GitHeadSha>
+            </PropertyGroup>
+        </When>
+        <Otherwise>
+            <PropertyGroup>
+                <GitHeadSha>Not found</GitHeadSha>
+                <DotGitDir>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory).git'))</DotGitDir>
+                <HeadFileContent Condition="Exists('$(DotGitDir)/HEAD')">$([System.IO.File]::ReadAllText('$(DotGitDir)/HEAD').Trim())</HeadFileContent>
+                <RefPath Condition="$(HeadFileContent.StartsWith('ref: '))">$(DotGitDir)/$(HeadFileContent.Substring(5))</RefPath>
+                <GitHeadSha Condition="'$(RefPath)' != '' AND Exists('$(RefPath)')">$([System.IO.File]::ReadAllText('$(RefPath)').Trim())</GitHeadSha>
+                <GitHeadSha Condition="'$(HeadFileContent)' != '' AND '$(RefPath)' == ''">$(HeadFileContent)</GitHeadSha>
+            </PropertyGroup>
+        </Otherwise>
+    </Choose>
+
+</Project>

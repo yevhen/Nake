@@ -30,7 +30,7 @@ namespace Nake
             return new TaskDeclarationScanner().Scan(code);
         }
 
-        public object[][] TestCases()
+        static object[][] TestCases()
         {
             return new[]
             {

@@ -32,7 +32,6 @@ namespace Nake.Scripting
             {"System",                          Reference(typeof(Component))},
             {"System.Core",                     Reference(typeof(IQueryable))},
             {"System.Data",                     Reference(typeof(DataSet))},
-            {"System.Data.DataSetExtensions",   Reference(typeof(DataTableExtensions))},
             {"System.Xml",                      Reference(typeof(XmlElement))},
             {"System.Xml.Linq",                 Reference(typeof(XElement))},
             {"Microsoft.CSharp",                Reference(typeof(RuntimeBinderException))},

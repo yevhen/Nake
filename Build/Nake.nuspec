@@ -8,8 +8,8 @@
     <licenseUrl>http://github.com/yevhen/Nake/blob/master/LICENSE.md</licenseUrl>
     <projectUrl>http://github.com/yevhen/Nake</projectUrl>
     <iconUrl>https://github.com/yevhen/Nake/raw/master/Logo.png</iconUrl>
-    <description>Magic script-based C# task runner with C# V6 support</description>
-    <tags>roslyn csx script scriptcs nake build automation</tags>
+    <description>Magic script-based C# task runner</description>
+    <tags>netcore roslyn csx script nake build automation</tags>
   </metadata>
   <files>
 

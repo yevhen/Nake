@@ -33,8 +33,7 @@ var AppVeyor = Var["APPVEYOR"] == "True";
 /// Restores dependencies (packages) from NuGet 
 [Task] void Restore()
 {
-    Cmd(@"Tools\NuGet.exe restore {RootPath}\Tools\Packages.config -o {RootPath}\Packages");
-    Cmd(@"Tools\NuGet.exe restore {RootPath}\Nake.sln -o {RootPath}\Packages");
+    Cmd(@"dotnet restore {RootPath}\Nake.sln");
 }
 
 /// Wipeout all build output and temporary build files 

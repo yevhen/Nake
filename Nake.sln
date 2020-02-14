@@ -3,13 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29519.87
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nake", "Source\Nake\Nake.csproj", "{FF2BA5A8-F9DC-468E-B77F-698D9C141EBB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Meta", "Source\Meta\Meta.csproj", "{B12EB89E-0C86-4D2E-866D-BBF1E6890806}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nake.Tests", "Source\Nake.Tests\Nake.Tests.csproj", "{2444EB4E-C1B8-47E0-9D2E-E4C59C30FFFE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nake", "Source\Nake\Nake.csproj", "{FF2BA5A8-F9DC-468E-B77F-698D9C141EBB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utility", "Source\Utility\Utility.csproj", "{E6106638-A952-4CA6-8C3D-438046AD4EAC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nake.Tests", "Source\Nake.Tests\Nake.Tests.csproj", "{2444EB4E-C1B8-47E0-9D2E-E4C59C30FFFE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utility.Tests", "Source\Utility.Tests\Utility.Tests.csproj", "{37E87FCF-AD98-4220-9D71-F9EE56ED4620}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Utility", "Source\Utility\Utility.csproj", "{E6106638-A952-4CA6-8C3D-438046AD4EAC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Utility.Tests", "Source\Utility.Tests\Utility.Tests.csproj", "{37E87FCF-AD98-4220-9D71-F9EE56ED4620}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{016CC421-89F5-43B3-BD78-B63D9562E884}"
 	ProjectSection(SolutionItems) = preProject
@@ -18,8 +20,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Source\ProductAssemblyInfo.cs = Source\ProductAssemblyInfo.cs
 		Publish.csx = Publish.csx
 	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Meta", "Source\Meta\Meta.csproj", "{B12EB89E-0C86-4D2E-866D-BBF1E6890806}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

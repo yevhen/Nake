@@ -330,7 +330,7 @@ namespace Nake
         /// <returns>  The string with resolved file set paths separated by given  separator </returns>
         public string ToString(string separator)
         {
-            return string.Join(separator, this); ;
+            return string.Join(separator, this);
         }
 
         class Inclusion

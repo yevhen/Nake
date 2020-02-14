@@ -23,7 +23,7 @@ namespace Nake
             Assert.AreEqual(Tasks.Count(), isTask ? 1 : 0);
         }
 
-        public object[][] TestCases()
+        static object[][] TestCases()
         {
             return new[]
             {
