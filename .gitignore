@@ -31,6 +31,7 @@ obj/
 *.debug.css
 _ReSharper*
 *.ide/
+*.ionide/
 ide/
 .vs/
 *.ncrunchproject
