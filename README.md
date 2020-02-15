@@ -1,6 +1,6 @@
 ![Nake](Logo.Wide.png)
 
-Nake is a magic task runner tool for .NET. It's a hybrid of Shovel and Rake. The DSL for defining tasks is uniquely minimal and it's just plain C# code! Nake is built on top of the latest Roslyn release so you can use all of the C# V6 features in you scripts and even more.
+Nake is a magic task runner tool for .NET Core. It's a hybrid of Shovel and Rake. The DSL for defining tasks is uniquely minimal and it's just plain C# code! Nake is built on top of the latest Roslyn release so you can use all of the latest C# features in you scripts and even more.
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/yevhen/Nake?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build status](https://ci.appveyor.com/api/projects/status/kors8n8y4r4xklop/branch/master?svg=true)](https://ci.appveyor.com/project/yevhen/nake/branch/master)
@@ -9,32 +9,31 @@ Nake is a magic task runner tool for .NET. It's a hybrid of Shovel and Rake. The
 
 ### How to install
 
-There multiple ways in which Nake could be installed. You can install it by using NuGet [package](https://www.nuget.org/packages/Nake), or you can get it by downloading a [standalone](https://github.com/yevhen/Nake/releases) executable from GitHub releases page, and of course you can always build it from sources. 
+Nake is built as dotnet tool. You can install it either globally of [locally](https://stu.dev/dotnet-core-3-local-tools/) (recommended):
 
-To install Nake via NuGet, run this command in NuGet package manager console:
-
-	PM> Install-Package Nake
+	PM> dotnet tool install Nake --version 3.0.0-dev
 
 ## Scripting reference
 
 ```cs
 #r "System"                         // 
-#r "System.Core"                    //   #reference assemblies from the GAC 
+#r "System.Core"                    //   #reference assemblies from the netstandard BCL
 #r "System.Data"                    //    (these are referenced by default)
 #r "System.Xml"                     //
 #r "System.Xml.Linq"                //
 
 #r "WindowsBase, Version=4.0..."    //  you can reference assembly by its full name
-#r "Packages\NUnit.2.6.2\nunit.dll" //        or by using relative path
-#r "C:\Orleans\SDK\Orleans.dll"     //            or by absolute path
+#r "./Packages/nunit.dll"           //        or by using relative path
+#r "/usr/bin/SDK/Orleans.dll"       //            or by absolute path
 
 #load "Other.csx"                   //      #load code from other script files
-#load "Build\Another.csx"           //  (both absolute and relative paths are fine)
+#load "Build/Another.csx"           //  (both absolute and relative paths are fine)
 
 using System;                       //
 using System.IO;                    //      standard C# namespace imports
 using System.Linq;                  //     (these are imported by default)
 using System.Text;                  //  
+using System.Threading.Tasks        //    
 using System.Collections.Generic;   //  
 
 using static System.IO.Path;        //    C# V6 "using static members" feature 
@@ -67,8 +66,8 @@ var who = "world";                  //  with the values passed from the command 
 }                                   
 
 [Step] void Clean()   			    //     Steps are Tasks with 'run once' semantics      
-{					                //     (foundation of any build automation tool)
-    Delete("{OutputPath}\*.*");	
+{				            //     (foundation of any build automation tool)
+    Delete("{OutputPath}/*.*");	
 }                                   
 
 [Step] void Build(string cfg = "Debug")
@@ -83,7 +82,7 @@ var who = "world";                  //  with the values passed from the command 
     Clean();                        //     you have complete control over decision,
     Build();                        //  when and in what order dependent steps should run
     -------                         //      (and Nake makes sure of run-once behavior)
-    NUnit("{OutputPath}\*.Tests.dll")   
+    NUnit("{OutputPath}/*.Tests.dll")   
 }
 
 [Step] void Publish(bool beta = false)
@@ -141,7 +140,7 @@ Options:
 	   -t  --trace            Enables full stack traces in error reporting + task execution trace
 	       --debug            Enables full script debugging in Visual Studio
 	   -T  --tasks [PATTERN]  Display tasks with descriptions matching optional PATTERN and exit
-	   	   --runner NAME      Use NAME as runner file name in task listing
+	       --runner NAME      Use NAME as runner file name in task listing
 	   -r  --reset-cache      Resets compilation output cache
 
 ### Invoking tasks
@@ -152,7 +151,7 @@ General syntax for invoking tasks and passing arguments is similar to the normal
 > Nake build                          //  run Build task with default arg values
 > Nake build Release                  //  or with first positional argument set to 'Release'
 > Nake build cfg=Release              //  or with named argument 'cfg' set to 'Release'
-> Nake build Release outDir="C:\Tmp"  //  you can mix positional and named arguments
+> Nake build Release outDir="/c/Tmp"  //  you can mix positional and named arguments
 > Nake build ; test                   //  or invoke multiple tasks within a same session
 > Nake build `; test                  //  also escape ';' when running in PowerShell console 
 > Nake publish --beta                 //  invoke Publish task with 'beta' arg set to 'true'
@@ -201,7 +200,6 @@ class Azure
 
 ## Backlog
 
-- Running on Mono
 - Interactive mode
 
 ## Contributing
