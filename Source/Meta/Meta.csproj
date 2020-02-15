@@ -3,19 +3,11 @@
 
   <PropertyGroup>
   	<RootNamespace>Nake</RootNamespace>
-    <AssemblyName>Meta</AssemblyName>
-    <PackageId>Nake.Meta</PackageId>
-    <Title>Meta package with Nake core API</Title>
+    <AssemblyName>Nake.Meta</AssemblyName>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <DocumentationFile>bin\Release\Nake.Meta.xml</DocumentationFile>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Include="..\ProductAssemblyInfo.cs">
-      <Link>Properties\ProductAssemblyInfo.cs</Link>
-    </Compile>
-  </ItemGroup>
 
 </Project>

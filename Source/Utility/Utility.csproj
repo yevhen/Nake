@@ -4,9 +4,6 @@
   <PropertyGroup>
     <RootNamespace>Nake</RootNamespace>
     <AssemblyName>Nake.Utility</AssemblyName>
-    <PackageId>Nake.Utility</PackageId>
-    <Title>Common utilities for Nake runner</Title>
-    <Description>Set of common tasks, helpers and file-system related functions</Description>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
@@ -17,12 +14,6 @@
     <PackageReference Include="Microsoft.Build" Version="$(MicrosoftBuildVersion)" />
     <PackageReference Include="Microsoft.Build.Tasks.Core" Version="$(MicrosoftBuildTasksCoreVersion)" />
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="$(MicrosoftBuildUtilitiesCoreVersion)" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Include="..\ProductAssemblyInfo.cs">
-      <Link>Properties\ProductAssemblyInfo.cs</Link>
-    </Compile>
   </ItemGroup>
 
 </Project>

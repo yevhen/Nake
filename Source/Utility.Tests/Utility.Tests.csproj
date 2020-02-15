@@ -3,7 +3,7 @@
 
   <PropertyGroup>
     <RootNamespace>Nake.Utility</RootNamespace>
-    <AssemblyName>Utility.Tests</AssemblyName>
+    <AssemblyName>Nake.Utility.Tests</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

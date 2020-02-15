@@ -3,8 +3,6 @@
 
   <PropertyGroup>
     <PackageId>Nake</PackageId>
-    <Title>Magic script-based C# task runner</Title>
-    <Description></Description>
     <OutputType>Exe</OutputType>
     <IsPackable>true</IsPackable>
     <PackAsTool>true</PackAsTool>
@@ -24,12 +22,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Meta\Meta.csproj" />
     <ProjectReference Include="..\Utility\Utility.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Include="..\ProductAssemblyInfo.cs">
-      <Link>Properties\ProductAssemblyInfo.cs</Link>
-    </Compile>
   </ItemGroup>
 
 </Project>

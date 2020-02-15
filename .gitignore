@@ -41,14 +41,9 @@ _UpgradeReport_Files/
 Backup/
 */TestResults/*
 TestResults/
-*Profiling Logs/
-*/cassette-cache/*
 
 #ignore certain folders
-/Output/
+/Artifacts/
 /Packages/
-/Tools/Nake/Roslyn
-/Packages/!Repositories.config
-/Source/Utility/Help
 
 .idea

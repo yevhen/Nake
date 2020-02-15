@@ -1,4 +1,7 @@
-﻿using static Nake.Log;
+﻿#r "./Tools/Nake/Nake.Meta.dll"
+#r "./Tools/Nake/Nake.Utility.dll"
+
+using static Nake.Log;
 
 /// Compile the application code
 [Step] void Default()

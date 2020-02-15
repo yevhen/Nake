@@ -1,90 +1,75 @@
-﻿using System.IO;
+﻿#r "System.Net.WebClient"
+
+#r "./Tools/Nake/Nake.Meta.dll"
+#r "./Tools/Nake/Nake.Utility.dll"
+
+using System.IO;
 using System.Net;
 using System.Linq;
 using System.Diagnostics;
 
+using Nake;
 using static Nake.FS;
 using static Nake.Log;
 using static Nake.Env;
 using static Nake.Run;
 
-const string RootPath = "%NakeScriptDirectory%";
-const string OutputPath = RootPath + @"\Output";
+var RootPath = "%NakeScriptDirectory%";
+var ArtifactsPath = $"{RootPath}/Artifacts";
+var ReleasePackagesPath = $"{ArtifactsPath}/Release";
 
-var PackagePath = @"{OutputPath}\Package";
-var DebugOutputPath = @"{PackagePath}\Debug";
-var ReleaseOutputPath = @"{PackagePath}\Release";
+string AppVeyorJobId = null;
+var Version = "3.0.0-dev";
 
-/// Builds sources in debug mode 
-[Task] void Default()
-{
-    Restore();
-    Clean();
-    Build();
-}
+// global init
+MakeDir(ArtifactsPath);
 
-/// Restores dependencies (packages) from NuGet 
-[Task] void Restore()
-{
-    Cmd(@"dotnet restore {RootPath}/Nake.sln");
-}
+/// Installs dependencies and builds sources in Debug mode
+[Task] void Default() => Build();
 
-/// Wipeout all build output and temporary build files 
-[Task] void Clean(string path = OutputPath)
-{
-    Delete(@"{path}\*.*|-:*.vshost.exe");
-    RemoveDir(@"**\bin|**\obj|{path}\*");    
-}
-
-/// Builds sources using specified configuration and output path
-[Step] void Build(string config = "Debug", string outDir = OutputPath)
-{
-    Exec("dotnet", " build Nake.sln -c {config}");
-}
+/// Builds sources using specified configuration
+[Step] void Build(string config = "Debug", bool verbose = false) => 
+    Cmd("dotnet build {RootPath}/Nake.sln /p:Configuration={config}" + (verbose ? "/v:d" : ""));
 
 /// Runs unit tests 
-[Step] void Test(string outputPath = OutputPath)
+[Step] void Test(bool slow = false)
 {
-    Build("Debug", outputPath);
+    Build("Debug");
 
-    var tests = new FileSet{@"{outputPath}\*.Tests.dll"}.ToString(" ");
-    var results = @"{outputPath}\nunit-test-results.xml";
+    var tests = new FileSet{$"{RootPath}/**/bin/Debug/**/*.Tests.dll"}.ToString(" ");
+    var results = $@"{ArtifactsPath}/nunit-test-results.xml";
 
-    Cmd(@"Packages\NUnit.Runners.2.6.2\tools\nunit-console.exe " + 
-    	@"/xml:{results} /framework:net-4.0 /noshadow /nologo {tests}");
+    try
+    {
+        Exec("dotnet", 
+            $@"vstest {tests} --logger:trx;LogFileName={results} " +
+            (AppVeyorJobId != null||slow ? "" : "--TestCaseFilter:TestCategory!=Slow"));
+    }
+    finally
+    {    	
+	    if (AppVeyorJobId != null)
+        {
+            var workerApi = "https://ci.appveyor.com/api/testresults/mstest/{AppVeyorJobId}";
+            Info($"Uploading {results} to {workerApi} using job id {AppVeyorJobId} ...");
+            
+            var response = new WebClient().UploadFile(workerApi, results);
+            var result = System.Text.Encoding.UTF8.GetString(response);
+                      
+            Info($"Appveyor response is: {result}");
+        }
+	}
 }
 
-/// Builds official NuGet package 
-[Step] void Package()
+/// Builds official NuGet packages 
+[Step] void Pack(bool skipFullCheck = false)
 {
-    Clean();
-
-    Test(DebugOutputPath);
-    Build("Release", ReleaseOutputPath);
-
-    var version = Version();
-
-    File.WriteAllText(
-        @"{ReleaseOutputPath}\Nake.bat",
-        "@ECHO OFF \r\n" +
-        @"Packages\Nake.{version}\tools\net45\Nake.exe %*"
-    );
-
-    string readme = File.ReadAllText(@"{RootPath}\Build\Readme.txt");
-    File.WriteAllText(@"{ReleaseOutputPath}\Readme.txt", readme.Replace("###", "Nake.{version}"));
-    
-    Cmd(@"Tools\Nuget.exe pack Build\Nake.nuspec -Version {version} " +
-         "-OutputDirectory {PackagePath} -BasePath {RootPath} -NoPackageAnalysis");
+    Test(!skipFullCheck);
+    Exec("dotnet", $"pack -c Release -p:PackageVersion={Version} Nake.sln");
 }
 
 /// Publishes package to NuGet gallery
-[Step] void Publish()
-{
-    var packageFile = @"{PackagePath}\Nake.{Version()}.nupkg";
-    Cmd(@"Tools\Nuget.exe push {packageFile} %NuGetApiKey% -Source https://nuget.org/");
-}
+[Step] void Publish() => Push("Nake"); 
 
-string Version()
-{
-    return "3.0.0";
-}
+void Push(string package) => Exec("dotnet", 
+    @"nuget push {ReleasePackagesPath}\{package}.{Version}.nupkg " +
+    "-k %NuGetApiKey% -s https://nuget.org/ -ss https://nuget.smbsrc.net");
