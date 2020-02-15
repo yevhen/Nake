@@ -44,7 +44,7 @@ namespace Nake
                 BuildEngine = new MSBuildEngineStub(disableStdOutLogging),
             };
 
-            if (!task.Execute() || (task.Log.HasLoggedErrors && !ignoreStdOutErrors))
+            if (!task.Execute() || task.Log.HasLoggedErrors)
                 throw new ApplicationException($"{task.GetType()} failed");
             
             return task.ExitCode;
