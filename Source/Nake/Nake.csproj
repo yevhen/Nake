@@ -5,9 +5,9 @@
     <PackageId>Nake</PackageId>
     <Title>Magic script-based C# task runner</Title>
     <Description></Description>
-    <ApplicationIcon />
     <OutputType>Exe</OutputType>
-    <StartupObject />
+    <IsPackable>true</IsPackable>
+    <PackAsTool>true</PackAsTool>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">

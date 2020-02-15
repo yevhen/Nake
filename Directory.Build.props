@@ -20,6 +20,7 @@
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <IncludeSource>true</IncludeSource>
+        <IsPackable>false</IsPackable>
     </PropertyGroup>
 
     <!-- Common compile parameters -->
