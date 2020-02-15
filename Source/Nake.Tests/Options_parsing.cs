@@ -105,10 +105,10 @@ namespace Nake
             Assert.That(arguments[0].Value, Is.EqualTo("1.0"));
         }
 
-        [Test, Ignore("Will fix later. probably")]
+        [Test]
         public void Handling_of_spaces_and_equal_sign_in_argument_values()
         {
-            var options = Parse(@"build pathWithSpace=""C:\Space \f.exe"" pathWithEq=C:\Eq=\F=.exe");
+            var options = Options.Parse(new[]{"build", @"pathWithSpace=C:\Space \f.exe", @"pathWithEq=C:\Eq=\F=.exe"});
             Assert.That(options.Tasks.Count, Is.EqualTo(1));
             Assert.That(options.Tasks[0].Name, Is.EqualTo("build"));
 
