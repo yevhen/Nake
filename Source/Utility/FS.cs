@@ -177,7 +177,7 @@ namespace Nake
         /// <exception cref="System.ArgumentException">Specified input files do not exist</exception>
         public static bool UpToDate(string outputFile, params string[] inputFiles)
         {
-            if (!File.Exists(Location.GetFullPath(outputFile)))
+            if (!File.Exists(Location.GetFullPath(FilePath.From(outputFile))))
                 return false;
 
             var outdated = false;
@@ -187,7 +187,7 @@ namespace Nake
                 if (!File.Exists(inputFile))
                     throw new ArgumentException("Specified input file does not exists: " + inputFile);
 
-                if (File.GetLastWriteTime(inputFile) <= File.GetLastWriteTime(Location.GetFullPath(outputFile)))
+                if (File.GetLastWriteTime(inputFile) <= File.GetLastWriteTime(Location.GetFullPath(FilePath.From(outputFile))))
                     continue;
 
                 outdated = true;

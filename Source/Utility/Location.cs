@@ -39,16 +39,10 @@ namespace Nake
                        : Path.Combine(basePath, path);
         }
 
-        internal static string GetFullPath(string path)
-        {
-            return GetFullPath(path, CurrentDirectory());
-        }
+        internal static FilePath GetFullPath(FilePath path) => 
+            GetFullPath(path, FilePath.From(CurrentDirectory()));
 
-        internal static string GetFullPath(string path, string basePath)
-        {
-            return Path.IsPathRooted(path)
-                       ? path
-                       : Path.GetFullPath(Path.Combine(basePath, path));
-        }
+        internal static FilePath GetFullPath(FilePath path, FilePath basePath) => 
+            Path.IsPathRooted(path) ? path : basePath.Combine(path);
     }
 }

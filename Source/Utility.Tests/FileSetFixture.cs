@@ -137,7 +137,7 @@ namespace Nake.Utility
 
         static string File(string fileName)
         {
-            return Path.Combine(BaseDirectory(), fileName.NormalizePath());
+            return Path.Combine(BaseDirectory(), fileName);
         }
 
         static string BaseDirectory()

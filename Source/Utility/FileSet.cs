@@ -80,17 +80,15 @@ namespace Nake
             if (string.IsNullOrWhiteSpace(pattern))
                 throw new ArgumentException("Pattern cannot be null or contain whitespace only", "pattern");
 
-            pattern = pattern.Replace('/', '\\');
-
-            foreach (var part in pattern.NormalizePath().Split(patternSeparator, StringSplitOptions.RemoveEmptyEntries))
+            foreach (var part in pattern.Split(patternSeparator, StringSplitOptions.RemoveEmptyEntries))
             {
                 if (part.StartsWith("-:"))
                     throw new ArgumentException("Include does not accept patterns with exclusion markers : " + part, pattern);
 
                 if (!ContainsWildcards(part))
-                    Include(new Item(Location.GetFullPath(part, basePath)));
+                    Include(new Item(Location.GetFullPath(FilePath.From(part), FilePath.From(basePath))));
 
-                includes.Add(new Inclusion(Location.GetRootedPath(part, basePath)));
+                includes.Add(new Inclusion(Location.GetRootedPath(FilePath.From(part), FilePath.From(basePath))));
             }
 
             return this;
@@ -114,14 +112,12 @@ namespace Nake
             if (string.IsNullOrWhiteSpace(pattern))
                 throw new ArgumentException("Pattern cannot be null or contain whitespace only", "pattern");
 
-            pattern = pattern.Replace('/', '\\');
-
-            foreach (var part in pattern.NormalizePath().Split(patternSeparator, StringSplitOptions.RemoveEmptyEntries))
+            foreach (var part in pattern.Split(patternSeparator, StringSplitOptions.RemoveEmptyEntries))
             {
                 if (part.StartsWith("-:"))
                     throw new ArgumentException("Exclude does not accept patterns with exclusion markers : " + part, pattern);
 
-                Add(Exclusion.By(part));
+                Add(Exclusion.By(FilePath.From(part)));
             }
 
             return this;
@@ -161,20 +157,9 @@ namespace Nake
             return this;
         }
 
-        static bool ContainsForwardSlashes(string arg)
-        {
-            return arg.Contains("/");
-        }
+        static bool ContainsWildcards(string pattern) => pattern.Contains("*") || pattern.Contains("?");
 
-        static bool ContainsWildcards(string pattern)
-        {
-            return pattern.Contains("*") || pattern.Contains("?");
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         /// <summary>
         /// Returns an enumerator that iterates through the collection.
@@ -201,23 +186,20 @@ namespace Nake
 
             foreach (var each in includes)
             {
-                var inclusion = each;
+                // replace backward slash to play nicely with Glob
+                var globPattern = each.Pattern.Replace(@"\", "/");
 
                 var matches = Glob
-                    .GetMatches(inclusion.Pattern)
+                    .GetMatches(globPattern)
                     .Where(file => !excludes.Any(exclusion => exclusion.Match(file)))
-                    .Select(inclusion.Create);
+                    .Select(each.Create);
 
                 foreach (var item in matches)
-                {
                     resolved.Add(item);
-                }
             }
 
             foreach (var item in absolutes)
-            {
                 resolved.Add(item);
-            }
 
             return resolved;
         }
@@ -229,7 +211,7 @@ namespace Nake
         /// <returns>New set of paths</returns>
         public string[] Mirror(string destination)
         {
-            destination = Location.GetFullPath(destination);
+            destination = Location.GetFullPath(FilePath.From(destination));
             return Transform(item => Path.Combine(destination, item.RecursivePath, item.FileName));
         }
 
@@ -240,7 +222,7 @@ namespace Nake
         /// <returns>New set of paths</returns>
         public string[] Flatten(string destination)
         {
-            destination = Location.GetFullPath(destination);
+            destination = Location.GetFullPath(FilePath.From(destination));
             return Transform(item => Path.Combine(destination, item.FileName));
         }
 
@@ -255,7 +237,7 @@ namespace Nake
             if (transform == null)
                 throw new ArgumentNullException("transform");
 
-            return Transform(item => new Item(transform(item)));
+            return Transform(item => new Item(FilePath.From(transform(item))));
         }
 
         FileSet Transform(Func<Item, Item> transform)
@@ -333,32 +315,24 @@ namespace Nake
 
         class Inclusion
         {
-            readonly string pattern = "";
             readonly string basePath = "";
 
             public Inclusion(string pattern)
             {
-                pattern = pattern.NormalizePath();
-                var baseDirectory = Path.GetDirectoryName(pattern);
+                var baseDirectory = Path.GetDirectoryName(FilePath.From(pattern));
 
                 if (!string.IsNullOrEmpty(baseDirectory))
                 {
-                    var recursivePathIndex = baseDirectory.IndexOf($@"{Path.DirectorySeparatorChar}**", StringComparison.Ordinal);
+                    var recursivePathIndex = baseDirectory.IndexOf($"{Path.DirectorySeparatorChar}**", StringComparison.Ordinal);
                     basePath = baseDirectory.Substring(0, recursivePathIndex != -1 ? recursivePathIndex : baseDirectory.Length);
                 }
 
-                this.pattern = pattern;
+                Pattern = pattern;
             }
 
-            public string Pattern
-            {
-                get { return pattern; }
-            }
+            public string Pattern { get; }
 
-            public Item Create(string file)
-            {
-                return new Item(basePath, file.NormalizePath());
-            }
+            public Item Create(string file) => new Item(FilePath.From(basePath), FilePath.From(file));
         }
 
         class Exclusion
@@ -371,27 +345,15 @@ namespace Nake
                 return By(regex);
             }
 
-            public static Exclusion By(Regex regex)
-            {            
-                return By(regex.IsMatch);
-            }
-
-            public static Exclusion By(Func<string, bool> predicate)
-            {
-                return new Exclusion(predicate);
-            }
+            public static Exclusion By(Regex regex) => By(regex.IsMatch);
+            public static Exclusion By(Func<string, bool> predicate) => new Exclusion(predicate);
 
             readonly Func<string, bool> predicate;
 
-            Exclusion(Func<string, bool> predicate)
-            {                
+            Exclusion(Func<string, bool> predicate) => 
                 this.predicate = predicate;
-            }
 
-            public bool Match(string file)
-            {
-                return predicate(file.NormalizePath());
-            }
+            public bool Match(string file) => predicate(file);
         }
 
         /// <summary>
@@ -431,11 +393,11 @@ namespace Nake
 
             readonly string fullPathCaseInsensitive;
 
-            internal Item(string fullPath)
+            internal Item(FilePath fullPath)
                 :this(fullPath, fullPath)
             {}
 
-            internal Item(string basePath, string fullPath)
+            internal Item(FilePath basePath, FilePath fullPath)
             {
                 if (fullPath.Length < basePath.Length)
                     throw new ArgumentOutOfRangeException("fullPath", "Full path is shorter than base path");
@@ -457,7 +419,7 @@ namespace Nake
                 Extension   = Path.GetExtension(fullPath);
                 Name        = Path.GetFileNameWithoutExtension(fullPath);
 
-                fullPathCaseInsensitive = fullPath.ToLowerInvariant();
+                fullPathCaseInsensitive = fullPath.CaseInsensitive();
             }
 
             /// <summary>
@@ -528,11 +490,5 @@ namespace Nake
                 return !left.Equals(right);
             }
         }
-    }
-
-    static class PathExtension
-    {
-        public static string NormalizePath(this string path) =>
-            path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar);
     }
 }
