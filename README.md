@@ -36,7 +36,7 @@ using System.Text;                  //
 using System.Threading.Tasks;       //    
 using System.Collections.Generic;   //  
 
-using static System.IO.Path;        //    C# V6 "using static members" feature 
+using static System.IO.Path;        //    C# "using static members" feature 
 using static System.Console;        //      will make you scripts more terse
 
 WriteLine("Are you ready? Y/N:");   //      any code you put on the script level 
@@ -65,8 +65,8 @@ var who = "world";                  //  with the values passed from the command 
 	    WriteLine("{what}, {whom} on {when}{emphasis}");
 }                                   
 
-[Step] void Clean()   			    //     Steps are Tasks with 'run once' semantics      
-{				            //     (foundation of any build automation tool)
+[Step] void Clean()                  //     Steps are Tasks with 'run once' semantics      
+{                                    //     (foundation of any build automation tool)
     Delete("{OutputPath}/*.*");	
 }                                   
 
@@ -82,7 +82,7 @@ var who = "world";                  //  with the values passed from the command 
     Clean();                        //     you have complete control over decision,
     Build();                        //  when and in what order dependent steps should run
     -------                         //      (and Nake makes sure of run-once behavior)
-    NUnit("{OutputPath}/*.Tests.dll")   
+    NUnit("{OutputPath}/*.Tests.dll");   
 }
 
 [Step] void Publish(bool beta = false)
@@ -90,7 +90,7 @@ var who = "world";                  //  with the values passed from the command 
     Test();                         //   sometimes, you need to execute the same step but with
     Build("Release");               //  different args. Unlike other build automation tools
     ------                          //  there is no special syntax to force step to run again, 
-    Nuget("Nake.nuspec", beta)      //       you just invoke it with different arguments!
+    Nuget("Nake.nuspec", beta);     //       you just invoke it with different arguments!
 }                                       
 
 var apiKey = "$NugetKey$";          //      $var$ is the shortcut syntax for getting 
@@ -107,7 +107,7 @@ class Azure                         //  namespace declarations cannot be used wi
     class Queue                     //     and you can nest them infinitely as you like
     {    
         [Task] void Clean()         //     then from the command line you would invoke
-        {}                          //  this task by its full path (ie, azure.queue.clean)
+        {}                          //   this task by its full path (ie, azure.queue.clean)
     }
 }
 
