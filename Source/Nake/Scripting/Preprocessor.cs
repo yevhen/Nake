@@ -247,6 +247,10 @@ namespace Nake.Scripting
             AssemblyName = assemblyName;
         }
 
+        public string FullPath => Path.IsPathRooted(AssemblyName) 
+            ? AssemblyName 
+            : Path.Combine(Path.GetDirectoryName(ScriptFile), AssemblyName);
+
         public bool Equals(AssemblyNameReference other)
         {
             return String.Equals(AssemblyName, other.AssemblyName);

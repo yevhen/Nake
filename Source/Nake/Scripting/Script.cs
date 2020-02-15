@@ -29,14 +29,17 @@ namespace Nake.Scripting
         static readonly Dictionary<string, MetadataReference> DefaultReferences = new Dictionary<string, MetadataReference>
         {
             {"mscorlib",                        Reference(typeof(object))},          
-            {"System",                          Reference(typeof(Component))},
+            {"System.Runtime",                  Reference(typeof(Action))},
+            {"System",                          Reference(typeof(Uri))},
+            {"System.ComponentModel",           Reference(typeof(Component))},
+            {"System.ComponentModel.Primitives",Reference(typeof(DescriptionAttribute))},
             {"System.Core",                     Reference(typeof(IQueryable))},
             {"System.Data",                     Reference(typeof(DataSet))},
             {"System.Xml",                      Reference(typeof(XmlElement))},
             {"System.Xml.Linq",                 Reference(typeof(XElement))},
             {"Microsoft.CSharp",                Reference(typeof(RuntimeBinderException))},
             {"Microsoft.Build.Framework",       Reference(typeof(ITaskItem))},
-            {"Microsoft.Build.Utilities.v4.0",  Reference(typeof(TaskItem))}
+            {"Microsoft.Build.Utilities",       Reference(typeof(TaskItem))}
         };
 
         static readonly string[] DefaultNamespaces =
@@ -47,30 +50,31 @@ namespace Nake.Scripting
             "System.Text",
             "System.IO",
             "System.Collections.Generic", 
+            "System.Threading.Tasks",
             "Microsoft.Build.Framework",
             "Microsoft.Build.Utilities"
         };
 
-        static MetadataReference Reference(Type type)
-        {
-            return MetadataReference.CreateFromFile(type.Assembly.Location);
-        }
+        static MetadataReference Reference(Type type) => MetadataReference.CreateFromFile(type.Assembly.Location);
 
         readonly HashSet<string> namespaces;
-        readonly List<MetadataReference> references;
+        readonly List<MetadataReference> resolved;
+        readonly HashSet<string> unresolved;
 
         public Script()
         {
             namespaces = new HashSet<string>(DefaultNamespaces);
-            references = new List<MetadataReference>(
+            resolved = new List<MetadataReference>(
                 NakeReferences.Concat(DefaultReferences.Select(x => x.Value)));
+            unresolved = new HashSet<string>();
         }
 
         public CompiledScript Compile(string code)
         {
             var options = ScriptOptions.Default
                 .AddImports(namespaces)
-                .AddReferences(references);
+                .AddReferences(resolved)
+                .AddReferences(unresolved);
 
             var script = CSharpScript.Create(code, options);
             var compilation = (CSharpCompilation)script.GetCompilation();
@@ -80,7 +84,7 @@ namespace Nake.Scripting
                 throw new NakeException("Script compilation failure! See diagnostics below." + Environment.NewLine +
                                         string.Join("\n", diagnostics.Where(x => x.Severity == DiagnosticSeverity.Error)));
 
-            return new CompiledScript(references.Select(x => new AssemblyReference(x)), compilation);
+            return new CompiledScript(resolved.Select(x => new AssemblyReference(x)), compilation);
         }
 
         public void AddReference(AssemblyNameReference reference)
@@ -88,13 +92,13 @@ namespace Nake.Scripting
             if (DefaultReferences.ContainsKey(reference.AssemblyName))
                 return;
 
-            string fullPath;
-            if (!GAC.AssemblyExist(reference.AssemblyName, out fullPath))
-                throw new NakeException(
-                    "Assembly reference {0} defined in script {1} cannot be found", 
-                    reference.AssemblyName, reference.ScriptFile);
+            if (File.Exists(reference.FullPath))
+            {
+                AddReference(MetadataReference.CreateFromFile(reference.FullPath));
+                return;
+            }
 
-            AddReference(MetadataReference.CreateFromFile(fullPath));
+            unresolved.Add(reference.AssemblyName);
         }
 
         public void AddReference(AssemblyAbsoluteReference reference)
@@ -109,10 +113,10 @@ namespace Nake.Scripting
 
         void AddReference(MetadataReference reference)
         {
-            if (references.Any(x => x == reference))
+            if (resolved.Any(x => x == reference))
                 return;
             
-            references.Add(reference);
+            resolved.Add(reference);
         }
 
         public void ImportNamespace(string ns)
