@@ -1,6 +1,6 @@
 ![Nake](Logo.Wide.png)
 
-Nake is a magic task runner tool for .NET Core. It's a hybrid of Shovel and Rake. The DSL for defining tasks is uniquely minimal and it's just plain C# code! Nake is built on top of the latest Roslyn release so you can use all of the latest C# features in you scripts and even more.
+Nake is a magic task runner tool for .NET Core. It's a hybrid of Shovel and Rake. The DSL for defining tasks is uniquely minimal and it's just plain (_naked_) C# code! Nake is built on top of the latest Roslyn release so you can use all of the latest C# features in you scripts and even more.
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/yevhen/Nake?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build status](https://ci.appveyor.com/api/projects/status/kors8n8y4r4xklop/branch/master?svg=true)](https://ci.appveyor.com/project/yevhen/nake/branch/master)
@@ -140,7 +140,6 @@ Options:
 	   -t  --trace            Enables full stack traces in error reporting + task execution trace
 	       --debug            Enables full script debugging in Visual Studio
 	   -T  --tasks [PATTERN]  Display tasks with descriptions matching optional PATTERN and exit
-	       --runner NAME      Use NAME as runner file name in task listing
 	   -r  --reset-cache      Resets compilation output cache
 
 ### Invoking tasks
