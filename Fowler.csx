@@ -1,6 +1,7 @@
 ﻿#r "./Tools/Nake/Nake.Meta.dll"
 #r "./Tools/Nake/Nake.Utility.dll"
 
+using Nake;
 using static Nake.Log;
 
 /// Compile the application code
