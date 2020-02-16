@@ -50,9 +50,7 @@ namespace Nake.Scripting
             "System.Text",
             "System.IO",
             "System.Collections.Generic", 
-            "System.Threading.Tasks",
-            "Microsoft.Build.Framework",
-            "Microsoft.Build.Utilities"
+            "System.Threading.Tasks"
         };
 
         static MetadataReference Reference(Type type) => MetadataReference.CreateFromFile(type.Assembly.Location);
