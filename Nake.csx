@@ -29,7 +29,7 @@ MakeDir(ArtifactsPath);
 
 /// Builds sources using specified configuration
 [Step] void Build(string config = "Debug", bool verbose = false) => 
-    Cmd("dotnet build {RootPath}/Nake.sln /p:Configuration={config}" + (verbose ? "/v:d" : ""));
+    $"dotnet build {RootPath}/Nake.sln /p:Configuration={config} {(verbose ? "/v:d" : "")}"._();
 
 /// Runs unit tests 
 [Step] void Test(bool slow = false)
@@ -41,15 +41,14 @@ MakeDir(ArtifactsPath);
 
     try
     {
-        Exec("dotnet", 
-            $@"vstest {tests} --logger:trx;LogFileName={results} " +
-            (AppVeyorJobId != null||slow ? "" : "--TestCaseFilter:TestCategory!=Slow"));
+        $@"dotnet vstest {tests} --logger:trx;LogFileName={results} 
+          {(AppVeyorJobId != null||slow ? "" : "--TestCaseFilter:TestCategory!=Slow")}"._();
     }
     finally
     {    	
 	    if (AppVeyorJobId != null)
         {
-            var workerApi = "https://ci.appveyor.com/api/testresults/mstest/{AppVeyorJobId}";
+            var workerApi = $"https://ci.appveyor.com/api/testresults/mstest/{AppVeyorJobId}";
             Info($"Uploading {results} to {workerApi} using job id {AppVeyorJobId} ...");
             
             var response = new WebClient().UploadFile(workerApi, results);
@@ -64,12 +63,12 @@ MakeDir(ArtifactsPath);
 [Step] void Pack(bool skipFullCheck = false)
 {
     Test(!skipFullCheck);
-    Exec("dotnet", $"pack -c Release -p:PackageVersion={Version} Nake.sln");
+    $"dotnet pack -c Release -p:PackageVersion={Version} Nake.sln"._();
 }
 
 /// Publishes package to NuGet gallery
 [Step] void Publish() => Push("Nake"); 
 
-void Push(string package) => Exec("dotnet", 
-    @"nuget push {ReleasePackagesPath}\{package}.{Version}.nupkg " +
-    "-k %NuGetApiKey% -s https://nuget.org/ -ss https://nuget.smbsrc.net");
+void Push(string package) => 
+    $@"dotnet nuget push {ReleasePackagesPath}/{package}.{Version}.nupkg 
+    -k %NuGetApiKey% -s https://nuget.org/ -ss https://nuget.smbsrc.net"._();

@@ -106,4 +106,16 @@ namespace Nake
             return task;
         }
     }
+
+    /// <summary>
+    /// Funky way to run a cli command
+    /// </summary>
+    public static class WagTheTail
+    {
+        /// <summary>
+        /// Runs cli command
+        /// </summary>
+        /// <param name="command">The command line to pass to <see cref="Run.Cmd"/></param>
+        public static void _(this string command) => Run.Cmd(command);
+    }
 }

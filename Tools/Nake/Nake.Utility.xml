@@ -553,5 +553,16 @@
             <returns>The executed task. Allows to get value of any OUT property</returns>
             <exception cref="T:System.ApplicationException">If tasks fails</exception>
         </member>
+        <member name="T:Nake.WagTheTail">
+            <summary>
+            Funky way to run a cli command
+            </summary>
+        </member>
+        <member name="M:Nake.WagTheTail._(System.String)">
+            <summary>
+            Runs cli command
+            </summary>
+            <param name="command">The command line to pass to <see cref="M:Nake.Run.Cmd(System.String,System.String[],System.String,System.Boolean,System.Boolean,System.Boolean,System.Boolean)"/></param>
+        </member>
     </members>
 </doc>
