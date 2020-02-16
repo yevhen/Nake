@@ -46,7 +46,7 @@ MakeDir(ArtifactsPath);
     }
     finally
     {    	
-	    if (AppVeyorJobId != null)
+	if (AppVeyorJobId != null)
         {
             var workerApi = $"https://ci.appveyor.com/api/testresults/mstest/{AppVeyorJobId}";
             Info($"Uploading {results} to {workerApi} using job id {AppVeyorJobId} ...");
@@ -56,7 +56,7 @@ MakeDir(ArtifactsPath);
                       
             Info($"Appveyor response is: {result}");
         }
-	}
+    }
 }
 
 /// Builds official NuGet packages 
