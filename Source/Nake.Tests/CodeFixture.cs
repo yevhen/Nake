@@ -15,7 +15,7 @@ namespace Nake
 
         protected static void Invoke(string taskName, params TaskArgument[] args)
         {
-            TaskRegistry.Invoke(taskName, args);
+            TaskRegistry.Invoke(taskName, args).GetAwaiter().GetResult();
         }
 
         protected static void Build(string code, Dictionary<string, string> substitutions = null)

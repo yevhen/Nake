@@ -5,6 +5,8 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 
+using AsyncTask = System.Threading.Tasks.Task;
+
 namespace Nake
 {
     class TaskInvocation
@@ -81,7 +83,7 @@ namespace Nake
             }
         }
 
-        public void Invoke()
+        public async AsyncTask Invoke()
         {
             try
             {
@@ -90,9 +92,19 @@ namespace Nake
                 if (!method.IsStatic)
                     host = GetMethodHost();                    
 
-                method.Invoke(
+                var result = method.Invoke(
                     host, BindingFlags.OptionalParamBinding, null,
                     values, CultureInfo.InvariantCulture);
+
+                switch (result)
+                {
+                    case AsyncTask t:
+                        await t;
+                        break;
+                    default:
+                        await AsyncTask.CompletedTask;
+                        break;
+                }
             }
             catch (ArgumentException)
             {

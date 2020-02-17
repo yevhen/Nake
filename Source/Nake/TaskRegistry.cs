@@ -1,8 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
-using System.Threading.Tasks;
+
+using AsyncTask = System.Threading.Tasks.Task;
 
 namespace Nake
 {
@@ -10,14 +10,14 @@ namespace Nake
     {
         internal static TaskRegistry Global;
 
-        public static void Invoke(string taskFullName, params TaskArgument[] arguments)
+        public static async AsyncTask Invoke(string taskFullName, params TaskArgument[] arguments)
         {
             var task = Global.Find(taskFullName);
 
             if (task == null)
                 throw new TaskNotFoundException(taskFullName);
 
-            task.Invoke(Global.script, arguments);
+            await task.Invoke(Global.script, arguments);
         }
 
         readonly Dictionary<string, Task> tasks = new Dictionary<string, Task>(new CaseInsensitiveEqualityComparer());

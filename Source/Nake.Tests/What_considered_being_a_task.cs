@@ -36,6 +36,14 @@ namespace Nake
                 ),
 
                 TaskDeclaration(
+                    @"[Task] async void GlobalTask() {}"
+                ),
+                
+                TaskDeclaration(
+                    @"[Task] async Task GlobalTask() {}"
+                ),
+
+                TaskDeclaration(
                     @" 
                       class Namespace
                       {

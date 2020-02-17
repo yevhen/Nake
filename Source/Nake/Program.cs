@@ -2,15 +2,17 @@
 using System.Diagnostics;
 using System.Threading.Tasks;
 
+using AsyncTask = System.Threading.Tasks.Task;
+
 namespace Nake
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async AsyncTask Main(string[] args)
         {
             BreakInDebuggerIfRequested();
             ObserveUnhandledExceptions();
-            StartApplication(args);
+            await StartApplication(args);
         }
 
         static void BreakInDebuggerIfRequested()
@@ -41,12 +43,12 @@ namespace Nake
             };
         }
     
-        static void StartApplication(string[] args)
+        static async AsyncTask StartApplication(string[] args)
         {
             try
             {
                 var options = Options.Parse(args);
-                new Application(options).Start();
+                await new Application(options).Start();
             }
             catch (OptionParseException e)
             {

@@ -204,5 +204,22 @@ namespace Nake
             Invoke("Task", new TaskArgument("paramValue", "camelCase"));
             Assert.That(Env.Var["paramValue"], Is.EqualTo("camelCase"));
         }
+
+        [Test]
+        public void Async_tasks()
+        {
+            Build(@"
+            
+                [Task] async Task IAmAsync() 
+                {
+                    await Task.Delay(100);
+                    Env.Var[""counter""] = ""42"";
+                }
+            ");
+
+            Invoke("IAmAsync");
+
+            Assert.That(int.Parse(Env.Var["counter"]), Is.EqualTo(42));
+        }
     }
 }

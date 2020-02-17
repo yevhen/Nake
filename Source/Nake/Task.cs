@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
+using AsyncTask = System.Threading.Tasks.Task;
+
 using Microsoft.CodeAnalysis;
 using Nake.Magic;
 
@@ -39,7 +41,7 @@ namespace Nake
                 .GroupBy(p => p.Name, StringComparer.OrdinalIgnoreCase)
                 .Any(p => p.Count() > 1);
 
-            if (!symbol.ReturnsVoid ||                
+            if ((!symbol.ReturnsVoid && symbol.ReturnType.ToString() != "System.Threading.Tasks.Task") ||                
                 symbol.IsGenericMethod ||
                 symbol.Parameters.Any(p => p.RefKind != RefKind.None || !TypeConverter.IsSupported(p.Type)) ||
                 hasDuplicateParameters)
@@ -110,7 +112,7 @@ namespace Nake
             Debug.Assert(reflected != null);            
         }
 
-        public void Invoke(object script, TaskArgument[] arguments)
+        public async AsyncTask Invoke(object script, TaskArgument[] arguments)
         {
             var invocation = new TaskInvocation(script, this, reflected, arguments);
 
@@ -121,7 +123,7 @@ namespace Nake
                     return;
             }
 
-            invocation.Invoke();
+            await invocation.Invoke();
         }       
 
         public override string ToString()

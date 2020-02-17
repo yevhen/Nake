@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
+using AsyncTask = System.Threading.Tasks.Task;
+
 using Nake.Magic;
 using Nake.Scripting;
 
@@ -18,7 +20,7 @@ namespace Nake
             this.options = options;
         }
 
-        public void Start()
+        public async AsyncTask Start()
         {
             SetCurrentDirectory();
 
@@ -47,7 +49,7 @@ namespace Nake
             OverrideEnvironmentVariables();
             DefineNakeEnvironmentVariables(file);
 
-            Invoke(script, declarations);
+            await Invoke(script, declarations);
         }
 
         void SetCurrentDirectory()
@@ -188,7 +190,7 @@ namespace Nake
             return new Preprocessor().Process(file);
         }
 
-        void Invoke(PreprocessedScript script, IEnumerable<TaskDeclaration> declarations)
+        async AsyncTask Invoke(PreprocessedScript script, IEnumerable<TaskDeclaration> declarations)
         {
             var result = Build(script, declarations);
             Initialize(result);
@@ -198,7 +200,7 @@ namespace Nake
                 tasks.Add(Options.Task.Default);
 
             foreach (var task in tasks)
-                TaskRegistry.Invoke(task.Name, task.Arguments);
+                await TaskRegistry.Invoke(task.Name, task.Arguments);
         }
         
         static void SetQuiet()
