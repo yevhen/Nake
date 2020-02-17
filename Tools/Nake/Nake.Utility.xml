@@ -518,6 +518,16 @@
             Shortcuts for running external tools
             </summary>
         </member>
+        <member name="M:Nake.Run.GetAwaiter(System.String)">
+            <summary>
+            Executes specified command within a standard OS command-line interpreter using default options.
+            </summary>
+            <param name="command">The command</param>
+            <returns>
+                <see cref="T:Nake.Run.Result"/> object which could be further inspected
+                for exit code and std out and error messages</returns>
+            <exception cref="T:System.ApplicationException">If command fails</exception>
+        </member>
         <member name="M:Nake.Run.Cmd(System.String,System.String[],System.String,System.Boolean,System.Boolean,System.Boolean,System.Boolean)">
             <summary>
             Executes specified command within a standard OS command-line interpreter.
@@ -526,43 +536,22 @@
             <param name="environmentVariables">The environment variables pairs to pass. Default is all vars defined within a process</param>
             <param name="workingDirectory">The working directory. Default is current directory</param>
             <param name="echoOff">if set to <c>true</c>disables echoing command output to std out</param>
-            <param name="ignoreStdOutErrors">if set to <c>true</c> ignores errors logged to std out</param>
+            <param name="ignoreStdError">if set to <c>true</c> ignores errors logged to std out</param>
             <param name="ignoreExitCode">if set to <c>true</c> ignores exit code</param>
-            <param name="disableStdOutLogging">if set to <c>true</c> completely disable any std out logging</param>
-            <returns> Exit code </returns>
+            <param name="quiet">if set to <c>true</c> completely disable any std out logging</param>
+            <returns>
+                <see cref="T:Nake.Run.Result"/> object which could be further inspected
+                for exit code and std out and error messages</returns>
             <exception cref="T:System.ApplicationException">If command fails</exception>
         </member>
-        <member name="M:Nake.Run.Exec(System.String,System.String,System.String,System.Boolean)">
-            <summary>
-            Executes the specified file with given argument string.
-            </summary>
-            <param name="fileName">Name of the executable file.</param>
-            <param name="arguments">The arguments.</param>
-            <param name="workingDirectory">The working directory. Default is current directory</param>
-            <param name="ignoreExitCode">if set to <c>true</c> ignores exit code</param>
-            <returns> Exit code </returns>
-        </member>
-        <member name="M:Nake.Run.Exec``1(``0,System.Boolean,System.Boolean)">
+        <member name="M:Nake.Run.Exec``1(``0,System.Boolean)">
             <summary>
             Executes MSBuild task.
             </summary>
             <typeparam name="TTask">The type of the task.</typeparam>
             <param name="task">The task.</param>
-            <param name="ignoreStdOutErrors">if set to <c>true</c> ignores errors logged to std out</param>
-            <param name="disableStdOutLogging">if set to <c>true</c> completely disable any std out logging</param>
-            <returns>The executed task. Allows to get value of any OUT property</returns>
-            <exception cref="T:System.ApplicationException">If tasks fails</exception>
-        </member>
-        <member name="T:Nake.WagTheTail">
-            <summary>
-            Funky way to run a cli command
-            </summary>
-        </member>
-        <member name="M:Nake.WagTheTail._(System.String)">
-            <summary>
-            Runs cli command
-            </summary>
-            <param name="command">The command line to pass to <see cref="M:Nake.Run.Cmd(System.String,System.String[],System.String,System.Boolean,System.Boolean,System.Boolean,System.Boolean)"/></param>
+            <param name="quiet">if set to <c>true</c> completely disable any std out logging</param>
+            <returns><c>true</c>, if successful</returns>
         </member>
     </members>
 </doc>

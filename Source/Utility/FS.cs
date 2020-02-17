@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-
+    
 using Microsoft.Build.Tasks;
 using MSBuildTask = Microsoft.Build.Utilities.Task;
 
@@ -199,7 +199,8 @@ namespace Nake
 
         static TTask Execute<TTask>(TTask task) where TTask : MSBuildTask
         {
-            return Run.Exec(task);
+            Run.Exec(task);
+            return task;
         }
     }
 }

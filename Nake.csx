@@ -4,6 +4,7 @@
 #r "./Tools/Nake/Nake.Utility.dll"
 
 using System.IO;
+using System.Text;
 using System.Net;
 using System.Linq;
 using System.Diagnostics;
@@ -28,11 +29,11 @@ MakeDir(ArtifactsPath);
 [Task] void Default() => Build();
 
 /// Builds sources using specified configuration
-[Step] void Build(string config = "Debug", bool verbose = false) => 
-    $"dotnet build {RootPath}/Nake.sln /p:Configuration={config} {(verbose ? "/v:d" : "")}"._();
+[Step] async void Build(string config = "Debug", bool verbose = false) => 
+    await $"dotnet build {RootPath}/Nake.sln /p:Configuration={config} {(verbose ? "/v:d" : "")}";
 
 /// Runs unit tests 
-[Step] void Test(bool slow = false)
+[Step] async void Test(bool slow = false)
 {
     Build("Debug");
 
@@ -41,8 +42,8 @@ MakeDir(ArtifactsPath);
 
     try
     {
-        $@"dotnet vstest {tests} --logger:trx;LogFileName={results} 
-          {(AppVeyorJobId != null||slow ? "" : "--TestCaseFilter:TestCategory!=Slow")}"._();
+        await $@"dotnet vstest {tests} --logger:trx;LogFileName={results} 
+            {(AppVeyorJobId != null||slow ? "" : "--TestCaseFilter:TestCategory!=Slow")}";
     }
     finally
     {    	
@@ -60,15 +61,15 @@ MakeDir(ArtifactsPath);
 }
 
 /// Builds official NuGet packages 
-[Step] void Pack(bool skipFullCheck = false)
+[Step] async void Pack(bool skipFullCheck = false)
 {
     Test(!skipFullCheck);
-    $"dotnet pack -c Release -p:PackageVersion={Version} Nake.sln"._();
+    await $"dotnet pack -c Release -p:PackageVersion={Version} Nake.sln";
 }
 
 /// Publishes package to NuGet gallery
 [Step] void Publish() => Push("Nake"); 
 
-void Push(string package) => 
-    $@"dotnet nuget push {ReleasePackagesPath}/{package}.{Version}.nupkg 
-    -k %NuGetApiKey% -s https://nuget.org/ -ss https://nuget.smbsrc.net"._();
+async void Push(string package) => 
+    await $@"dotnet nuget push {ReleasePackagesPath}/{package}.{Version}.nupkg 
+    -k %NuGetApiKey% -s https://nuget.org/ -ss https://nuget.smbsrc.net";

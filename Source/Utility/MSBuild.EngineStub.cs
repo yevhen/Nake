@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 
 using Microsoft.Build.Framework;
 using Microsoft.Build.Logging;
@@ -9,14 +12,20 @@ namespace Nake
     class MSBuildEngineStub : IBuildEngine
     {
         readonly ConsoleLogger logger;
+        readonly ConcurrentBag<string> stdError = new ConcurrentBag<string>();
 
         public MSBuildEngineStub(bool quiet = false)
         {
             logger = new ConsoleLogger(quiet ? LoggerVerbosity.Quiet : LoggerVerbosity.Normal);
         }
 
+        public List<string> StdError => stdError.ToList();
+
         public void LogErrorEvent(BuildErrorEventArgs e)
         {
+            if (string.IsNullOrEmpty(e.Code))
+                stdError.Add(e.Message);
+
             logger.ErrorHandler(this, e);
         }
 
