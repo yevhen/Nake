@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 
+using Nake.Bake;
+
 using AsyncTask = System.Threading.Tasks.Task;
 
 namespace Nake
@@ -42,7 +44,7 @@ namespace Nake
             Debug.Assert(ctor != null);
 
             var submissionStates = new object[2];
-            submissionStates[0] = new object();
+            submissionStates[0] = CakeContextBuilder.Build();
 
             var instance = ctor.Invoke(new object[] {submissionStates});
             submission.GetMethod("<Initialize>").Invoke(instance, new object[0]);

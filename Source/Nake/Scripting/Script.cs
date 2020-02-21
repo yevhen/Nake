@@ -7,6 +7,8 @@ using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 
+using Cake.Core;
+
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Scripting;
@@ -74,7 +76,7 @@ namespace Nake.Scripting
                 .AddReferences(resolved)
                 .AddReferences(unresolved);
 
-            var script = CSharpScript.Create(code, options);
+            var script = CSharpScript.Create(code, options, globalsType: typeof(ICakeContext));
             var compilation = (CSharpCompilation)script.GetCompilation();
 
             var diagnostics = compilation.GetDiagnostics();
