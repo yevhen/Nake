@@ -200,7 +200,7 @@ namespace Nake
                 tasks.Add(Options.Task.Default);
 
             foreach (var task in tasks)
-                await TaskRegistry.Invoke(task.Name, task.Arguments);
+                await TaskRegistry.InvokeTask(task.Name, task.Arguments);
         }
         
         static void SetQuiet()

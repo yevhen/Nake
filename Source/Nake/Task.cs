@@ -7,81 +7,93 @@ using System.Reflection;
 using AsyncTask = System.Threading.Tasks.Task;
 
 using Microsoft.CodeAnalysis;
-using Nake.Magic;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Nake
 {
+    using Magic;
+
     class Task
     {
         internal const string ScriptClass = "Submission#0";
+        const string SystemThreadingTaskType = "System.Threading.Tasks.Task";
 
         readonly List<Task> dependencies = new List<Task>();
-        readonly HashSet<TaskInvocation> invocations = new HashSet<TaskInvocation>();
+        readonly HashSet<BodyInvocation> invocations = new HashSet<BodyInvocation>();
 
-        readonly string signature;
+        readonly IMethodSymbol symbol;
         readonly bool step;
         MethodInfo reflected;
 
         public Task(IMethodSymbol symbol, bool step)
         {
             CheckSignature(symbol);
-            signature = symbol.ToString();
+            Signature = symbol.ToString();
+            this.symbol = symbol;
             this.step = step;
         }
 
         public Task(TaskDeclaration declaration)
         {
-            signature = declaration.Signature;
+            Signature = declaration.Signature;
             step = declaration.IsStep;
         }
 
         static void CheckSignature(IMethodSymbol symbol)
         {
-            bool hasDuplicateParameters = symbol.Parameters
+            var hasDuplicateParameters = symbol.Parameters
                 .GroupBy(p => p.Name, StringComparer.OrdinalIgnoreCase)
                 .Any(p => p.Count() > 1);
 
-            if ((!symbol.ReturnsVoid && symbol.ReturnType.ToString() != "System.Threading.Tasks.Task") ||                
+            if (!symbol.ReturnsVoid && symbol.ReturnType.ToString() != SystemThreadingTaskType ||                
                 symbol.IsGenericMethod ||
                 symbol.Parameters.Any(p => p.RefKind != RefKind.None || !TypeConverter.IsSupported(p.Type)) ||
                 hasDuplicateParameters)
                 throw new TaskSignatureViolationException(symbol.ToString());
-        }  
-
-        internal bool IsGlobal
-        {
-            get { return !FullName.Contains("."); }
         }
 
-        string Name
+        public MethodDeclarationSyntax Replace(MethodDeclarationSyntax method)
         {
-            get
-            {
-                return IsGlobal
-                        ? FullName
-                        : FullName.Substring(FullName.LastIndexOf(".", StringComparison.Ordinal) + 1);
-            }
+            var originalBody = MethodBody(method);
+            var proxyBody = ProxyBody(method, originalBody);
+
+            var newBody = SyntaxFactory.ParseExpression(proxyBody);
+            var expressionBody = SyntaxFactory.ArrowExpressionClause(newBody);
+
+            return method.WithBody(null).WithExpressionBody(expressionBody);
         }
 
-        public string FullName
+        string ProxyBody(BaseMethodDeclarationSyntax method, string body)
         {
-            get { return Signature.Substring(0, Signature.IndexOf("(", StringComparison.Ordinal)); }
+            var arguments = TaskArgument.BuildArgumentString(method.ParameterList.Parameters);
+            
+            return symbol.IsAsync
+                ? TaskRegistry.BuildInvokeTaskAsyncString(FullName, arguments, body)
+                : TaskRegistry.BuildInvokeTaskString(FullName, arguments, body);
         }
 
-        string DeclaringType
+        static string MethodBody(BaseMethodDeclarationSyntax method)
         {
-            get
-            {
-                return !IsGlobal
-                        ? ScriptClass + "+" + FullName.Substring(0, FullName.LastIndexOf(".", StringComparison.Ordinal)).Replace(".", "+")
-                        : ScriptClass;
-            }
+            if (method.Body != null)
+                return method.Body.ToFullString();
+
+            var body = method.ExpressionBody.ToFullString();
+            return body.Substring(body.IndexOf("=>", StringComparison.Ordinal) + 2);
         }
 
-        public string Signature
-        {
-            get { return signature; }
-        }
+        public string Signature { get; }
+
+        public string FullName => Signature.Substring(0, Signature.IndexOf("(", StringComparison.Ordinal));
+        internal bool IsGlobal => !FullName.Contains(".");
+
+        string Name => IsGlobal ? 
+            FullName : 
+            FullName.Substring(FullName.LastIndexOf(".", StringComparison.Ordinal) + 1);
+        
+        string DeclaringType => !IsGlobal
+            ? ScriptClass + "+" + FullName.Substring(0, FullName.LastIndexOf(".", StringComparison.Ordinal)).Replace(".", "+")
+            : ScriptClass;
 
         public void AddDependency(Task dependency)
         {
@@ -90,18 +102,18 @@ namespace Nake
 
             var via = new List<string>();
 
-            if (dependency.IsDependantUpon(this, via))
+            if (dependency.IsDependentUpon(this, via))
                 throw new CyclicDependencyException(this, dependency, string.Join(" -> ", via) + " -> " + FullName);
 
             dependencies.Add(dependency);
         }
 
-        bool IsDependantUpon(Task other, ICollection<string> chain)
+        bool IsDependentUpon(Task other, ICollection<string> chain)
         {
             chain.Add(FullName);
 
             return dependencies.Contains(other) ||
-                   dependencies.Any(dependency => dependency.IsDependantUpon(other, chain));
+                   dependencies.Any(dependency => dependency.IsDependentUpon(other, chain));
         }
         
         public void Reflect(Assembly assembly)
@@ -112,23 +124,45 @@ namespace Nake
             Debug.Assert(reflected != null);            
         }
 
-        public async AsyncTask Invoke(object script, TaskArgument[] arguments)
+        public async AsyncTask Invoke(object script, TaskArgument[] arguments) => 
+            await new TaskInvocation(script, this, reflected, arguments).Invoke();
+
+        public async AsyncTask Invoke(IEnumerable<TaskArgument> arguments, Func<AsyncTask> body)
         {
-            var invocation = new TaskInvocation(script, this, reflected, arguments);
+            if (AlreadyInvoked(arguments))
+                return;
 
-            if (step)
-            {
-                var alreadyInvoked = !invocations.Add(invocation);
-                if (alreadyInvoked)
-                    return;
-            }
-
-            await invocation.Invoke();
-        }       
-
-        public override string ToString()
-        {
-            return Signature;
+            await body();
         }
+
+        public void Invoke(IEnumerable<TaskArgument> arguments, Action body)
+        {
+            if (AlreadyInvoked(arguments))
+                return;
+
+            body();
+        }
+
+        bool AlreadyInvoked(IEnumerable<TaskArgument> arguments) => 
+            step && !invocations.Add(new BodyInvocation(arguments));
+
+        class BodyInvocation
+        {
+            readonly object[] values;
+
+            public BodyInvocation(IEnumerable<TaskArgument> arguments) => 
+                values = arguments.Select(x => x.Value).ToArray();
+
+            public override bool Equals(object obj) => 
+                !ReferenceEquals(null, obj) && (ReferenceEquals(this, obj) || Equals((BodyInvocation) obj));
+
+            bool Equals(BodyInvocation other) => 
+                !values.Where((value, index) => !value.Equals(other.values[index])).Any();
+
+            public override int GetHashCode() => 
+                values.Aggregate(0, (current, value) => current ^ value.GetHashCode());
+        }
+
+        public override string ToString() => Signature;
     }
 }

@@ -42,15 +42,15 @@ namespace Nake.Magic
             return CSharpSyntaxTree.Create((CompilationUnitSyntax) root, options, tree.FilePath, Encoding.UTF8);
         }
 
-        public override SyntaxNode VisitInvocationExpression(InvocationExpressionSyntax node)
+        public override SyntaxNode VisitMethodDeclaration(MethodDeclarationSyntax node)
         {
-            var visited = (InvocationExpressionSyntax)
-                base.VisitInvocationExpression(node);
-            
-            var invocation = result.Find(node);
-            return invocation != null 
-                              ? invocation.Replace(visited) 
-                              : visited;
+            var visited = (MethodDeclarationSyntax)
+                base.VisitMethodDeclaration(node);
+
+            var task = result.Find(node);
+            return task != null 
+                ? task.Replace(visited) 
+                : visited;
         }
 
         public override SyntaxNode VisitLiteralExpression(LiteralExpressionSyntax node)

@@ -67,21 +67,23 @@ namespace Nake
             
                 static int counter = 0;
 
-                [Step] void Step1(string p) 
+                [Step] void Step1(string arg1, int arg2 = default) 
                 {
                     Env.Var[""Step1ExecutedCount""] = (++counter).ToString();
                 }
 
                 [Step] void Step2() 
                 {
-                    Step1(""first time"");
-                    Step1(""second time"");
+                    Step1(""first time"",  1);
+                    Step1(""second time"", 1);
+                    Step1(""second time"", 0);
+                    Step1(""second time""); // won't be executed, params match previous (default int = 0)
                 }
             ");
 
             Invoke("Step2");
 
-            Assert.That(int.Parse(Env.Var["Step1ExecutedCount"]), Is.EqualTo(2));
+            Assert.That(int.Parse(Env.Var["Step1ExecutedCount"]), Is.EqualTo(3));
         }
 
         [Test]

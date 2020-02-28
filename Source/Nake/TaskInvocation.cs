@@ -40,8 +40,7 @@ namespace Nake
 
                 if (parameter == null)
                     throw new TaskArgumentException(task, 
-                        string.Format("Cannot bind argument ({0}) -> {1}{2}", 
-                                      i + 1, argument.IsNamed() ? argument.Name + ":" : "", argument.Value));
+                        $"Cannot bind argument ({i + 1}) -> {(argument.IsNamed() ? argument.Name + ":" : "")}{argument.Value}");
 
                 result[parameter] = Convert(argument, i, parameter);
             }
@@ -49,15 +48,11 @@ namespace Nake
             return result.Values.ToArray();
         }
 
-        ParameterInfo GetParameterByPosition(int position)
-        {
-            return method.GetParameters().SingleOrDefault(x => x.Position == position);
-        }
+        ParameterInfo GetParameterByPosition(int position) => 
+            method.GetParameters().SingleOrDefault(x => x.Position == position);
 
-        ParameterInfo GetParameterByName(string name)
-        {
-            return method.GetParameters().SingleOrDefault(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
-        }
+        ParameterInfo GetParameterByName(string name) => 
+            method.GetParameters().SingleOrDefault(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
 
         object Convert(TaskArgument arg, int position, ParameterInfo parameter)
         {
@@ -124,37 +119,6 @@ namespace Nake
         {
             Debug.Assert(method.DeclaringType != null);
             return task.IsGlobal ? script : Activator.CreateInstance(method.DeclaringType);
-        }
-
-        bool Equals(TaskInvocation other)
-        {
-            return !values.Where((value, index) => value != other.values[index]).Any();
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj))
-                return false;
-            
-            if (ReferenceEquals(this, obj))
-                return true;
-
-            return obj.GetType() == typeof(TaskInvocation) && Equals((TaskInvocation) obj);
-        }
-
-        public override int GetHashCode()
-        {
-            return values.Aggregate(0, (current, value) => current ^ value.GetHashCode());
-        }
-
-        public static bool operator ==(TaskInvocation left, TaskInvocation right)
-        {
-            return Equals(left, right);
-        }
-
-        public static bool operator !=(TaskInvocation left, TaskInvocation right)
-        {
-            return !Equals(left, right);
         }
     }
 }

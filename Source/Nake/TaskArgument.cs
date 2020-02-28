@@ -1,11 +1,30 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Nake
 {
     public class TaskArgument
     {
-        public readonly string Name = "";
+        static string FullTypeName => typeof(TaskArgument).FullName;
+
+        public static string BuildArgumentString(IReadOnlyList<ParameterSyntax> parameters)
+        {
+            return parameters.Count != 0
+                ? $"new {FullTypeName}[]{{{string.Join(", ", parameters.Select(Format))}}}"
+                : $"new {FullTypeName}[0]";
+
+            static string Format(ParameterSyntax parameter)
+            {
+                return $@"new {FullTypeName}(""{ArgumentName()}"", {ArgumentName()})";
+                string ArgumentName() => parameter.Identifier.ValueText;
+            }
+        }
+        
+        public readonly string Name;
         public readonly object Value;
 
         public TaskArgument(object value)
@@ -14,22 +33,12 @@ namespace Nake
 
         public TaskArgument(string name, object value)
         {
-            if (name == null)
-                throw new ArgumentNullException("name");
-
-            Name = name;
+            Name = name ?? throw new ArgumentNullException(nameof(name));
             Value = value;
         }
 
-        public bool IsPositional()
-        {
-            return string.IsNullOrEmpty(Name);
-        }
-
-        public bool IsNamed()
-        {
-            return !IsPositional();
-        }
+        public bool IsPositional() => string.IsNullOrEmpty(Name);
+        public bool IsNamed() => !IsPositional();
 
         public object Convert(Type conversionType)
         {
@@ -49,9 +58,6 @@ namespace Nake
             return Enum.Parse(enumType, value, true);
         }
 
-        object ConvertSimpleValue(Type conversionType)
-        {
-            return TypeConverter.Convert(Value, conversionType);
-        }
+        object ConvertSimpleValue(Type conversionType) => TypeConverter.Convert(Value, conversionType);
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
@@ -8,17 +9,24 @@ namespace Nake
 {
     public class TaskRegistry
     {
+        static string FullTypeName => typeof(TaskRegistry).FullName;
+
+        internal static string BuildInvokeTaskString(string fullName, string arguments, string body) =>
+            $@"{FullTypeName}.{nameof(InvokeTask)}(""{fullName}"", {arguments}, ()=> {body})";
+
+        internal static string BuildInvokeTaskAsyncString(string fullName, string arguments, string body) => 
+            $@"await {FullTypeName}.{nameof(InvokeTaskAsync)}(""{fullName}"", {arguments}, async ()=> {body})";
+
         internal static TaskRegistry Global;
 
-        public static async AsyncTask Invoke(string taskFullName, params TaskArgument[] arguments)
-        {
-            var task = Global.Find(taskFullName);
+        public static void InvokeTask(string fullName, TaskArgument[] arguments, Action body) =>
+            Task(fullName).Invoke(arguments, body);
 
-            if (task == null)
-                throw new TaskNotFoundException(taskFullName);
+        public static async AsyncTask InvokeTaskAsync(string fullName, TaskArgument[] arguments, Func<AsyncTask> body) => 
+            await Task(fullName).Invoke(arguments, body);
 
-            await task.Invoke(Global.script, arguments);
-        }
+        public static async AsyncTask InvokeTask(string fullName, params TaskArgument[] arguments) => 
+            await Task(fullName).Invoke(Global.script, arguments);
 
         readonly Dictionary<string, Task> tasks = new Dictionary<string, Task>(new CaseInsensitiveEqualityComparer());
         readonly object script;
@@ -36,7 +44,7 @@ namespace Nake
 
         static object CreateScriptInstance(Assembly assembly)
         {
-            var submission = assembly.GetType(Task.ScriptClass);
+            var submission = assembly.GetType(Nake.Task.ScriptClass);
 
             var ctor = submission.GetConstructor(new[] {typeof(object[])});
             Debug.Assert(ctor != null);
@@ -45,19 +53,23 @@ namespace Nake
             submissionStates[0] = new object();
 
             var instance = ctor.Invoke(new object[] {submissionStates});
+            // ReSharper disable once PossibleNullReferenceException
             submission.GetMethod("<Initialize>").Invoke(instance, new object[0]);
 
             return instance;
         }
 
-        internal Task Find(string taskFullName)
+        static Task Task(string fullName)
         {
-            return tasks.Find(taskFullName);
+            var task = Global.FindTask(fullName);
+            
+            if (task == null)
+                throw new TaskNotFoundException(fullName);
+            
+            return task;
         }
-        
-        internal IEnumerable<Task> Tasks
-        {
-            get { return tasks.Values; }
-        }
+
+        internal Task FindTask(string fullName) => tasks.Find(fullName);
+        internal IEnumerable<Task> Tasks => tasks.Values;
     }
 }

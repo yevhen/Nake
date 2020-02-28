@@ -72,12 +72,11 @@ namespace Nake.Magic
 
         public override void VisitInvocationExpression(InvocationExpressionSyntax node)
         {
-            var symbol = ModelExtensions.GetSymbolInfo(model, node).Symbol as IMethodSymbol;
-
-            if (symbol != null)
+            if (ModelExtensions.GetSymbolInfo(model, node).Symbol is IMethodSymbol symbol)
             {
                 visitingStringFormat = IsStringFormatInvocation(symbol);
 
+                // TODO: YB - shouldn't we track dependencies for both Tasks and Steps?
                 if (IsStep(symbol))
                 {
                     var task = result.Find(symbol);
@@ -87,10 +86,7 @@ namespace Nake.Magic
                         result.Add(symbol, task);
                     }
 
-                    result.Add(node, new ProxyInvocation(task));
-
-                    if (current != null)
-                        current.AddDependency(task);
+                    current?.AddDependency(task);
                 }
             }
 
