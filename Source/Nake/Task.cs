@@ -143,8 +143,11 @@ namespace Nake
             body();
         }
 
-        bool AlreadyInvoked(IEnumerable<TaskArgument> arguments) => 
-            step && !invocations.Add(new BodyInvocation(arguments));
+        bool AlreadyInvoked(IEnumerable<TaskArgument> arguments)
+        {
+            lock (invocations)
+                return step && !invocations.Add(new BodyInvocation(arguments));
+        }
 
         class BodyInvocation
         {

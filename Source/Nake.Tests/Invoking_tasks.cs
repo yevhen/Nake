@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 
 using NUnit.Framework;
 
@@ -84,6 +85,31 @@ namespace Nake
             Invoke("Step2");
 
             Assert.That(int.Parse(Env.Var["Step1ExecutedCount"]), Is.EqualTo(3));
+        }
+
+        [Test]
+        public void Concurrent_invocation_of_steps()
+        {
+            Build(@"
+            
+                using System.Threading;
+                static int counter = 0;
+
+                [Step] void Step1(string arg) 
+                {
+                    Env.Var[""Step1ExecutedCount""] = (++counter).ToString();
+                    Thread.Sleep(1);
+                }
+
+                [Step] void Step2() 
+                {
+                    Parallel.For(0, 10000, new ParallelOptions{MaxDegreeOfParallelism = 1000}, (_, __) => Step1(""parallel""));
+                }
+            ");
+
+            Invoke("Step2");
+
+            Assert.That(int.Parse(Env.Var["Step1ExecutedCount"]), Is.EqualTo(1));
         }
 
         [Test]
