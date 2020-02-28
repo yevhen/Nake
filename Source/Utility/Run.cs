@@ -6,7 +6,6 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 using Microsoft.Build.Tasks;
-using MsbTask = Microsoft.Build.Utilities.Task;
 
 namespace Nake
 {
@@ -69,19 +68,6 @@ namespace Nake
             return new Result(task.ExitCode, output, engine.StdError);
         }
 
-        /// <summary>
-        /// Executes MSBuild task.
-        /// </summary>
-        /// <typeparam name="TTask">The type of the task.</typeparam>
-        /// <param name="task">The task.</param>
-        /// <param name="quiet">if set to <c>true</c> completely disable any std out logging</param>
-        /// <returns><c>true</c>, if successful</returns>
-        public static bool Exec<TTask>(TTask task, bool quiet = false) where TTask : MsbTask
-        {
-            task.BuildEngine = new MSBuildEngineStub(quiet);
-            return task.Execute();
-        }
-        
         public class Result : IEnumerable<string>
         {
             public readonly int ExitCode;
