@@ -28,7 +28,7 @@ namespace Nake
                 var e = (Exception) args.ExceptionObject;
 
                 Log.Error(e);
-                App.Fail(e);
+                Session.Fail(e);
             };
 
             TaskScheduler.UnobservedTaskException += (sender, args) =>
@@ -39,7 +39,7 @@ namespace Nake
                 foreach (var inner in e.Flatten().InnerExceptions)
                     Log.Error(inner);
 
-                App.Fail(e);
+                Session.Fail(e);
             };
         }
     
@@ -54,12 +54,12 @@ namespace Nake
             {
                 Log.Error(e.Message);
                 Options.PrintUsage();
-                App.Fail(e);
+                Session.Fail(e);
             }
             catch (TaskInvocationException e)
             {
                 Log.Error(e.GetBaseException());
-                App.Fail(e);
+                Session.Fail(e);
             }
         }
     }
