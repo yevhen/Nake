@@ -11,7 +11,7 @@ using System.Text.RegularExpressions;
 
 namespace GlobDir
 {
-    public static class Glob
+    static class Glob
     {
         [Flags]
         public enum Constants
