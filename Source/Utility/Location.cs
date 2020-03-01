@@ -4,7 +4,7 @@ using System.IO;
 namespace Nake
 {
     /// <summary>
-    /// Convinience helper methods for working with file system paths
+    /// Convenience helper methods for working with file system paths
     /// </summary>
     public static class Location
     {
@@ -18,19 +18,13 @@ namespace Nake
         /// Gets the script directory.
         /// </summary>
         /// <value> The directory in which entry script is residing. </value>
-        public static string NakeScriptDirectory
-        {
-            get { return Env.Var["NakeScriptDirectory"]; }
-        }
+        public static string NakeScriptDirectory => Env.Var["NakeScriptDirectory"];
 
         /// <summary> 
         /// Gets the startup directory. 
         /// </summary>
         /// <value> The directory in which Nake was started. </value>
-        public static string NakeStartupDirectory
-        {
-            get { return Env.Var["NakeStartupDirectory"]; }
-        }
+        public static string NakeStartupDirectory => Env.Var["NakeStartupDirectory"];
 
         internal static string GetRootedPath(string path, string basePath)
         {

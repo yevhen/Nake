@@ -13,7 +13,7 @@ namespace Nake
         /// <remarks>
         ///  Could be substituted in order to redirect messages
         /// </remarks>
-        public static Action<string> Out = text => Console.WriteLine(text);
+        public static Action<string> Out = Console.WriteLine;
 
         static readonly bool QuietMode = Env.Var.Defined("NakeQuietMode");
         static readonly bool SilentMode = Env.Var.Defined("NakeSilentMode");
