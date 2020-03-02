@@ -17,7 +17,7 @@ namespace Nake.Utility
         [SetUp]
         public void SetUp()
         {
-            Location.CurrentDirectory = BaseDirectory;
+            Location.CurrentDirectory = BaseDirectory();
 
             files = new FileSet();
         }

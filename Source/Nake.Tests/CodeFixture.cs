@@ -4,6 +4,8 @@ using NUnit.Framework;
 
 namespace Nake
 {
+    using Scripting;
+
     abstract class CodeFixture
     {
         [SetUp]
@@ -17,7 +19,13 @@ namespace Nake
 
         protected static void Build(string code, Dictionary<string, string> substitutions = null)
         {
-            var engine = new Engine();
+            var additionalReferences = new[]
+            {
+                new AssemblyNameReference("meta", typeof(StepAttribute).Assembly.Location),
+                new AssemblyNameReference("utility", typeof(Env).Assembly.Location)
+            };
+
+            var engine = new Engine(additionalReferences);
             
             var result = engine.Build(
                 code, substitutions ?? new Dictionary<string, string>(), false

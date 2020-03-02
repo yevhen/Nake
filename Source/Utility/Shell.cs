@@ -67,7 +67,7 @@ namespace Nake
             {   
                 Command = command,
                 EchoOff = echoOff,
-                WorkingDirectory = workingDirectory ?? Location.CurrentDirectory(),
+                WorkingDirectory = workingDirectory ?? Location.CurrentDirectory,
                 IgnoreExitCode = ignoreExitCode,
                 LogStandardErrorAsError = !ignoreStdError,
                 EnvironmentVariables = environmentVariables ?? Env.Var.All(),

@@ -4,5 +4,101 @@
         <name>Nake</name>
     </assembly>
     <members>
+        <member name="T:Nake.Color">
+            <summary>
+            Helps printing console messages with given color
+            </summary>
+        </member>
+        <member name="M:Nake.Color.With(System.ConsoleColor,System.Action)">
+            <summary>
+            Temporarily switches console color to the given one, while executing specified action
+            </summary>
+            <param name="color">The color to switch to.</param>
+            <param name="action">The action to execute.</param>
+        </member>
+        <member name="T:Nake.Log">
+            <summary>
+            Shortcut methods for outputting messages to std out
+            </summary>
+        </member>
+        <member name="F:Nake.Log.Out">
+            <summary>
+            Controls actual printing to Console.Out.
+            </summary>
+            <remarks>
+             Could be substituted in order to redirect messages
+            </remarks>
+        </member>
+        <member name="M:Nake.Log.TraceFormat(System.String,System.Object[])">
+            <summary>
+            Prints trace-level message using specified format string and arguments. The message will be printed in DarkGreen color.
+            The message will be printed only if Nake is called with --trace switch.
+            </summary>
+            <param name="message">The message.</param>
+            <param name="args">The arguments.</param>
+        </member>
+        <member name="M:Nake.Log.Trace(System.String)">
+            <summary>
+            Prints trace-level message. The message will be printed in DarkGreen color.
+            The message will be printed only if Nake is called with --trace switch.
+            </summary>
+            <param name="message">The message.</param>
+        </member>
+        <member name="M:Nake.Log.MessageFormat(System.String,System.Object[])">
+            <summary>
+            Prints simple message using specified format string and arguments. The message will be printed in DarkCyan color.
+            </summary>
+            <param name="message">The message.</param>
+            <param name="args">The arguments.</param>
+        </member>
+        <member name="M:Nake.Log.Message(System.String)">
+            <summary>
+            Prints simple message. The message will be printed in DarkCyan color.
+            </summary>
+            <param name="message">The message.</param>
+        </member>
+        <member name="M:Nake.Log.InfoFormat(System.String,System.Object[])">
+            <summary>
+            Prints informational message using specified format string and arguments. The message will be printed in DarkGray color.
+            </summary>
+            <param name="message">The message.</param>
+            <param name="args">The arguments.</param>
+        </member>
+        <member name="M:Nake.Log.Info(System.String)">
+            <summary>
+            Prints informational message. The message will be printed in DarkGray color.
+            </summary>
+            <param name="message">The message.</param>
+        </member>
+        <member name="M:Nake.Log.Error(System.Exception)">
+            <summary>
+            Prints error message using specified exception as input. The message will be printed in DarkRed color.
+            The stack trace will be printed only if Nake is called with --trace switch.
+            </summary>
+            <param name="exception">The exception.</param>
+        </member>
+        <member name="M:Nake.Log.Error(System.String)">
+            <summary>
+            Prints error message. The message will be printed in DarkRed color.
+            </summary>
+            <param name="message">The message.</param>
+        </member>
+        <member name="T:Nake.Session">
+            <summary>
+            Helper methods for controlling Nake runner session
+            </summary>
+        </member>
+        <member name="M:Nake.Session.Exit(System.String)">
+            <summary>
+            Exits Nake runner with optional printing of the given message.
+            </summary>
+            <param name="message">The message.</param>
+        </member>
+        <member name="M:Nake.Session.Fail(System.String)">
+            <summary>
+            Exits Nake runner with failure code (-1), optionally printing the given message.
+            </summary>
+            <param name="message">The message.</param>
+        </member>
     </members>
 </doc>

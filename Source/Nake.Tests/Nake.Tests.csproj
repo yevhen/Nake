@@ -13,7 +13,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Nake\Nake.csproj"/>
+    <ProjectReference Include="..\Meta\Meta.csproj" />
+    <ProjectReference Include="..\Nake\Nake.csproj" />
+    <ProjectReference Include="..\Utility\Utility.csproj" />
   </ItemGroup>
   
 </Project>

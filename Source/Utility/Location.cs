@@ -4,27 +4,37 @@ using System.IO;
 namespace Nake
 {
     /// <summary>
-    /// Convenience helper methods for working with file system paths
+    /// Convenience helper methods for working with script related file system locations
     /// </summary>
     public static class Location
     {
         /// <summary>
-        /// Returns path to the current directory. By default it is a directory in which Nake was started.
+        /// Gets the directory in which entry script is residing
         /// </summary>
-        /// <remarks>Could be substituted dynamically</remarks>
-        public static Func<string> CurrentDirectory = () => NakeStartupDirectory;
-
-        /// <summary>
-        /// Gets the script directory.
-        /// </summary>
-        /// <value> The directory in which entry script is residing. </value>
-        public static string NakeScriptDirectory => Env.Var["NakeScriptDirectory"];
+        /// <value> The directory path</value>
+        // TODO: YB - get rid of this. Switch to substitution on script-level
+        [Obsolete("Please use %NakeScriptDirectory% variable substitution to get proper path")]
+        public static string NakeScriptDirectory { get; } = Env.Var["NakeScriptDirectory"];
 
         /// <summary> 
-        /// Gets the startup directory. 
+        /// Gets the working directory passed to Nake runner.
+        /// If not specified from cli will return <see cref="NakeStartupDirectory"/>
         /// </summary>
-        /// <value> The directory in which Nake was started. </value>
-        public static string NakeStartupDirectory => Env.Var["NakeStartupDirectory"];
+        /// <value> The directory path</value>
+        public static string NakeWorkingDirectory { get; } = Env.Var["NakeWorkingDirectory"];
+
+        /// <summary> 
+        /// Gets the Nake startup directory, which is whatever <see cref="Environment.CurrentDirectory"/>
+        /// was pointing to at the time the Nake was started. 
+        /// </summary>
+        /// <value> The directory path</value>
+        public static string NakeStartupDirectory { get; } = Env.Var["NakeStartupDirectory"];
+
+        /// <summary>
+        /// Get or set the path to the current working directory.
+        /// By default, if not overriden from cli, it is a directory in which Nake was started.
+        /// </summary>
+        public static string CurrentDirectory { get; set; } = NakeWorkingDirectory;
 
         internal static string GetRootedPath(string path, string basePath)
         {
@@ -34,7 +44,7 @@ namespace Nake
         }
 
         internal static FilePath GetFullPath(FilePath path) => 
-            GetFullPath(path, FilePath.From(CurrentDirectory()));
+            GetFullPath(path, FilePath.From(CurrentDirectory));
 
         internal static FilePath GetFullPath(FilePath path, FilePath basePath) => 
             Path.IsPathRooted(path) ? path : basePath.Combine(path);

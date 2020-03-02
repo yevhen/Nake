@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
+using static System.Environment;
 
 using Nake.Scripting;
 
@@ -159,7 +160,7 @@ namespace Nake
 
             var current = new StringBuilder();
             foreach (var name in names)
-                current.Append(Env.Var[name]);
+                current.Append(GetEnvironmentVariable(name));
 
             return StringHash(current.ToString()) != captured;
         }

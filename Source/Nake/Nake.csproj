@@ -16,9 +16,4 @@
     <PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="$(MicrosoftCodeAnalysisScriptingVersion)" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Meta\Meta.csproj" />
-    <ProjectReference Include="..\Utility\Utility.csproj" />
-  </ItemGroup>
-
 </Project>

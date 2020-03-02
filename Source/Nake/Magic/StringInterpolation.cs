@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using static System.Environment;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -127,7 +126,7 @@ namespace Nake.Magic
             return environmentVariablePattern.Replace(token, match =>
             {
                 var name = match.Groups["variable"].Value;
-                var value = Env.Var[name] ?? "?UNDEFINED?";
+                var value = GetEnvironmentVariable(name) ?? "?UNDEFINED?";
                 
                 Captured.Add(new EnvironmentVariable(name, value));
                 return value;

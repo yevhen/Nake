@@ -11,8 +11,6 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.CSharp.RuntimeBinder;
-using Microsoft.Build.Framework;
-using Microsoft.Build.Utilities;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 
 namespace Nake.Scripting
@@ -22,8 +20,6 @@ namespace Nake.Scripting
         static readonly List<MetadataReference> NakeReferences = new List<MetadataReference>
         {
             Reference(typeof(Engine)),
-            Reference(typeof(TaskAttribute)),
-            Reference(typeof(Env))
         };
 
         static readonly Dictionary<string, MetadataReference> DefaultReferences = new Dictionary<string, MetadataReference>
@@ -38,8 +34,6 @@ namespace Nake.Scripting
             {"System.Xml",                      Reference(typeof(XmlElement))},
             {"System.Xml.Linq",                 Reference(typeof(XElement))},
             {"Microsoft.CSharp",                Reference(typeof(RuntimeBinderException))},
-            {"Microsoft.Build.Framework",       Reference(typeof(ITaskItem))},
-            {"Microsoft.Build.Utilities",       Reference(typeof(TaskItem))}
         };
 
         static readonly string[] DefaultNamespaces =

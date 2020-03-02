@@ -42,29 +42,19 @@ namespace Nake
     {
         readonly EnvironmentVariableTarget target;
 
-        internal EnvironmentScope(EnvironmentVariableTarget target)
-        {
+        internal EnvironmentScope(EnvironmentVariableTarget target) => 
             this.target = target;
-        }
 
         /// <summary>
-        /// Gets or sets the envrionment variable with the specified name.
+        /// Gets or sets the environment variable with the specified name.
         /// </summary>
         /// <value> The string value. </value>
         /// <param name="name">The variable name.</param>
         /// <returns>Value or <c>null</c> if environment variable does not exists</returns>
         public string this[string name]
         {
-            get
-            {
-                return Defined(name)
-                           ? Environment.GetEnvironmentVariable(name, target)
-                           : null;
-            }
-            set
-            {
-                Environment.SetEnvironmentVariable(name, value, target);
-            }
+            get => Defined(name) ? Environment.GetEnvironmentVariable(name, target) : null;
+            set => Environment.SetEnvironmentVariable(name, value, target);
         }
 
         /// <summary>
@@ -72,19 +62,14 @@ namespace Nake
         /// </summary>
         /// <param name="name">The name of variable.</param>
         /// <returns><c>true</c> if defined, <c>false</c> otherwise</returns>
-        public bool Defined(string name)
-        {
-            return Environment.GetEnvironmentVariable(name, target) != null;
-        }
+        public bool Defined(string name) => Environment.GetEnvironmentVariable(name, target) != null;
 
         /// <summary>
-        /// Returns all environment varaibles as name=value pairs
+        /// Returns all environment variables as name=value pairs
         /// </summary>
         /// <returns>Array of environment variable pairs</returns>
-        public string[] All()
-        {
-            return (from DictionaryEntry entry in Environment.GetEnvironmentVariables(target)
-                    select entry.Key + "=" + entry.Value).ToArray();
-        }
+        public string[] All() =>
+            (from DictionaryEntry entry in Environment.GetEnvironmentVariables(target)
+             select entry.Key + "=" + entry.Value).ToArray();
     }
 }

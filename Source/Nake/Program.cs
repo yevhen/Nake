@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using static System.Environment;
 
 using AsyncTask = System.Threading.Tasks.Task;
 
@@ -17,7 +18,7 @@ namespace Nake
 
         static void BreakInDebuggerIfRequested()
         {
-            if (Env.Var["NakeDebugger"] == "1")
+            if (GetEnvironmentVariable("NakeDebugger") == "1")
                 Debugger.Break();
         }
 

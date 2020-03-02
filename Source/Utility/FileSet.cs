@@ -30,7 +30,7 @@ namespace Nake
         /// <param name="basePath">The base path to be used for relative paths, instead of CurrentDirectory.</param>
         public FileSet(string basePath = null)
         {
-            this.basePath = basePath ?? Location.CurrentDirectory();
+            this.basePath = basePath ?? Location.CurrentDirectory;
         }
 
         /// <summary>

@@ -25,10 +25,8 @@ namespace Nake
         /// </summary>
         /// <param name="message">The message.</param>
         /// <param name="args">The arguments.</param>
-        public static void TraceFormat(string message, params object[] args)
-        {
+        public static void TraceFormat(string message, params object[] args) => 
             Trace(string.Format(message, args));
-        }
 
         /// <summary>
         /// Prints trace-level message. The message will be printed in DarkGreen color.
@@ -48,10 +46,8 @@ namespace Nake
         /// </summary>
         /// <param name="message">The message.</param>
         /// <param name="args">The arguments.</param>
-        public static void MessageFormat(string message, params object[] args)
-        {
+        public static void MessageFormat(string message, params object[] args) => 
             Message(string.Format(message, args));
-        }
 
         /// <summary>
         /// Prints simple message. The message will be printed in DarkCyan color.
@@ -70,10 +66,8 @@ namespace Nake
         /// </summary>
         /// <param name="message">The message.</param>
         /// <param name="args">The arguments.</param>
-        public static void InfoFormat(string message, params object[] args)
-        {
+        public static void InfoFormat(string message, params object[] args) => 
             Info(string.Format(message, args));
-        }
 
         /// <summary>
         /// Prints informational message. The message will be printed in DarkGray color.
@@ -104,9 +98,7 @@ namespace Nake
         /// Prints error message. The message will be printed in DarkRed color.
         /// </summary>
         /// <param name="message">The message.</param>
-        public static void Error(string message)
-        {
+        public static void Error(string message) => 
             Color.With(ConsoleColor.DarkRed, () => Out(message));
-        }
     }
 }

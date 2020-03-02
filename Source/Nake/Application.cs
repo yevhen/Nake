@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using static System.Environment;
 
 using AsyncTask = System.Threading.Tasks.Task;
 
@@ -13,12 +14,11 @@ namespace Nake
 {
     class Application
     {
+        string currentDirectory;
         readonly Options options;
         
-        public Application(Options options)
-        {
+        public Application(Options options) => 
             this.options = options;
-        }
 
         public async AsyncTask Start()
         {
@@ -54,20 +54,21 @@ namespace Nake
 
         void SetCurrentDirectory()
         {
-            var directory = options.CurrentDirectory ?? Environment.CurrentDirectory;
-            Location.CurrentDirectory = () => directory;
+            var directory = options.CurrentDirectory ?? CurrentDirectory;
+            currentDirectory = directory;
         }
 
         void OverrideEnvironmentVariables()
         {
             foreach (var variable in options.Variables)
-                Env.Var[variable.Name] = variable.Value;
+                SetEnvironmentVariable(variable.Name, variable.Value);
         }
 
-        static void DefineNakeEnvironmentVariables(FileInfo scriptFile)
+        void DefineNakeEnvironmentVariables(FileInfo scriptFile)
         {
-            Env.Var["NakeScriptDirectory"] = scriptFile.DirectoryName;
-            Env.Var["NakeStartupDirectory"] = Location.CurrentDirectory();
+            SetEnvironmentVariable("NakeScriptDirectory",  scriptFile.DirectoryName);
+            SetEnvironmentVariable("NakeStartupDirectory", currentDirectory);
+            SetEnvironmentVariable("NakeWorkingDirectory", CurrentDirectory);
         }
 
         FileInfo Find()
@@ -75,7 +76,7 @@ namespace Nake
             if (options.ScriptFile != null)
             {
                 var absoluteFilePath = !Path.IsPathRooted(options.ScriptFile) 
-                    ? Path.GetFullPath(Path.Combine(Location.CurrentDirectory(), options.ScriptFile))
+                    ? Path.GetFullPath(Path.Combine(currentDirectory, options.ScriptFile))
                     : options.ScriptFile;
 
                 if (!File.Exists(absoluteFilePath))
@@ -84,10 +85,10 @@ namespace Nake
                 return new FileInfo(absoluteFilePath);
             }
 
-            var defaultScriptFile = Path.Combine(Location.CurrentDirectory(), "Nake.csx");
+            var defaultScriptFile = Path.Combine(currentDirectory, "Nake.csx");
 
             if (!File.Exists(defaultScriptFile))
-                throw new NakeException("Nake.csx file was not found in current directory [{0}]", Location.CurrentDirectory());
+                throw new NakeException("Nake.csx file was not found in current directory [{0}]", currentDirectory);
 
             return new FileInfo(defaultScriptFile);
         }
@@ -111,15 +112,11 @@ namespace Nake
             return result;
         }
 
-        Dictionary<string, string> VariableSubstitutions()
-        {
-            return options.Variables.ToDictionary(x => x.Name, x => x.Value);
-        }
+        Dictionary<string, string> VariableSubstitutions() => 
+            options.Variables.ToDictionary(x => x.Name, x => x.Value);
 
-        static void Initialize(BuildResult result)
-        {
+        static void Initialize(BuildResult result) => 
             TaskRegistry.Global = new TaskRegistry(result);
-        }
 
         static void ShowHelp()
         {
@@ -203,19 +200,8 @@ namespace Nake
                 await TaskRegistry.InvokeTask(task.Name, task.Arguments);
         }
         
-        static void SetQuiet()
-        {
-            Env.Var["NakeQuietMode"] = "true";
-        }
-
-        static void SetSilent()
-        {
-            Env.Var["NakeSilentMode"] = "true";
-        }
-
-        static void SetTrace()
-        {
-            Env.Var["NakeTraceEnabled"] = "true";
-        }
+        static void SetQuiet() => SetEnvironmentVariable("NakeQuietMode", "true");
+        static void SetSilent() => SetEnvironmentVariable("NakeSilentMode", "true");
+        static void SetTrace() => SetEnvironmentVariable("NakeTraceEnabled", "true");
     }
 }
