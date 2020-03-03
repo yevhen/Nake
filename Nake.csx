@@ -13,7 +13,7 @@ using Nake;
 using static Nake.FS;
 using static Nake.Log;
 using static Nake.Env;
-using static Nake.Run;
+using static Nake.Shell;
 
 var RootPath = "%NakeScriptDirectory%";
 var ArtifactsPath = $"{RootPath}/Artifacts";
@@ -42,8 +42,8 @@ MakeDir(ArtifactsPath);
 
     try
     {
-        await $@"dotnet vstest {tests} --logger:trx;LogFileName={results} 
-            {(AppVeyorJobId != null||slow ? "" : "--TestCaseFilter:TestCategory!=Slow")}";
+        await ($@"dotnet vstest {tests} --logger:trx;LogFileName={results} " + 
+              $"{(AppVeyorJobId != null||slow ? "" : "--TestCaseFilter:TestCategory!=Slow")}");
     }
     finally
     {    	

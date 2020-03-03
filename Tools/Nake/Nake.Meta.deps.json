@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v3.1",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v3.1": {
+      "Nake.Meta/3.0.0-dev": {
+        "runtime": {
+          "Nake.Meta.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Nake.Meta/3.0.0-dev": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
