@@ -27,13 +27,13 @@ namespace Nake
             this.namespaces = namespaces ?? Enumerable.Empty<string>();
         }
 
-        public BuildResult Build(ScriptFile file, IDictionary<string, string> substitutions, bool debug)
+        public BuildResult Build(ScriptSource source, IDictionary<string, string> substitutions, bool debug)
         {
-            var magic = new PixieDust(Compile(file));
+            var magic = new PixieDust(Compile(source));
             return magic.Apply(substitutions, debug);
         }
 
-        CompiledScript Compile(ScriptFile file)
+        CompiledScript Compile(ScriptSource source)
         {
             var script = new Script();
 
@@ -46,7 +46,7 @@ namespace Nake
             foreach (var @namespace in namespaces)
                 script.ImportNamespace(@namespace);
 
-            return script.Compile(file);
+            return script.Compile(source);
         }
     }
 

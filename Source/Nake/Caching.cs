@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -14,11 +15,11 @@ namespace Nake
     class CachingEngine
     {
         readonly Engine engine;
-        readonly ScriptFile script;
+        readonly ScriptSource script;
         readonly Task[] tasks;
         readonly bool reset;
 
-        public CachingEngine(Engine engine, ScriptFile script, Task[] tasks, bool reset)
+        public CachingEngine(Engine engine, ScriptSource script, Task[] tasks, bool reset)
         {
             this.engine = engine;
             this.script = script;
@@ -56,25 +57,27 @@ namespace Nake
 
         readonly SHA1 sha1 = SHA1.Create();
         readonly bool debug;
-        readonly ScriptFile script;
+        readonly ScriptSource source;
         readonly IEnumerable<KeyValuePair<string, string>> substitutions;
 
-        public CacheKey(ScriptFile script, IEnumerable<KeyValuePair<string, string>> substitutions, bool debug)
+        public CacheKey(ScriptSource source, IEnumerable<KeyValuePair<string, string>> substitutions, bool debug)
         {
-            this.script = script;
+            Debug.Assert(source.IsFile);
+
+            this.source = source;
             this.debug = debug;
             this.substitutions = substitutions;
 
-            var scriptBaseFolder = Path.Combine(rootCacheFolder, StringHash(script.FullPath));
+            var scriptBaseFolder = Path.Combine(rootCacheFolder, StringHash(source.File.FullName));
             CacheFolder = Path.Combine(scriptBaseFolder, ComputeScriptHash());
         }
 
         string CacheFolder { get; }
-        string AssemblyFile => Path.Combine(CacheFolder, script.Name + ".dll");
-        string PdbFile => Path.Combine(CacheFolder, script.Name + ".pdb");
+        string AssemblyFile => Path.Combine(CacheFolder, source.File.Name + ".dll");
+        string PdbFile => Path.Combine(CacheFolder, source.File.Name + ".pdb");
         string ReferencesFile => Path.Combine(CacheFolder, "references");
         string CapturedVariablesFile => Path.Combine(CacheFolder, "variables");
-        string ComputeScriptHash() => StringHash(script.Content + ToDeterministicString(substitutions) + debug);
+        string ComputeScriptHash() => StringHash(source.Content + ToDeterministicString(substitutions) + debug);
 
         static string ToDeterministicString(IEnumerable<KeyValuePair<string, string>> substitutions) =>
             string.Join("", substitutions

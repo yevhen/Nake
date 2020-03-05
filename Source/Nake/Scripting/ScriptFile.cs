@@ -2,19 +2,17 @@
 
 namespace Nake.Scripting
 {
-    class ScriptFile
+    class ScriptSource
     {
-        public readonly string Name;
-        public readonly string FullPath;
-        public readonly string DirectoryPath;
         public readonly string Content;
+        public readonly FileInfo File;
 
-        public ScriptFile(FileInfo file, string content)
+        public ScriptSource(string content, FileInfo file = null)
         {
-            Name = file.Name;
-            FullPath = file.FullName;
             Content = content;
-            DirectoryPath = file.DirectoryName;
+            File = file;
         }
+
+        public bool IsFile => File != null;
     }
 }

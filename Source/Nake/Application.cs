@@ -101,7 +101,7 @@ namespace Nake
                 script.Namespaces
             );
 
-            var scriptFile = new ScriptFile(script.File, script.Code);
+            var scriptFile = new ScriptSource(script.Code, script.File);
 
             var cachingEngine = new CachingEngine(
                 engine, scriptFile, declarations.Select(x => new Task(x)).ToArray(), options.ResetCache              

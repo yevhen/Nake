@@ -64,27 +64,10 @@ namespace Nake.Scripting
             unresolved = new HashSet<string>();
         }
 
-        public CompiledScript Compile(ScriptFile file)
+        public CompiledScript Compile(ScriptSource source)
         {
-            Logger Logger(Type t) => (l, m, e) => Log.Out(m);
-            
-            using var loader = new InteractiveAssemblyLoader();
-            var loaded = AppDomain.CurrentDomain.GetAssemblies()
-                .Where(a => !a.IsDynamic)
-                .Select(a => a.Location)
-                .Distinct()
-                .ToDictionary(Path.GetFileName);
-
-            var dependencyResolver = new CompilationDependencyResolver(Logger);
-            var dependencies = dependencyResolver.GetDependencies(file.DirectoryPath, new[] { file.FullPath }, true, "netcoreapp3.1");
-            
-            var assemblyReferences = dependencies
-                .SelectMany(d => d.AssemblyPaths)
-                .Select(l => loaded.TryGetValue(Path.GetFileName(l), out var e) ? e : l)
-                .ToArray();
-
-            foreach (var each in assemblyReferences) 
-                AddReference(MetadataReference.CreateFromFile(each));
+            if (source.IsFile)
+                AddCompilationDependencies(source);
 
             var options = ScriptOptions.Default
                 .AddImports(namespaces)
@@ -92,7 +75,7 @@ namespace Nake.Scripting
                 .AddReferences(unresolved)
                 .WithMetadataResolver(new NuGetMetadataReferenceResolver(ScriptOptions.Default.MetadataResolver));
 
-            var script = CSharpScript.Create(file.Content, options, assemblyLoader: loader);
+            var script = CSharpScript.Create(source.Content, options);
             var compilation = (CSharpCompilation)script.GetCompilation();
 
             var diagnostics = compilation.GetDiagnostics();
@@ -101,6 +84,27 @@ namespace Nake.Scripting
                                         string.Join("\n", diagnostics.Where(x => x.Severity == DiagnosticSeverity.Error)));
 
             return new CompiledScript(resolved.Select(x => new AssemblyReference(x)), compilation);
+        }
+
+        void AddCompilationDependencies(ScriptSource source)
+        {
+            var loaded = AppDomain.CurrentDomain.GetAssemblies()
+                .Where(a => !a.IsDynamic)
+                .Select(a => a.Location)
+                .Distinct()
+                .ToDictionary(Path.GetFileName);
+
+            var dependencyResolver = new CompilationDependencyResolver(t => (l, m, e) => Log.Out(m));
+            var dependencies = dependencyResolver.GetDependencies(source.File.DirectoryName, new[] {source.File.FullName}, true,
+                "netcoreapp3.1");
+
+            var assemblyReferences = dependencies
+                .SelectMany(d => d.AssemblyPaths)
+                .Select(l => loaded.TryGetValue(Path.GetFileName(l), out var e) ? e : l)
+                .ToArray();
+
+            foreach (var each in assemblyReferences)
+                AddReference(MetadataReference.CreateFromFile(each));
         }
 
         public void AddReference(AssemblyNameReference reference)

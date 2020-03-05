@@ -17,7 +17,7 @@ namespace Nake
         protected static void Invoke(string taskName, params TaskArgument[] args) => 
             TaskRegistry.InvokeTask(taskName, args).GetAwaiter().GetResult();
 
-        protected static void Build(string code, Dictionary<string, string> substitutions = null)
+        protected static void Build(string code, Dictionary<string, string> substitutions = null, bool enableNugetReferences = false)
         {
             var additionalReferences = new[]
             {
@@ -26,15 +26,18 @@ namespace Nake
             };
 
             var engine = new Engine(additionalReferences);
+            var source = new ScriptSource(code);
 
-            var tmp = Path.GetTempFileName();
-            File.WriteAllText(tmp, code);
+            if (enableNugetReferences)
+            {
+                var tmp = Path.GetTempFileName();
+                File.WriteAllText(tmp, code);
+                source = new ScriptSource(code, new FileInfo(tmp));
+            }
 
-            var result = engine.Build(
-                new ScriptFile(new FileInfo(tmp), code), 
-                substitutions ?? new Dictionary<string, string>(), false
-            );
-
+            var result = engine.Build(source, 
+                substitutions ?? new Dictionary<string, string>(), false);
+            
             TaskRegistry.Global = new TaskRegistry(result);
         }
 
