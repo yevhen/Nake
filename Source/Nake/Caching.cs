@@ -14,11 +14,11 @@ namespace Nake
     class CachingEngine
     {
         readonly Engine engine;
-        readonly FileInfo script;
+        readonly ScriptFile script;
         readonly Task[] tasks;
         readonly bool reset;
 
-        public CachingEngine(Engine engine, FileInfo script, Task[] tasks, bool reset)
+        public CachingEngine(Engine engine, ScriptFile script, Task[] tasks, bool reset)
         {
             this.engine = engine;
             this.script = script;
@@ -26,9 +26,9 @@ namespace Nake
             this.reset = reset;
         }
 
-        public BuildResult Build(string code, IDictionary<string, string> substitutions, bool debug)
+        public BuildResult Build(IDictionary<string, string> substitutions, bool debug)
         {
-            var key = new CacheKey(script, code, substitutions, debug);
+            var key = new CacheKey(script, substitutions, debug);
 
             var cached = key.Find(tasks);
             if (cached != null && !reset)
@@ -37,7 +37,7 @@ namespace Nake
             if (reset)
                 key.Reset();
 
-            var output = engine.Build(code, substitutions, debug);
+            var output = engine.Build(script, substitutions, debug);
             key.Store(output);
 
             return output;
@@ -55,65 +55,33 @@ namespace Nake
         }
 
         readonly SHA1 sha1 = SHA1.Create();
-        readonly string code;
         readonly bool debug;
-        readonly FileInfo script;
+        readonly ScriptFile script;
         readonly IEnumerable<KeyValuePair<string, string>> substitutions;
-        readonly string cacheFolder;
 
-        public CacheKey(FileInfo script, string code, IEnumerable<KeyValuePair<string, string>> substitutions, bool debug)
+        public CacheKey(ScriptFile script, IEnumerable<KeyValuePair<string, string>> substitutions, bool debug)
         {
             this.script = script;
-            this.code = code;
             this.debug = debug;
             this.substitutions = substitutions;
 
-            var scriptBaseFolder = Path.Combine(rootCacheFolder, StringHash(script.FullName));
-            cacheFolder = Path.Combine(scriptBaseFolder, ComputeScriptHash());
+            var scriptBaseFolder = Path.Combine(rootCacheFolder, StringHash(script.FullPath));
+            CacheFolder = Path.Combine(scriptBaseFolder, ComputeScriptHash());
         }
 
-        string CacheFolder
-        {
-            get { return cacheFolder; }
-        }
+        string CacheFolder { get; }
+        string AssemblyFile => Path.Combine(CacheFolder, script.Name + ".dll");
+        string PdbFile => Path.Combine(CacheFolder, script.Name + ".pdb");
+        string ReferencesFile => Path.Combine(CacheFolder, "references");
+        string CapturedVariablesFile => Path.Combine(CacheFolder, "variables");
+        string ComputeScriptHash() => StringHash(script.Content + ToDeterministicString(substitutions) + debug);
 
-        string AssemblyFile
-        {
-            get { return Path.Combine(cacheFolder, script.Name + ".dll"); }
-        }
+        static string ToDeterministicString(IEnumerable<KeyValuePair<string, string>> substitutions) =>
+            string.Join("", substitutions
+                .OrderBy(x => x.Key.ToLower())
+                .Select(x => x.Key.ToLower() + x.Value.ToLower()));
 
-        string PdbFile
-        {
-            get { return Path.Combine(cacheFolder, script.Name + ".pdb"); }
-        }
-
-        string ReferencesFile
-        {
-            get { return Path.Combine(cacheFolder, "references"); }
-        }
-
-        string CapturedVariablesFile
-        {
-            get { return Path.Combine(cacheFolder, "variables"); }
-        }
-
-        string ComputeScriptHash()
-        {
-            return StringHash(code + ToDeterministicString(substitutions) + debug);
-        }
-
-        static string ToDeterministicString(IEnumerable<KeyValuePair<string, string>> substitutions)
-        {
-            return string.Join("", substitutions
-                    .OrderBy(x => x.Key.ToLower())
-                    .Select(x => x.Key.ToLower() + x.Value.ToLower()));
-        }
-
-        string StringHash(string s)
-        {
-            var hash = Convert.ToBase64String(sha1.ComputeHash(Encoding.UTF8.GetBytes(s)));
-            return EnsureSafePath(hash);
-        }
+        string StringHash(string s) => EnsureSafePath(Convert.ToBase64String(sha1.ComputeHash(Encoding.UTF8.GetBytes(s))));
 
         string EnsureSafePath(string s)
         {
@@ -143,10 +111,7 @@ namespace Nake
             return new BuildResult(tasks, references, null, assembly, debug ? symbols : null);
         }
 
-        bool CachedAssemblyExists()
-        {
-            return File.Exists(AssemblyFile);
-        }
+        bool CachedAssemblyExists() => File.Exists(AssemblyFile);
 
         bool CapturedVariablesMismatch()
         {
@@ -165,22 +130,13 @@ namespace Nake
             return StringHash(current.ToString()) != captured;
         }
 
-        AssemblyReference[] ReadReferences()
-        {
-            return File.ReadAllLines(ReferencesFile)
-                       .Select(line => new AssemblyReference(line))
-                       .ToArray();
-        }
+        AssemblyReference[] ReadReferences() =>
+            File.ReadAllLines(ReferencesFile)
+                .Select(line => new AssemblyReference(line))
+                .ToArray();
 
-        byte[] ReadAssembly()
-        {
-            return File.ReadAllBytes(AssemblyFile);
-        }
-
-        byte[] ReadSymbols()
-        {
-            return debug && File.Exists(PdbFile) ? File.ReadAllBytes(PdbFile) : null;
-        }
+        byte[] ReadAssembly() => File.ReadAllBytes(AssemblyFile);
+        byte[] ReadSymbols() => debug && File.Exists(PdbFile) ? File.ReadAllBytes(PdbFile) : null;
 
         public void Store(BuildResult result)
         {
@@ -192,15 +148,8 @@ namespace Nake
             WriteSymbols(result);
         }
 
-        void CreateCacheFolder()
-        {
-            Directory.CreateDirectory(CacheFolder);
-        }
-
-        void WriteReferences(BuildResult result)
-        {
-            File.WriteAllLines(ReferencesFile, result.References.Select(x => x.FullPath));
-        }
+        void CreateCacheFolder() => Directory.CreateDirectory(CacheFolder);
+        void WriteReferences(BuildResult result) => File.WriteAllLines(ReferencesFile, result.References.Select(x => x.FullPath));
 
         void WriteVariables(BuildResult result)
         {

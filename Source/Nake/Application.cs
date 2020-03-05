@@ -101,12 +101,14 @@ namespace Nake
                 script.Namespaces
             );
 
+            var scriptFile = new ScriptFile(script.File, script.Code);
+
             var cachingEngine = new CachingEngine(
-                engine, script.File, declarations.Select(x => new Task(x)).ToArray(), options.ResetCache              
+                engine, scriptFile, declarations.Select(x => new Task(x)).ToArray(), options.ResetCache              
             );
 
             var result = cachingEngine.Build(
-                script.Code, VariableSubstitutions(), options.DebugScript
+                VariableSubstitutions(), options.DebugScript
             );
 
             return result;

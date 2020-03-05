@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-
+using System.IO;
 using NUnit.Framework;
 
 namespace Nake
@@ -26,9 +26,13 @@ namespace Nake
             };
 
             var engine = new Engine(additionalReferences);
-            
+
+            var tmp = Path.GetTempFileName();
+            File.WriteAllText(tmp, code);
+
             var result = engine.Build(
-                code, substitutions ?? new Dictionary<string, string>(), false
+                new ScriptFile(new FileInfo(tmp), code), 
+                substitutions ?? new Dictionary<string, string>(), false
             );
 
             TaskRegistry.Global = new TaskRegistry(result);

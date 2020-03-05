@@ -44,6 +44,10 @@
     <!-- Shared Package Versions -->
     <PropertyGroup>
 
+		<!-- Infrastructure packages -->
+		<DotnetScriptDependencyModelVersion>0.50.0</DotnetScriptDependencyModelVersion>
+		<DotnetScriptDependencyModelNugetVersion>0.50.1</DotnetScriptDependencyModelNugetVersion>
+
         <!-- MSBuild packages -->
         <MicrosoftBuildVersion>16.4.0</MicrosoftBuildVersion>
         <MicrosoftBuildTasksCoreVersion>16.4.0</MicrosoftBuildTasksCoreVersion>

@@ -14,6 +14,8 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="$(MicrosoftCodeAnalysisScriptingVersion)" />
+    <PackageReference Include="Dotnet.Script.DependencyModel" Version="$(DotnetScriptDependencyModelVersion)" />
+    <PackageReference Include="Dotnet.Script.DependencyModel.NuGet" Version="$(DotnetScriptDependencyModelNugetVersion)" />
   </ItemGroup>
 
 </Project>

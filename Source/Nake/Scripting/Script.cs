@@ -6,12 +6,15 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
-
+using Dotnet.Script.DependencyModel.Compilation;
+using Dotnet.Script.DependencyModel.Logging;
+using Dotnet.Script.DependencyModel.NuGet;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.CSharp.RuntimeBinder;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
+using Microsoft.CodeAnalysis.Scripting.Hosting;
 
 namespace Nake.Scripting
 {
@@ -61,14 +64,35 @@ namespace Nake.Scripting
             unresolved = new HashSet<string>();
         }
 
-        public CompiledScript Compile(string code)
+        public CompiledScript Compile(ScriptFile file)
         {
+            Logger Logger(Type t) => (l, m, e) => Log.Out(m);
+            
+            using var loader = new InteractiveAssemblyLoader();
+            var loaded = AppDomain.CurrentDomain.GetAssemblies()
+                .Where(a => !a.IsDynamic)
+                .Select(a => a.Location)
+                .Distinct()
+                .ToDictionary(Path.GetFileName);
+
+            var dependencyResolver = new CompilationDependencyResolver(Logger);
+            var dependencies = dependencyResolver.GetDependencies(file.DirectoryPath, new[] { file.FullPath }, true, "netcoreapp3.1");
+            
+            var assemblyReferences = dependencies
+                .SelectMany(d => d.AssemblyPaths)
+                .Select(l => loaded.TryGetValue(Path.GetFileName(l), out var e) ? e : l)
+                .ToArray();
+
+            foreach (var each in assemblyReferences) 
+                AddReference(MetadataReference.CreateFromFile(each));
+
             var options = ScriptOptions.Default
                 .AddImports(namespaces)
                 .AddReferences(resolved)
-                .AddReferences(unresolved);
+                .AddReferences(unresolved)
+                .WithMetadataResolver(new NuGetMetadataReferenceResolver(ScriptOptions.Default.MetadataResolver));
 
-            var script = CSharpScript.Create(code, options);
+            var script = CSharpScript.Create(file.Content, options, assemblyLoader: loader);
             var compilation = (CSharpCompilation)script.GetCompilation();
 
             var diagnostics = compilation.GetDiagnostics();
