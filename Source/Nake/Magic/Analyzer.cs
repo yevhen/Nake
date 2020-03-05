@@ -102,6 +102,11 @@ namespace Nake.Magic
         public override void VisitFieldDeclaration(FieldDeclarationSyntax node)
         {
             visitingConstant = node.Modifiers.Any(SyntaxKind.ConstKeyword);
+            if (visitingConstant)
+            {
+                base.VisitFieldDeclaration(node);
+                return;
+            }
 
             foreach (var variable in node.Declaration.Variables)
             {

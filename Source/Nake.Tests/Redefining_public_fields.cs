@@ -9,7 +9,7 @@ namespace Nake
     class Redefining_public_fields : CodeFixture
     {
         [Test]
-        public void Can_redefine_any_script_level_var_any_public_field_or_constant()
+        public void Can_redefine_any_script_level_var_any_public_field_but_not_constant()
         {
             Build(@"
                 
@@ -49,10 +49,10 @@ namespace Nake
             Invoke("Test");
 
             Assert.That(Env.Var["ScriptLevelVar"],          Is.EqualTo("1"));
-            Assert.That(Env.Var["PublicConstField"],        Is.EqualTo("1"));
+            Assert.That(Env.Var["PublicConstField"],        Is.EqualTo("0"));
             Assert.That(Env.Var["PublicStaticField"],       Is.EqualTo("1"));
             Assert.That(Env.Var["NestedClass.PublicField"], Is.EqualTo("1"));
-            Assert.That(Env.Var["PrivateConstField"],       Is.EqualTo("1"));
+            Assert.That(Env.Var["PrivateConstField"],       Is.EqualTo("0"));
             Assert.That(Env.Var["PrivateStaticField"],      Is.EqualTo("1"));
         }
 
