@@ -126,7 +126,7 @@ namespace Nake.Magic
             return environmentVariablePattern.Replace(token, match =>
             {
                 var name = match.Groups["variable"].Value;
-                var value = GetEnvironmentVariable(name) ?? "?UNDEFINED?";
+                var value = GetEnvironmentVariable(name) ?? "";
                 
                 Captured.Add(new EnvironmentVariable(name, value));
                 return value;
