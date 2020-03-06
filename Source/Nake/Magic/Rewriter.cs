@@ -53,26 +53,34 @@ namespace Nake.Magic
                 : visited;
         }
 
+        public override SyntaxNode VisitVariableDeclarator(VariableDeclaratorSyntax node)
+        {
+            var substitution = result.Find(node);
+    
+            return substitution != null 
+                ? substitution.Substitute() 
+                : base.VisitVariableDeclarator(node);
+        }
+
         public override SyntaxNode VisitLiteralExpression(LiteralExpressionSyntax node)
         {
             var interpolation = result.Find(node);
             if (interpolation == null)
                 return base.VisitLiteralExpression(node);
 
-            var interpolated = interpolation.Interpolate();
-            foreach (var variable in interpolation.Captured)
+            var (interpolated, captured) = interpolation.Interpolate();
+            foreach (var variable in captured)
                 Captured.Add(variable);
 
             return interpolated;
         }
 
-        public override SyntaxNode VisitVariableDeclarator(VariableDeclaratorSyntax node)
+        public override SyntaxNode VisitInterpolatedStringExpression(InterpolatedStringExpressionSyntax node)
         {
-            var substitution = result.Find(node);
-    
-            return substitution != null 
-                                ? substitution.Substitute() 
-                                : base.VisitVariableDeclarator(node);
+            var interpolation = result.Find(node);
+            return interpolation != null
+                ? (interpolation.Interpolate()).interpolated
+                : base.VisitInterpolatedStringExpression(node);
         }
     }
 }

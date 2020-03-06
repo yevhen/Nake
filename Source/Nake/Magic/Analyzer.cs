@@ -16,7 +16,6 @@ namespace Nake.Magic
 
         Task current;
         bool visitingConstant;
-        bool visitingStringFormat;
         AnalyzerResult result;
         
         public Analyzer(CSharpCompilation compilation, IDictionary<string, string> substitutions)
@@ -60,22 +59,16 @@ namespace Nake.Magic
             current = null;
         }
 
-        static bool IsTask(ISymbol symbol)
-        {
-            return symbol.GetAttributes().SingleOrDefault(x => x.AttributeClass.Name == "TaskAttribute") != null;
-        }     
+        static bool IsTask(ISymbol symbol) => HasAttribute(symbol, "TaskAttribute");
+        static bool IsStep(ISymbol symbol) => HasAttribute(symbol, "StepAttribute");
 
-        static bool IsStep(ISymbol symbol)
-        {
-            return symbol.GetAttributes().SingleOrDefault(x => x.AttributeClass.Name == "StepAttribute") != null;
-        }     
+        static bool HasAttribute(ISymbol symbol, string attribute) => 
+            symbol.GetAttributes().SingleOrDefault(x => x.AttributeClass.Name == attribute) != null;
 
         public override void VisitInvocationExpression(InvocationExpressionSyntax node)
         {
             if (ModelExtensions.GetSymbolInfo(model, node).Symbol is IMethodSymbol symbol)
             {
-                visitingStringFormat = IsStringFormatInvocation(symbol);
-
                 // TODO: YB - shouldn't we track dependencies for both Tasks and Steps?
                 if (IsStep(symbol))
                 {
@@ -91,12 +84,6 @@ namespace Nake.Magic
             }
 
             base.VisitInvocationExpression(node);
-            visitingStringFormat = false;
-        }
-
-        static bool IsStringFormatInvocation(IMethodSymbol symbol)
-        {
-            return symbol.ToString().StartsWith("string.Format(");
         }
 
         public override void VisitFieldDeclaration(FieldDeclarationSyntax node)
@@ -127,7 +114,6 @@ namespace Nake.Magic
         public override void VisitLocalDeclarationStatement(LocalDeclarationStatementSyntax node)
         {
             visitingConstant = node.Modifiers.Any(SyntaxKind.ConstKeyword);
-            
             base.VisitLocalDeclarationStatement(node);
             visitingConstant = false;
         }
@@ -135,7 +121,6 @@ namespace Nake.Magic
         public override void VisitParameter(ParameterSyntax node)
         {
             visitingConstant = true;
-
             base.VisitParameter(node);
             visitingConstant = false;
         }
@@ -143,17 +128,26 @@ namespace Nake.Magic
         public override void VisitAttribute(AttributeSyntax node)
         {
             visitingConstant = true;
-
             base.VisitAttribute(node);
             visitingConstant = false;
         }
 
         public override void VisitLiteralExpression(LiteralExpressionSyntax node)
         {
-            if (!visitingStringFormat && StringInterpolation.Qualifies(node))
-                result.Add(node, new StringInterpolation(model, node, visitingConstant));
-            
+            var interpolation = EnvironmentVariableInterpolation.Match(node, visitingConstant);
+            if (interpolation != null)
+                result.Add(node, interpolation);
+
             base.VisitLiteralExpression(node);
+        }
+
+        public override void VisitInterpolatedStringExpression(InterpolatedStringExpressionSyntax node)
+        { 
+            var interpolation = EnvironmentVariableInterpolation.Match(node);
+            if (interpolation != null)
+                result.Add(node, interpolation);
+
+            base.VisitInterpolatedStringExpression(node);
         }
     }
 }

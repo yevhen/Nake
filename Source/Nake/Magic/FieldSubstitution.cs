@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -27,7 +24,7 @@ namespace Nake.Magic
             if (literal != null)
                 return node.WithInitializer(SyntaxFactory.EqualsValueClause(literal));
 
-            Log.Trace(string.Format("Matched field {0} with substitution coming from cmd line but type conversion failed", symbol));
+            Log.Trace($"Matched field {symbol} with substitution coming from cmd line but type conversion failed");
 
             return node;
         }
@@ -75,12 +72,9 @@ namespace Nake.Magic
             return SyntaxFactory.LiteralExpression(
                     SyntaxKind.StringLiteralExpression,
                     SyntaxFactory.Literal(@"@""" + substitution + @"""", substitution)
-                          .WithLeadingTrivia(new[] {SyntaxFactory.Space}));
+                          .WithLeadingTrivia(SyntaxFactory.Space));
         }
 
-        public static bool Qualifies(IFieldSymbol symbol)
-        {
-            return TypeConverter.IsSupported(symbol.Type);
-        }
+        public static bool Qualifies(IFieldSymbol symbol) => TypeConverter.IsSupported(symbol.Type);
     }
 }

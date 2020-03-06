@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reflection;
 
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
 
 using Nake.Magic;
@@ -86,23 +85,22 @@ namespace Nake
 
         void Emit(Compilation compilation, out byte[] assembly)
         {
-            using (var assemblyStream = new MemoryStream())
-            {
-                Check(compilation, compilation.Emit(assemblyStream));
-                assembly = assemblyStream.GetBuffer();
-            }
+            using var assemblyStream = new MemoryStream();
+            
+            Check(compilation, compilation.Emit(assemblyStream));
+            
+            assembly = assemblyStream.GetBuffer();
         }
 
         void EmitDebug(Compilation compilation, out byte[] assembly, out byte[] symbols)
         {
-            using (var assemblyStream = new MemoryStream())
-            using (var symbolStream = new MemoryStream())
-            {
-                Check(compilation, compilation.Emit(assemblyStream, pdbStream: symbolStream));
-
-                assembly = assemblyStream.GetBuffer();
-                symbols = symbolStream.GetBuffer();
-            }
+            using var assemblyStream = new MemoryStream();
+            using var symbolStream = new MemoryStream();
+            
+            Check(compilation, compilation.Emit(assemblyStream, pdbStream: symbolStream));
+            
+            assembly = assemblyStream.GetBuffer();
+            symbols = symbolStream.GetBuffer();
         }
 
         void Check(Compilation compilation, EmitResult result)

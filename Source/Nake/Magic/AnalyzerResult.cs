@@ -2,18 +2,22 @@
 using System.Linq;
 
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Nake.Magic
 {
     class AnalyzerResult : SyntaxWalker
     {
-        readonly IDictionary<IMethodSymbol, Task> tasksBySymbol = new Dictionary<IMethodSymbol, Task>();
-        readonly IDictionary<MethodDeclarationSyntax, Task> tasksBySyntax = new Dictionary<MethodDeclarationSyntax, Task>();
-        readonly IDictionary<string, Task> tasksByName = new Dictionary<string, Task>(new CaseInsensitiveEqualityComparer());
+        readonly Dictionary<IMethodSymbol, Task> tasksBySymbol = new Dictionary<IMethodSymbol, Task>();
+        readonly Dictionary<MethodDeclarationSyntax, Task> tasksBySyntax = new Dictionary<MethodDeclarationSyntax, Task>();
+        readonly Dictionary<string, Task> tasksByName = new Dictionary<string, Task>(new CaseInsensitiveEqualityComparer());
         
-        readonly IDictionary<VariableDeclaratorSyntax, FieldSubstitution> substitutions = new Dictionary<VariableDeclaratorSyntax, FieldSubstitution>();
-        readonly IDictionary<LiteralExpressionSyntax, StringInterpolation> interpolations = new Dictionary<LiteralExpressionSyntax, StringInterpolation>();        
+        readonly Dictionary<VariableDeclaratorSyntax, FieldSubstitution> substitutions = 
+             new Dictionary<VariableDeclaratorSyntax, FieldSubstitution>();
+        
+        readonly Dictionary<CSharpSyntaxNode, IEnvironmentVariableInterpolation> interpolations = 
+             new Dictionary<CSharpSyntaxNode, IEnvironmentVariableInterpolation>();        
         
         public IEnumerable<Task> Tasks => tasksBySymbol.Values;
 
@@ -36,7 +40,7 @@ namespace Nake.Magic
         public void Add(VariableDeclaratorSyntax node, FieldSubstitution substitution) => substitutions.Add(node, substitution);
         public FieldSubstitution Find(VariableDeclaratorSyntax node) => substitutions.Find(node);
 
-        public void Add(LiteralExpressionSyntax node, StringInterpolation interpolation) => interpolations.Add(node, interpolation);
-        public StringInterpolation Find(LiteralExpressionSyntax node) => interpolations.Find(node);
+        public void Add(CSharpSyntaxNode node, IEnvironmentVariableInterpolation interpolation) => interpolations.Add(node, interpolation);
+        public IEnvironmentVariableInterpolation Find(CSharpSyntaxNode node) => interpolations.Find(node);
     }
 }
