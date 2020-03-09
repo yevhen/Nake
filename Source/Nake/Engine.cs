@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
 
 using Nake.Magic;
@@ -83,28 +84,28 @@ namespace Nake
             );            
         }
 
-        static void Emit(Compilation compilation, out byte[] assembly)
+        void Emit(Compilation compilation, out byte[] assembly)
         {
             using (var assemblyStream = new MemoryStream())
             {
-                Check(compilation.Emit(assemblyStream));
+                Check(compilation, compilation.Emit(assemblyStream));
                 assembly = assemblyStream.GetBuffer();
             }
         }
 
-        static void EmitDebug(Compilation compilation, out byte[] assembly, out byte[] symbols)
+        void EmitDebug(Compilation compilation, out byte[] assembly, out byte[] symbols)
         {
             using (var assemblyStream = new MemoryStream())
             using (var symbolStream = new MemoryStream())
             {
-                Check(compilation.Emit(assemblyStream, pdbStream: symbolStream));
+                Check(compilation, compilation.Emit(assemblyStream, pdbStream: symbolStream));
 
                 assembly = assemblyStream.GetBuffer();
                 symbols = symbolStream.GetBuffer();
             }
         }
 
-        static void Check(EmitResult result)
+        void Check(Compilation compilation, EmitResult result)
         {
             if (result.Success)
                 return;
@@ -114,8 +115,9 @@ namespace Nake
                 .ToArray();
 
             if (errors.Any())
-                throw new NakeException("Compilation failed!\r\n\r\n" +
-                    string.Join("\r\n", errors.Select(x => x.ToString())));
+                throw new RewrittenScriptCompilationException(SourceText(script.Compilation), SourceText(compilation), errors);
+
+            static string SourceText(Compilation arg) => arg.SyntaxTrees.First().ToString();
         }
     }
 

@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
+using static System.Environment;
 
-using Nake.Magic;
+using Microsoft.CodeAnalysis;
 
 namespace Nake
 {
+    using Magic;
+
     class NakeException : Exception
     {
         public NakeException(string message)
@@ -17,6 +21,31 @@ namespace Nake
         public NakeException(string message, params object[] args)
             : base(string.Format(message, args))
         {}
+    }
+
+    class ScriptCompilationException : NakeException
+    {
+        public ScriptCompilationException(IEnumerable<Diagnostic> diagnostics)
+            : base($"Script compilation failure! See diagnostics below.{NewLine}" +
+                   $"{string.Join(NewLine, diagnostics)}")
+        {}
+    }
+
+    class RewrittenScriptCompilationException : NakeException
+    {
+        public readonly string SourceText;
+        public readonly string RewrittenText;
+
+        public RewrittenScriptCompilationException(string sourceText, string rewrittenText, IEnumerable<Diagnostic> diagnostics)
+            : base("Oops, we broke your script after rewriting it. " +
+                   $"Open an issue on GH and include the following.{NewLine}" +
+                   $"Source:{NewLine}{sourceText}{NewLine}" +
+                   $"Rewritten:{NewLine}{rewrittenText}{NewLine}" +
+                   $"{string.Join(NewLine, diagnostics)}")
+        {
+            SourceText = sourceText;
+            RewrittenText = rewrittenText;
+        }
     }
 
     class TaskNotFoundException : NakeException
@@ -50,15 +79,12 @@ namespace Nake
         readonly Exception source;
 
         public TaskInvocationException(Task task, Exception source)
-            : base(string.Format("'{0}' task failed. Error: '{1}'", task, source.Message), source)
+            : base($"'{task}' task failed. Error: '{source.Message}'", source)
         {
             this.source = source;
         }
 
-        public Exception SourceException
-        {
-            get { return source; }
-        }
+        public Exception SourceException => source;
     }
 
     class DuplicateTaskException : NakeException
@@ -109,27 +135,6 @@ namespace Nake
     {
         public TaskSignatureViolationException(string method)
             : base("Bad task method signature: '{0}'. Should be public static void non-generic, have no out or ref parameters, have no duplicate parameters that differ only by case and all parameters should be either bool, int, string or enum type", method)
-        {}
-    }
-
-    class ExpressionReturnTypeIsVoidException : NakeException
-    {
-        public ExpressionReturnTypeIsVoidException(string expression, string diagnostics)
-            : base("{0}: error CSX0101: Expression {{{1}}}' returns void", diagnostics, expression)
-        {}
-    }
-
-    class ExpressionResolutionFailedException : NakeException
-    {
-        public ExpressionResolutionFailedException(string expression, string diagnostics)
-            : base("{0}: error CSX0102: Expression {{{1}}}' cannot be resolved in the current context", diagnostics, expression)
-        {}
-    }    
-    
-    class ExpressionSyntaxException : NakeException
-    {
-        public ExpressionSyntaxException(string expression, string diagnostics)
-            : base("{0}: error CSX0102: Expression {{{1}}}' has invalid syntax", diagnostics, expression)
         {}
     }
 }

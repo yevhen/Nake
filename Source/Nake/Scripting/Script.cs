@@ -1,20 +1,21 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.ComponentModel;
 using System.Data;
 using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
+
 using Dotnet.Script.DependencyModel.Compilation;
-using Dotnet.Script.DependencyModel.Logging;
 using Dotnet.Script.DependencyModel.NuGet;
+
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.CSharp.RuntimeBinder;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
-using Microsoft.CodeAnalysis.Scripting.Hosting;
 
 namespace Nake.Scripting
 {
@@ -78,10 +79,12 @@ namespace Nake.Scripting
             var script = CSharpScript.Create(source.Content, options);
             var compilation = (CSharpCompilation)script.GetCompilation();
 
-            var diagnostics = compilation.GetDiagnostics();
-            if (diagnostics.Any(x => x.Severity == DiagnosticSeverity.Error))
-                throw new NakeException("Script compilation failure! See diagnostics below." + Environment.NewLine +
-                                        string.Join("\n", diagnostics.Where(x => x.Severity == DiagnosticSeverity.Error)));
+            var errors = compilation.GetDiagnostics()
+                .Where(x => x.Severity == DiagnosticSeverity.Error)
+                .ToArray();
+
+            if (errors.Any())
+                throw new ScriptCompilationException(errors);
 
             return new CompiledScript(resolved.Select(x => new AssemblyReference(x)), compilation);
         }
@@ -95,8 +98,10 @@ namespace Nake.Scripting
                 .ToDictionary(Path.GetFileName);
 
             var dependencyResolver = new CompilationDependencyResolver(t => (l, m, e) => Log.Out(m));
-            var dependencies = dependencyResolver.GetDependencies(source.File.DirectoryName, new[] {source.File.FullName}, true,
-                "netcoreapp3.1");
+            var dependencies = dependencyResolver.GetDependencies(
+                source.File.DirectoryName, 
+                new[] {source.File.FullName}, 
+                true, "netcoreapp3.1");
 
             var assemblyReferences = dependencies
                 .SelectMany(d => d.AssemblyPaths)
