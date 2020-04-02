@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Threading.Tasks;
 
 using Microsoft.Build.Tasks;
@@ -65,7 +66,7 @@ namespace Nake
 
             var task = new Exec
             {   
-                Command = command,
+                Command = Prepare(command),
                 EchoOff = echoOff,
                 WorkingDirectory = workingDirectory ?? Location.CurrentDirectory,
                 IgnoreExitCode = ignoreExitCode,
@@ -83,6 +84,47 @@ namespace Nake
             return new Result(task.ExitCode, output, engine.StdError);
         }
 
+        static string Prepare(string command)
+        {
+            var lines = command.Split(Environment.NewLine);
+            return lines.Length == 1 ? command : PrepareMultiline(Line.From(lines));
+        }
+
+        static string PrepareMultiline(Line[] lines)
+        {
+            var result = new StringBuilder();
+            Array.ForEach(lines, each => each.Append(result));
+            return result.ToString();
+        }
+
+        class Line
+        {
+            public static Line[] From(IEnumerable<string> lines) => lines.Aggregate(new List<Line>(), (list, line) =>
+            {
+                list.Add(new Line(line, list.LastOrDefault()));
+                return list;
+            })
+            .ToArray();
+
+            readonly bool continues;
+            readonly string value;
+
+            Line(string line, Line previous = null)
+            {
+                var trimmed = line.TrimEnd();
+                continues = trimmed.EndsWith(" \\");
+                
+                value = continues 
+                    ? trimmed.Substring(0, trimmed.Length - 1) 
+                    : $"{line}{Environment.NewLine}";
+
+                if (previous?.continues == true)
+                    value = value.TrimStart();
+            }
+
+            public void Append(StringBuilder result) => result.Append(value);
+        }
+        
         /// <summary>
         /// Represents the result of shell command or program execution.
         /// Contains properties to iterate over console output.

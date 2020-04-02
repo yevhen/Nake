@@ -41,8 +41,8 @@ MakeDir(ArtifactsPath);
 
     try
     {
-        await ($@"dotnet vstest {tests} --logger:trx;LogFileName={results} " + 
-              $"{(AppVeyorJobId != null||slow ? "" : "--TestCaseFilter:TestCategory!=Slow")}");
+        await $@"dotnet vstest {tests} --logger:trx;LogFileName={results} \
+              {(AppVeyorJobId != null||slow ? "" : "--TestCaseFilter:TestCategory!=Slow")}";
     }
     finally
     {    	
@@ -70,5 +70,5 @@ MakeDir(ArtifactsPath);
 [Step] void Publish() => Push("Nake"); 
 
 async void Push(string package) => 
-    await ($@"dotnet nuget push {ReleasePackagesPath}/**/*.{Version}.nupkg " +
-           "-k %NuGetApiKey% -s https://nuget.org/ -ss https://nuget.smbsrc.net --skip-duplicate");
+    await $@"dotnet nuget push {ReleasePackagesPath}/**/*.{Version}.nupkg \
+           -k %NuGetApiKey% -s https://nuget.org/ -ss https://nuget.smbsrc.net --skip-duplicate";
