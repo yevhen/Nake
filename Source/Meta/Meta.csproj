@@ -4,6 +4,7 @@
   <PropertyGroup>
   	<RootNamespace>Nake</RootNamespace>
     <AssemblyName>Nake.Meta</AssemblyName>
+    <IsPackable>true</IsPackable>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
