@@ -73,6 +73,9 @@ namespace Nake.Scripting
                 .AddReferences(references)
                 .WithMetadataResolver(new NuGetMetadataReferenceResolver(ScriptOptions.Default.MetadataResolver));
 
+            if (source.IsFile)
+                options = options.WithFilePath(source.File.FullName);
+
             var script = CSharpScript.Create(source.Code, options);
             var compilation = (CSharpCompilation)script.GetCompilation();
 
@@ -80,7 +83,7 @@ namespace Nake.Scripting
                 .Where(x => x.Severity == DiagnosticSeverity.Error)
                 .ToArray();
 
-            if (errors.Any())
+            if (errors.Any())   
                 throw new ScriptCompilationException(errors);
 
             return new CompiledScript(references.Select(x => new AssemblyReference(x)), compilation);

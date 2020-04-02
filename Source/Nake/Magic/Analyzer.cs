@@ -134,7 +134,7 @@ namespace Nake.Magic
 
         public override void VisitLiteralExpression(LiteralExpressionSyntax node)
         {
-            var interpolation = EnvironmentVariableInterpolation.Match(node, visitingConstant);
+            var interpolation = EnvironmentVariableInterpolation.Match(model, node, visitingConstant);
             if (interpolation != null)
                 result.Add(node, interpolation);
 
@@ -143,7 +143,7 @@ namespace Nake.Magic
 
         public override void VisitInterpolatedStringExpression(InterpolatedStringExpressionSyntax node)
         { 
-            var interpolation = EnvironmentVariableInterpolation.Match(node);
+            var interpolation = EnvironmentVariableInterpolation.Match(model, node);
             if (interpolation != null)
                 result.Add(node, interpolation);
 

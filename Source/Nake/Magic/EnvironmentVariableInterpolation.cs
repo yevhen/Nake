@@ -16,23 +16,33 @@ namespace Nake.Magic
 
     class EnvironmentVariableInterpolation
     {
-        public static IEnvironmentVariableInterpolation Match(LiteralExpressionSyntax node, bool constant)
+        const string NakeScriptDirectoryVariable = "NakeScriptDirectory";
+
+        public static IEnvironmentVariableInterpolation Match(SemanticModel model, LiteralExpressionSyntax node, bool constant)
         {
             if (node.Kind() != SyntaxKind.StringLiteralExpression)
                 return null;
 
+            var filePath = ScriptFilePath(model, node);
+
             if (constant && Constant.Qualifies(node))
-                return new Constant(node);
+                return new Constant(node, filePath);
 
             return RuntimeWithinLiteral.Qualifies(node)
-                ? new RuntimeWithinLiteral(node)
+                ? new RuntimeWithinLiteral(node, filePath)
                 : null;
         }
 
-        public static IEnvironmentVariableInterpolation Match(InterpolatedStringExpressionSyntax node) =>
+        public static IEnvironmentVariableInterpolation Match(SemanticModel model, InterpolatedStringExpressionSyntax node) =>
             RuntimeWithinInterpolation.Qualifies(node)
-                ? new RuntimeWithinInterpolation(node)
+                ? new RuntimeWithinInterpolation(node, ScriptFilePath(model, node))
                 : null;
+
+        static string ScriptFilePath(SemanticModel model, SyntaxNode node)
+        {
+            var symbol = model.GetEnclosingSymbol(node.FullSpan.Start);
+            return (symbol.Locations.FirstOrDefault()?.GetLineSpan())?.Path ?? "NOT_A_FILE";
+        }
 
         static bool Qualifies(string text) => 
             VariablePattern.IsMatch(text) || 
@@ -54,9 +64,13 @@ namespace Nake.Magic
                 EnvironmentVariableInterpolation.Qualifies(node.ToString());
 
             readonly LiteralExpressionSyntax node;
+            readonly string filePath;
 
-            public Constant(LiteralExpressionSyntax node) =>
+            public Constant(LiteralExpressionSyntax node, string filePath)
+            {
                 this.node = node;
+                this.filePath = filePath;
+            }
 
             public (SyntaxNode, EnvironmentVariable[]) Interpolate()
             {
@@ -66,9 +80,12 @@ namespace Nake.Magic
                 var inlined = VariablePattern.Replace(literal, match =>
                 {
                     var name  = match.Groups["variable"].Value;
-                    var value = Environment.GetEnvironmentVariable(name) ?? "";
+                    if (name == NakeScriptDirectoryVariable)
+                        return filePath;
 
+                    var value = Environment.GetEnvironmentVariable(name) ?? "";
                     captured.Add(new EnvironmentVariable(name, value));
+
                     return value;
                 });
 
@@ -83,13 +100,17 @@ namespace Nake.Magic
                 EnvironmentVariableInterpolation.Qualifies(node.ToString());
 
             readonly LiteralExpressionSyntax node;
-        
-            public RuntimeWithinLiteral(LiteralExpressionSyntax node) => 
+            readonly string filePath;
+
+            public RuntimeWithinLiteral(LiteralExpressionSyntax node, string filePath)
+            {
                 this.node = node;
+                this.filePath = filePath;
+            }
 
             public (SyntaxNode, EnvironmentVariable[]) Interpolate()
             {
-                var contents = InterpolateContents(node.Token.ValueText);
+                var contents = InterpolateContents(node.Token.ValueText, filePath);
             
                 var interpolated = SyntaxFactory.InterpolatedStringExpression(
                     SyntaxFactory.Token(SyntaxKind.InterpolatedStringStartToken),
@@ -109,9 +130,13 @@ namespace Nake.Magic
                 EnvironmentVariableInterpolation.Qualifies(node.TextToken.ValueText);
 
             readonly InterpolatedStringExpressionSyntax node;
+            readonly string filePath;
 
-            public RuntimeWithinInterpolation(InterpolatedStringExpressionSyntax node) =>
+            public RuntimeWithinInterpolation(InterpolatedStringExpressionSyntax node, string filePath)
+            {
                 this.node = node;
+                this.filePath = filePath;
+            }
 
             public (SyntaxNode, EnvironmentVariable[]) Interpolate()
             {
@@ -121,7 +146,7 @@ namespace Nake.Magic
                 {
                     if (each is InterpolatedStringTextSyntax its && Qualifies(its))
                     {
-                        result.AddRange(InterpolateContents(its.TextToken.ValueText));
+                        result.AddRange(InterpolateContents(its.TextToken.ValueText, filePath));
                         continue;
                     }
 
@@ -137,7 +162,7 @@ namespace Nake.Magic
             }
         }
 
-        static IEnumerable<InterpolatedStringContentSyntax> InterpolateContents(string literal)
+        static IEnumerable<InterpolatedStringContentSyntax> InterpolateContents(string literal, string filePath)
         { 
             var start = 0;
             
@@ -149,11 +174,18 @@ namespace Nake.Magic
                     yield return InterpolatedStringText(Unescape(text));
 
                 var name = match.Groups["variable"].Value;
-                var invocation = $"{typeof(Substitutions).FullName}.{nameof(Substitutions.EnvironmentVariable)}(\"{name}\")";
+                if (name == NakeScriptDirectoryVariable)
+                {
+                    var inline = $"@\"{filePath}\"";
+                    yield return SyntaxFactory.Interpolation(SyntaxFactory.ParseExpression(inline));
+                }
+                else
+                {
+                    var invocation = $"{typeof(Substitutions).FullName}.{nameof(Substitutions.EnvironmentVariable)}(\"{name}\")";
+                    yield return SyntaxFactory.Interpolation(SyntaxFactory.ParseExpression(invocation));
+                }
 
-                yield return SyntaxFactory.Interpolation(SyntaxFactory.ParseExpression(invocation));
                 start = match.Index + match.Length;
-
                 match = match.NextMatch();
             }
 

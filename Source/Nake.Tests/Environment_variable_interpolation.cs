@@ -42,6 +42,21 @@ namespace Nake
             }
 
             [Test]
+            public void NakeScriptDirectory_inlined_at_compile_time()
+            {
+                var path = Build(@"                
+                    const string inlined = ""%NakeScriptDirectory%"";
+
+                    [Task] void Interpolate() => Env.Var[""Constant_NakeScriptDirectory""] = inlined;                    
+                ", 
+                createScriptFile: true);
+
+                Invoke("Interpolate");
+
+                Assert.That(Env.Var["Constant_NakeScriptDirectory"], Is.EqualTo(path));
+            }
+
+            [Test]
             [TestCaseSource(typeof(Environment_variable_interpolation), nameof(InliningSurroundingTestCases))]
             public void Inlined_respectively_to_surroundings(string surrounding, string value, string result)
             {
@@ -155,6 +170,24 @@ namespace Nake
                 Assert.That(Env.Var["Inlined"], Is.EqualTo(@"C:\Work\OSS"));
             }
 
+            [Test]
+            public void NakeScriptDirectory_inlined_at_compile_time()
+            {
+                var path = Build(@"                
+
+                    [Task] void Interpolate() 
+                    { 
+                        var inlined = ""%NakeScriptDirectory%"";                    
+                        Env.Var[""Runtime_NakeScriptDirectory""] = inlined;
+                    }
+                ", 
+                createScriptFile: true);
+
+                Invoke("Interpolate");
+
+                Assert.That(Env.Var["Runtime_NakeScriptDirectory"], Is.EqualTo(path));
+            }
+            
             [Test]
             [TestCaseSource(typeof(Environment_variable_interpolation), nameof(InliningSurroundingTestCases))]
             [TestCaseSource(typeof(Runtime), nameof(InterpolatedSurroundingTestCases))]

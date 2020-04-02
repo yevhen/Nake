@@ -8,14 +8,6 @@ namespace Nake
     /// </summary>
     public static class Location
     {
-        /// <summary>
-        /// Gets the directory in which entry script is residing
-        /// </summary>
-        /// <value> The directory path</value>
-        // TODO: YB - get rid of this. Switch to substitution on script-level
-        [Obsolete("Please use %NakeScriptDirectory% variable substitution to get proper path")]
-        public static string NakeScriptDirectory { get; } = Env.Var["NakeScriptDirectory"];
-
         /// <summary> 
         /// Gets the working directory passed to Nake runner.
         /// If not specified from cli will return <see cref="NakeStartupDirectory"/>
