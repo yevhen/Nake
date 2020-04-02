@@ -6,10 +6,26 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
+using Nake.Scripting;
+
 namespace Nake.Magic
 {
     class TaskDeclarationScanner : CSharpSyntaxWalker
     {
+        public static TaskDeclaration[] Scan(ScriptSource source, bool comments = true)
+        {
+            var result = new HashSet<TaskDeclaration>();
+            
+            foreach (var each in source.AllFiles())
+            {
+                new TaskDeclarationScanner()
+                    .Scan(each.Code, comments).ToList()
+                    .ForEach(x => result.Add(x));
+            }
+
+            return result.ToArray();
+        }
+
         readonly Dictionary<string, TaskDeclaration> tasks = 
              new Dictionary<string, TaskDeclaration>(new CaseInsensitiveEqualityComparer());
 

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,17 +14,14 @@ namespace Nake
 {
     class Engine
     {
-        readonly IEnumerable<AssemblyNameReference> assemblyNameReferences;
-        readonly IEnumerable<AssemblyAbsoluteReference> assemblyAbsoluteReferences;
+        readonly IEnumerable<AssemblyReference> references;
         readonly IEnumerable<string> namespaces;
 
         public Engine(
-            IEnumerable<AssemblyNameReference> assemblyNameReferences = null,
-            IEnumerable<AssemblyAbsoluteReference> assemblyAbsoluteReferences = null,
+            IEnumerable<AssemblyReference> references = null,
             IEnumerable<string> namespaces = null)
         {
-            this.assemblyNameReferences = assemblyNameReferences ?? Enumerable.Empty<AssemblyNameReference>();
-            this.assemblyAbsoluteReferences = assemblyAbsoluteReferences ?? Enumerable.Empty<AssemblyAbsoluteReference>();
+            this.references = references ?? Enumerable.Empty<AssemblyReference>();
             this.namespaces = namespaces ?? Enumerable.Empty<string>();
         }
 
@@ -37,14 +35,11 @@ namespace Nake
         {
             var script = new Script();
 
-            foreach (var reference in assemblyNameReferences)
-                script.AddReference(reference);
+            foreach (var each in references)
+                script.AddReference(each);
 
-            foreach (var reference in assemblyAbsoluteReferences)
-                script.AddReference(reference);
-
-            foreach (var @namespace in namespaces)
-                script.ImportNamespace(@namespace);
+            foreach (var each in namespaces)
+                script.ImportNamespace(each);
 
             return script.Compile(source);
         }
@@ -122,7 +117,7 @@ namespace Nake
     class BuildResult
     {
         public readonly Task[] Tasks;
-        public readonly AssemblyReference[] References;
+        public readonly Scripting.AssemblyReference[] References;
         public readonly EnvironmentVariable[] Variables;
         public readonly Assembly Assembly;
         public readonly byte[] AssemblyBytes;
@@ -130,7 +125,7 @@ namespace Nake
 
         public BuildResult(
             Task[] tasks,
-            AssemblyReference[] references,
+            Scripting.AssemblyReference[] references,
             EnvironmentVariable[] variables,
             byte[] assembly,
             byte[] symbols)
@@ -161,5 +156,27 @@ namespace Nake
             foreach (var task in Tasks)
                 task.Reflect(Assembly);
         }
+    }
+
+    struct AssemblyReference : IEquatable<AssemblyReference>
+    {
+        public readonly string AssemblyName;
+
+        public AssemblyReference(string path) => 
+            AssemblyName = path;
+
+        public bool Equals(AssemblyReference other) => string.Equals(AssemblyName, other.AssemblyName);
+
+        public override bool Equals(object obj) => 
+            !ReferenceEquals(null, obj) && 
+            obj is AssemblyReference reference && Equals(reference);
+
+        public override int GetHashCode() => AssemblyName.GetHashCode();
+        public override string ToString() => AssemblyName;
+
+        public static bool operator ==(AssemblyReference left, AssemblyReference right) => left.Equals(right);
+        public static bool operator !=(AssemblyReference left, AssemblyReference right) => !left.Equals(right);
+
+        public static implicit operator string(AssemblyReference obj) => obj.AssemblyName;
     }
 }

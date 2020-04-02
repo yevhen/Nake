@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using static System.Environment;
 
+using static System.Environment;
 using AsyncTask = System.Threading.Tasks.Task;
 
 using Nake.Magic;
@@ -40,14 +40,14 @@ namespace Nake
                 SetTrace();
 
             var file = Find();
-            var script = Preprocess(file);
+            var script = Parse(file);
             var declarations = Scan(script);
 
             if (options.ShowTasks)
                 ShowTasks(declarations);
 
             OverrideEnvironmentVariables();
-            DefineNakeEnvironmentVariables(file);
+            DefineNakeEnvironmentVariables();
 
             await Invoke(script, declarations);
         }
@@ -64,9 +64,8 @@ namespace Nake
                 SetEnvironmentVariable(variable.Name, variable.Value);
         }
 
-        void DefineNakeEnvironmentVariables(FileInfo scriptFile)
+        void DefineNakeEnvironmentVariables()
         {
-            SetEnvironmentVariable("NakeScriptDirectory",  scriptFile.DirectoryName);
             SetEnvironmentVariable("NakeStartupDirectory", currentDirectory);
             SetEnvironmentVariable("NakeWorkingDirectory", CurrentDirectory);
         }
@@ -93,15 +92,11 @@ namespace Nake
             return new FileInfo(defaultScriptFile);
         }
 
-        BuildResult Build(PreprocessedScript script, IEnumerable<TaskDeclaration> declarations)
+        BuildResult Build(ScriptSource source, IEnumerable<TaskDeclaration> declarations)
         {
-            var engine = new Engine(
-                script.References, 
-                script.AbsoluteReferences, 
-                script.Namespaces
-            );
+            var engine = new Engine();
 
-            var scriptFile = new ScriptSource(script.Code, script.File);
+            var scriptFile = new ScriptSource(source.Code, source.File);
 
             var cachingEngine = new CachingEngine(
                 engine, scriptFile, declarations.Select(x => new Task(x)).ToArray(), options.ResetCache              
@@ -179,19 +174,12 @@ namespace Nake
             Console.WriteLine();
         }
 
-        TaskDeclaration[] Scan(PreprocessedScript script)
-        {
-            return new TaskDeclarationScanner().Scan(script.Code, options.ShowTasks).ToArray();
-        }
+        static ScriptSource Parse(FileInfo file) => new ScriptSource(File.ReadAllText(file.FullName), file);
+        static TaskDeclaration[] Scan(ScriptSource source) => TaskDeclarationScanner.Scan(source);
 
-        static PreprocessedScript Preprocess(FileInfo file)
+        async AsyncTask Invoke(ScriptSource source, IEnumerable<TaskDeclaration> declarations)
         {
-            return new Preprocessor().Process(file);
-        }
-
-        async AsyncTask Invoke(PreprocessedScript script, IEnumerable<TaskDeclaration> declarations)
-        {
-            var result = Build(script, declarations);
+            var result = Build(source, declarations);
             Initialize(result);
 
             var tasks = options.Tasks;

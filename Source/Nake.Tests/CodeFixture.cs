@@ -17,18 +17,18 @@ namespace Nake
         protected static void Invoke(string taskName, params TaskArgument[] args) => 
             TaskRegistry.InvokeTask(taskName, args).GetAwaiter().GetResult();
 
-        protected static void Build(string code, Dictionary<string, string> substitutions = null, bool enableNugetReferences = false)
+        protected static string Build(string code, Dictionary<string, string> substitutions = null, bool createScriptFile = false)
         {
             var additionalReferences = new[]
             {
-                new AssemblyNameReference("meta", typeof(StepAttribute).Assembly.Location),
-                new AssemblyNameReference("utility", typeof(Env).Assembly.Location)
+                new AssemblyReference(typeof(StepAttribute).Assembly.Location),
+                new AssemblyReference(typeof(Env).Assembly.Location)
             };
 
             var engine = new Engine(additionalReferences);
             var source = new ScriptSource(code);
 
-            if (enableNugetReferences)
+            if (createScriptFile)
             {
                 var tmp = Path.GetTempFileName();
                 File.WriteAllText(tmp, code);
@@ -39,6 +39,7 @@ namespace Nake
                 substitutions ?? new Dictionary<string, string>(), false);
             
             TaskRegistry.Global = new TaskRegistry(result);
+            return source.File?.FullName;
         }
 
         protected static IEnumerable<Task> Tasks => TaskRegistry.Global.Tasks;

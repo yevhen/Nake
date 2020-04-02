@@ -54,15 +54,13 @@ namespace Nake.Scripting
         static MetadataReference Reference(Type type) => MetadataReference.CreateFromFile(type.Assembly.Location);
 
         readonly HashSet<string> namespaces;
-        readonly List<MetadataReference> resolved;
-        readonly HashSet<string> unresolved;
+        readonly List<MetadataReference> references;
 
         public Script()
         {
             namespaces = new HashSet<string>(DefaultNamespaces);
-            resolved = new List<MetadataReference>(
+            references = new List<MetadataReference>(
                 NakeReferences.Concat(DefaultReferences.Select(x => x.Value)));
-            unresolved = new HashSet<string>();
         }
 
         public CompiledScript Compile(ScriptSource source)
@@ -72,11 +70,10 @@ namespace Nake.Scripting
 
             var options = ScriptOptions.Default
                 .AddImports(namespaces)
-                .AddReferences(resolved)
-                .AddReferences(unresolved)
+                .AddReferences(references)
                 .WithMetadataResolver(new NuGetMetadataReferenceResolver(ScriptOptions.Default.MetadataResolver));
 
-            var script = CSharpScript.Create(source.Content, options);
+            var script = CSharpScript.Create(source.Code, options);
             var compilation = (CSharpCompilation)script.GetCompilation();
 
             var errors = compilation.GetDiagnostics()
@@ -86,7 +83,7 @@ namespace Nake.Scripting
             if (errors.Any())
                 throw new ScriptCompilationException(errors);
 
-            return new CompiledScript(resolved.Select(x => new AssemblyReference(x)), compilation);
+            return new CompiledScript(references.Select(x => new AssemblyReference(x)), compilation);
         }
 
         void AddCompilationDependencies(ScriptSource source)
@@ -100,7 +97,7 @@ namespace Nake.Scripting
             var dependencyResolver = new CompilationDependencyResolver(t => (l, m, e) => Log.Out(m));
             var dependencies = dependencyResolver.GetDependencies(
                 source.File.DirectoryName, 
-                new[] {source.File.FullName}, 
+                source.AllFiles().Select(x => x.File.ToString()), 
                 true, "netcoreapp3.1");
 
             var assemblyReferences = dependencies
@@ -109,39 +106,17 @@ namespace Nake.Scripting
                 .ToArray();
 
             foreach (var each in assemblyReferences)
-                AddReference(MetadataReference.CreateFromFile(each));
+                AddReference(each);
         }
 
-        public void AddReference(AssemblyNameReference reference)
-        {
-            if (DefaultReferences.ContainsKey(reference.AssemblyName))
-                return;
-
-            if (File.Exists(reference.FullPath))
-            {
-                AddReference(MetadataReference.CreateFromFile(reference.FullPath));
-                return;
-            }
-
-            unresolved.Add(reference.AssemblyName);
-        }
-
-        public void AddReference(AssemblyAbsoluteReference reference)
-        {
-            if (!File.Exists(reference))
-                throw new NakeException(
-                    "Reference {0} defined in script {1} cannot be found",
-                    reference.AssemblyPath, reference.ScriptFile);
-
-            AddReference(MetadataReference.CreateFromFile(reference));
-        }
-
+        public void AddReference(string path) => AddReference(MetadataReference.CreateFromFile(path));
+        
         void AddReference(MetadataReference reference)
         {
-            if (resolved.Any(x => x == reference))
+            if (references.Any(x => x == reference))
                 return;
             
-            resolved.Add(reference);
+            references.Add(reference);
         }
 
         public void ImportNamespace(string ns)

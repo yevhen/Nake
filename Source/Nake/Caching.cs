@@ -77,7 +77,7 @@ namespace Nake
         string PdbFile => Path.Combine(CacheFolder, source.File.Name + ".pdb");
         string ReferencesFile => Path.Combine(CacheFolder, "references");
         string CapturedVariablesFile => Path.Combine(CacheFolder, "variables");
-        string ComputeScriptHash() => StringHash(source.Content + ToDeterministicString(substitutions) + debug);
+        string ComputeScriptHash() => StringHash(source.Code + ToDeterministicString(substitutions) + debug);
 
         static string ToDeterministicString(IEnumerable<KeyValuePair<string, string>> substitutions) =>
             string.Join("", substitutions
@@ -133,9 +133,9 @@ namespace Nake
             return StringHash(current.ToString()) != captured;
         }
 
-        AssemblyReference[] ReadReferences() =>
+        Scripting.AssemblyReference[] ReadReferences() =>
             File.ReadAllLines(ReferencesFile)
-                .Select(line => new AssemblyReference(line))
+                .Select(line => new Scripting.AssemblyReference(line))
                 .ToArray();
 
         byte[] ReadAssembly() => File.ReadAllBytes(AssemblyFile);

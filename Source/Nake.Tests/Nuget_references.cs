@@ -19,7 +19,7 @@ namespace Nake
                     Env.Var[""ResolvedShard""] = Shard.Resolve(""A"", 10).ToString();
                 }
             ", 
-            enableNugetReferences: true);
+            createScriptFile: true);
 
             Invoke("Test");
 

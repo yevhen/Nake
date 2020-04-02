@@ -6,21 +6,14 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Nake.Magic
 {
-    public class TaskDeclaration
+    public class TaskDeclaration : IEquatable<TaskDeclaration>
     {
-        readonly string path;
-        readonly MethodDeclarationSyntax declaration;
-        readonly bool step;
-        readonly string comments = "";
-
         public TaskDeclaration(string path, MethodDeclarationSyntax declaration, bool step)
         {
             Debug.Assert(path != null);
             Debug.Assert(declaration != null);
 
-            this.path = path;
-            this.declaration = declaration;
-            this.step = step;
+            IsStep = step;
 
             var documentation = declaration
                 .DescendantNodes(descendIntoTrivia: true)
@@ -28,41 +21,40 @@ namespace Nake.Magic
                 .FirstOrDefault();
 
             if (documentation != null)
-                comments = documentation.Content.ToString()
-                            .Replace("///", "").Trim(' ').TrimEnd('\n').TrimEnd('\r');
+                Summary = documentation.Content.ToString()
+                    .Replace("///", "").Trim(' ').TrimEnd('\n').TrimEnd('\r');
+
+            Signature = TaskSignature(declaration, path);
+            FullName = Signature.Substring(0, Signature.IndexOf("(", StringComparison.Ordinal));
         }
 
-        public bool IsStep
+        public string Signature { get; }
+        public string FullName { get; }
+        public string Summary { get; } = "";
+        public bool IsStep { get; }
+
+        public string DisplayName => FullName.ToLowerInvariant();
+
+        static string TaskSignature(MethodDeclarationSyntax method, string path)
         {
-            get { return step; }
+            var signature = method.Identifier.ToString();
+            signature += method.ParameterList.ToString();
+            return path == "" ? signature : path + "." + signature;
         }
 
-        public string DisplayName
-        {
-            get { return FullName.ToLowerInvariant(); }
-        }
+        public bool Equals(TaskDeclaration other) => 
+            !ReferenceEquals(null, other) && 
+            (ReferenceEquals(this, other) || 
+            FullName == other.FullName);
 
-        public string FullName
-        {
-            get
-            {
-                return Signature.Substring(0, Signature.IndexOf("(", StringComparison.Ordinal));
-            }
-        }
+        public override bool Equals(object obj) => 
+            !ReferenceEquals(null, obj) && 
+            (ReferenceEquals(this, obj) || 
+            obj.GetType() == GetType() && Equals((TaskDeclaration) obj));
 
-        public string Signature
-        {
-            get
-            {
-                var signature = declaration.Identifier.ToString();
-                signature += declaration.ParameterList.ToString();
-                return path == "" ? signature : path + "." + signature;
-            }
-        }
+        public override int GetHashCode() => (FullName != null ? FullName.GetHashCode() : 0);
 
-        public string Summary
-        {
-            get { return comments; }
-        }
+        public static bool operator ==(TaskDeclaration left, TaskDeclaration right) => Equals(left, right);
+        public static bool operator !=(TaskDeclaration left, TaskDeclaration right) => !Equals(left, right);
     }
 }
