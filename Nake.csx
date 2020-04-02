@@ -71,5 +71,5 @@ MakeDir(ArtifactsPath);
 [Step] void Publish() => Push("Nake"); 
 
 async void Push(string package) => 
-    await $@"dotnet nuget push {ReleasePackagesPath}/{package}.{Version}.nupkg 
-    -k %NuGetApiKey% -s https://nuget.org/ -ss https://nuget.smbsrc.net";
+    await ($@"dotnet nuget push {ReleasePackagesPath}/**/*.{Version}.nupkg " +
+           "-k %NuGetApiKey% -s https://nuget.org/ -ss https://nuget.smbsrc.net --skip-duplicate");
