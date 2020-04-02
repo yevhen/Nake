@@ -39,7 +39,7 @@ namespace Nake
         /// <param name="task">The task.</param>
         /// <param name="quiet">if set to <c>true</c> completely disable any std out logging</param>
         /// <returns><c>true</c>, if successful</returns>
-        public static bool Exec<TTask>(TTask task, bool quiet = false) where TTask : Task
+        public static bool Exec<TTask>(this TTask task, bool quiet = false) where TTask : Task
         {
             task.BuildEngine = new MSBuildEngineStub(quiet);
             return task.Execute();

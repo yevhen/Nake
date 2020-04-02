@@ -163,7 +163,8 @@ namespace Nake
             public IEnumerator<string> GetEnumerator() => Output.GetEnumerator();
             IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable) Output).GetEnumerator();
 
-            public static implicit operator string(Result r) => string.Join(Environment.NewLine, r.Output);
+            public static implicit operator string(Result r) => r.ToString();
+            public override string ToString() => string.Join(Environment.NewLine, Output);
         }
     }
 }
