@@ -57,6 +57,7 @@
         <MicrosoftWin32RegistryVersion>4.7.0</MicrosoftWin32RegistryVersion>
         <SystemCodeDomVersion>4.7.0</SystemCodeDomVersion>
         <SystemSecurityPrincipalWindowsVersion>4.7.0</SystemSecurityPrincipalWindowsVersion>
+        <SystemSecurityCryptographyProtectedDataVersion>4.7.0</SystemSecurityCryptographyProtectedDataVersion>
 
         <!-- Roslyn packages -->
         <MicrosoftCodeAnalysisScriptingVersion>3.4.0</MicrosoftCodeAnalysisScriptingVersion>

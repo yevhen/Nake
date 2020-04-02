@@ -16,6 +16,7 @@
     <PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="$(MicrosoftCodeAnalysisScriptingVersion)" />
     <PackageReference Include="Dotnet.Script.DependencyModel" Version="$(DotnetScriptDependencyModelVersion)" />
     <PackageReference Include="Dotnet.Script.DependencyModel.NuGet" Version="$(DotnetScriptDependencyModelNugetVersion)" />
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="$(SystemSecurityCryptographyProtectedDataVersion)" />
   </ItemGroup>
 
 </Project>
