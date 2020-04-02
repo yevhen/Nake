@@ -199,7 +199,7 @@ namespace Nake
 
         static TTask Execute<TTask>(TTask task) where TTask : MSBuildTask
         {
-            task.Execute();
+            task.Exec();
             return task;
         }
     }
