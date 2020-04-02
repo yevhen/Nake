@@ -1,7 +1,7 @@
 ﻿#r "System.Net.WebClient"
 
-#r "./Tools/Nake/Nake.Meta.dll"
-#r "./Tools/Nake/Nake.Utility.dll"
+#r "nuget: Nake.Meta, 3.0.0-alpha"
+#r "nuget: Nake.Utility, 3.0.0-alpha"
 
 using System.IO;
 using System.Text;
