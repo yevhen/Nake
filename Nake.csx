@@ -13,7 +13,6 @@ using Nake;
 using static Nake.FS;
 using static Nake.Log;
 using static Nake.Env;
-using static Nake.Shell;
 
 var RootPath = "%NakeScriptDirectory%";
 var ArtifactsPath = $"{RootPath}/Artifacts";
