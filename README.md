@@ -111,7 +111,7 @@ Write("$NakeStartupDirectory$");    //       these special environment variables
 Write("$NakeWorkingDirectory$");    //        are automatically created by Nake
 
 var root = "$NakeScriptDirectory$"; //   this is how you can get script directory and it's
-Env.Var["NakeScriptDirectory];      //   always inlined and not available from environment
+Env.Var["NakeScriptDirectory"];     //   always inlined and not available from environment
 
 Write("{{esc}}");                   //  will simply print {esc} (no string interpolation)
 Write("$$esc$$");                   //  will simply print $esc$ (no env variable inlining)
