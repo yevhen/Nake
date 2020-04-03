@@ -124,7 +124,7 @@ var (exitCode, output) =            //    and you can get the result of the exec
    await $"docker container ls";    
 
 await $@"docker logs --tail 10 \    //         bash-style line continuations (\)
-         {container}";              //        are supported afor verbatim strings
+         {container}";              //        could be used with verbatim strings
 
 class Azure                         //  namespace declarations cannot be used with scripts,
 {                                   //  but could be easily emulated with class declarations
