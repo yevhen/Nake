@@ -165,6 +165,30 @@ namespace Nake
 
             public static implicit operator string(Result r) => r.ToString();
             public override string ToString() => string.Join(Environment.NewLine, Output);
+
+            /// <summary>
+            /// Helper method to deconstruct into a tuple of ExitCode and Output
+            /// </summary>
+            /// <param name="exitCode"><see cref="ExitCode"/></param>
+            /// <param name="output"><see cref="Output"/> as a string</param>
+            public void Deconstruct(out int exitCode, out string output)
+            {
+                exitCode = ExitCode;
+                output = ToString();
+            }
+
+            /// <summary>
+            /// Helper method to deconstruct into a tuple of ExitCode, StdOut and StdError
+            /// </summary>
+            /// <param name="exitCode"><see cref="ExitCode"/></param>
+            /// <param name="stdOut"><see cref="StdOut"/></param>
+            /// <param name="stdError"><see cref="StdError"/></param>
+            public void Deconstruct(out int exitCode, out List<string> stdOut, out List<string> stdError)
+            {
+                exitCode = ExitCode;
+                stdOut = StdOut;
+                stdError = StdError;
+            }
         }
     }
 }
