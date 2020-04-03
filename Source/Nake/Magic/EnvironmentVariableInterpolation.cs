@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -81,7 +82,7 @@ namespace Nake.Magic
                 {
                     var name  = match.Groups["variable"].Value;
                     if (name == NakeScriptDirectoryVariable)
-                        return filePath;
+                        return Path.GetDirectoryName(filePath);
 
                     var value = Environment.GetEnvironmentVariable(name) ?? "";
                     captured.Add(new EnvironmentVariable(name, value));
@@ -176,7 +177,7 @@ namespace Nake.Magic
                 var name = match.Groups["variable"].Value;
                 if (name == NakeScriptDirectoryVariable)
                 {
-                    var inline = $"@\"{filePath}\"";
+                    var inline = $"@\"{Path.GetDirectoryName(filePath)}\"";
                     yield return SyntaxFactory.Interpolation(SyntaxFactory.ParseExpression(inline));
                 }
                 else
