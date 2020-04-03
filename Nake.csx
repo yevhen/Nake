@@ -1,7 +1,7 @@
 ﻿#r "System.Net.WebClient"
 
-#r "nuget: Nake.Meta, 3.0.0-alpha"
-#r "nuget: Nake.Utility, 3.0.0-alpha"
+#r "nuget: Nake.Meta, 3.0.0-alpha-7"
+#r "nuget: Nake.Utility, 3.0.0-alpha-7"
 
 using System.IO;
 using System.Text;
