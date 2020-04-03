@@ -11,20 +11,25 @@ Nake is a magic task runner tool for .NET Core. It's a hybrid of Shovel and Rake
 
 Nake is built as dotnet tool. You can install it either globally of [locally](https://stu.dev/dotnet-core-3-local-tools/) (recommended):
 
-	PM> dotnet tool install Nake --version 3.0.0-dev
+	PM> dotnet tool install Nake --version 3.0.0-alpha-8
 
 ## Scripting reference
 
 ```cs
-#r "System"                         // 
-#r "System.Core"                    //   #reference assemblies from the netstandard BCL
-#r "System.Data"                    //    (these are referenced by default)
-#r "System.Xml"                     //
-#r "System.Xml.Linq"                //
+#r "System                          //
+#r "System.Core"                    //
+#r "System.Data"                    //   #reference assemblies from the netstandard BCL   
+#r "System.Xml"                     //       (these are referenced by default)
+#r "System.Xml.Linq"                //    
+#r "Microsoft.CSharp"               //
 
-#r "WindowsBase, Version=4.0..."    //  you can reference assembly by its full name
+#r "System.IO, Version=4.0..."      //  you can reference assembly by its full name
 #r "./Packages/nunit.dll"           //        or by using relative path
 #r "/usr/bin/SDK/Orleans.dll"       //            or by absolute path
+                                        
+#r "nuget: Streamstone, 2.0.0"      //  Nake is using dotnetscript dependency resolution
+#r "nuget: Newtonsoft.Json"         //  so referencing nuget packages is fully supported
+#r "nuget: Orleankka, 2.*"          //  https://github.com/filipw/dotnet-script#nuget-packages-1
 
 #load "Other.csx"                   //      #load code from other script files
 #load "Build/Another.csx"           //  (both absolute and relative paths are fine)
@@ -49,7 +54,7 @@ var who = "world";                  //  with the values passed from the command 
 /// Prints greeting                 //  this F#-style summary is shown in task listing
 [Task] void Welcome()               //  [Task] makes method runnable from command line
 {                                       
-    WriteLine("{greeting},{who}!"); //  forget ugly string.Format & string concatenation 
+    Write($"{greeting},{who}!");    //  forget ugly string.Format & string concatenation 
 }                                   //   with built-in support for string interpolation
 
 [Task] void Tell(
@@ -62,12 +67,12 @@ var who = "world";                  //  with the values passed from the command 
 {
     var emphasis = quiet ? "" : "!";
     for (; times > 0; times--)
-	    WriteLine("{what}, {whom} on {when}{emphasis}");
+	    WriteLine($"{what}, {whom} on {when}{emphasis}");
 }                                   
 
 [Step] void Clean()                  //     Steps are Tasks with 'run once' semantics      
 {                                    //     (foundation of any build automation tool)
-    Delete("{OutputPath}/*.*");	
+    Delete($"{OutputPath}/*.*");	
 }                                   
 
 [Step] void Build(string cfg = "Debug")
@@ -82,7 +87,7 @@ var who = "world";                  //  with the values passed from the command 
     Clean();                        //     you have complete control over decision,
     Build();                        //  when and in what order dependent steps should run
     -------                         //      (and Nake makes sure of run-once behavior)
-    NUnit("{OutputPath}/*.Tests.dll");   
+    NUnit($"{OutputPath}/*.Tests.dll");   
 }
 
 [Step] void Publish(bool beta = false)
@@ -107,7 +112,7 @@ class Azure                         //  namespace declarations cannot be used wi
     class Queue                     //     and you can nest them infinitely as you like
     {    
         [Task] void Clean()         //     then from the command line you would invoke
-        {}                          //   this task by its full path (ie, azure.queue.clean)
+        {}                          //   this task by its full path (ie, azure.queue clean)
     }
 }
 
