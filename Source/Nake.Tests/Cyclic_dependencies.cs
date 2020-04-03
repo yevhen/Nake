@@ -60,5 +60,23 @@ namespace Nake
 
             "));
         }
+
+        [Test]
+        public void Tasks_are_tracked_as_well()
+        {
+            Assert.Throws<CyclicDependencyException>(() => Build(@"
+            
+                [Task] void Task1() 
+                {
+                    Task2();
+                }
+
+                [Task] void Task2() 
+                {
+                    Task1();
+                }
+
+            "));
+        }
     }
 }

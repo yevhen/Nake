@@ -69,13 +69,15 @@ namespace Nake.Magic
         {
             if (ModelExtensions.GetSymbolInfo(model, node).Symbol is IMethodSymbol symbol)
             {
-                // TODO: YB - shouldn't we track dependencies for both Tasks and Steps?
-                if (IsStep(symbol))
+                var isStep = IsStep(symbol);
+                var isTask = IsTask(symbol);
+
+                if (isStep || isTask)
                 {
                     var task = result.Find(symbol);
                     if (task == null)
                     {
-                        task = new Task(symbol, true);
+                        task = new Task(symbol, isStep);
                         result.Add(symbol, task);
                     }
 
