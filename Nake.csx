@@ -67,8 +67,18 @@ MakeDir(ArtifactsPath);
 }
 
 /// Publishes package to NuGet gallery
-[Step] void Publish() => Push("Nake"); 
+[Step] async void Publish() => await 
+    $@"dotnet nuget push {ReleasePackagesPath}/**/*.{Version}.nupkg \
+    -k %NuGetApiKey% -s https://nuget.org/ -ss https://nuget.smbsrc.net --skip-duplicate";
 
-async void Push(string package) => 
-    await $@"dotnet nuget push {ReleasePackagesPath}/**/*.{Version}.nupkg \
-           -k %NuGetApiKey% -s https://nuget.org/ -ss https://nuget.smbsrc.net --skip-duplicate";
+/// Unlists nake packages from Nuget.org
+[Task] void Unlist() 
+{
+    Delete("Nake");
+    Delete("Nake.Utility");
+    Delete("Nake.Meta");
+        
+    async void Delete(string package) => await 
+        $@"dotnet nuget delete {package} {Version} \
+        -k %NuGetApiKey% -s https://nuget.org/ --non-interactive";
+}
