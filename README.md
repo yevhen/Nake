@@ -101,11 +101,30 @@ var who = "world";                  //  with the values passed from the command 
 var apiKey = "$NugetKey$";          //      $var$ is the shortcut syntax for getting 
 Push(apiKey, "{PackagePath}");      //          value of environment variable
 
+const string ApiKey = "$APIKEY$";   //     environment variables defined in constant scopes
+void Push(string key = "$APIKEY$")  //       evaluated once at compile-time (ie, inlined)
+
+var ApiKey = "$APIKEY$";            //     environment variables defined in variable scopes
+Write("$APIKEY$");                  //       evaluated at invocation-time (dynamic)
+
 Write("$NakeStartupDirectory$");    //       these special environment variables
-Write("$NakeScriptDirectory$");     //        are automatically created by Nake
+Write("$NakeWorkingDirectory$");    //        are automatically created by Nake
+
+var root = "$NakeScriptDirectory$"; //   this is how you can get script directory and it's
+Env.Var["NakeScriptDirectory];      //   always inlined and not available from environment
 
 Write("{{esc}}");                   //  will simply print {esc} (no string interpolation)
 Write("$$esc$$");                   //  will simply print $esc$ (no env variable inlining)
+
+Cmd($"docker build -f {spec} .");   //    you can use Nake.Utility to execute programs and 
+Cmd($"echo {title}");               //        shell commands in the most succint way ...
+
+await $"docker rm {cid} .";         //    simply await the string to get it executed
+var (exitCode, output) =            //    and you can get the result of the execution
+   await $"docker container ls";    
+
+await $@"docker logs --tail 10 \    //         bash-style line continuations (\)
+         {container}";              //        are supported afor verbatim strings
 
 class Azure                         //  namespace declarations cannot be used with scripts,
 {                                   //  but could be easily emulated with class declarations
@@ -175,16 +194,16 @@ Out-of-the box Nake includes a lot of useful convinient utility functions to hel
 
 Check out table below for reference on using utility library:
 
-| Class         						                    | Functions     					                    |
+| Class         						                    | Functions     					 |
 |:----------------------------------------------------------|:------------------------------------------------------|
-| [Run](https://github.com/yevhen/Nake/wiki/Run)          	| Running external tools: Cmd, MSBuild              	|
-| [App](https://github.com/yevhen/Nake/wiki/App)           	| Controlling Nake's runner              		        |
-| [Log](https://github.com/yevhen/Nake/wiki/Log)          	| Logging messages to console              		        |
-| [Env](https://github.com/yevhen/Nake/wiki/Env)          	| Working with environment variables              	    |
-| [FS](https://github.com/yevhen/Nake/wiki/FS)            	| File-system tasks, such as copy/move/del/mkdir/etc    |
-| [FileSet](https://github.com/yevhen/Nake/wiki/FileSet)  	| File path selection and transformation (globber)      |
-| [Color](https://github.com/yevhen/Nake/wiki/Color)      	| Printing to console in color              		    |
-| [Location](https://github.com/yevhen/Nake/wiki/Location)	| Current directory and special paths (script, startup) |
+| [Shell](https://github.com/yevhen/Nake/wiki/Shell)          	| Executing programs and shell commands             |
+| [Session](https://github.com/yevhen/Nake/wiki/Session)       	| Controlling current Nake's runner session         |
+| [Log](https://github.com/yevhen/Nake/wiki/Log)          	| Logging messages to console                       |
+| [Env](https://github.com/yevhen/Nake/wiki/Env)          	| Working with environment variables                |
+| [FS](https://github.com/yevhen/Nake/wiki/FS)            	| File-system tasks, such as copy/move/del/mkdir/etc|
+| [FileSet](https://github.com/yevhen/Nake/wiki/FileSet)  	| File path selection and transformation (globber)  |
+| [Color](https://github.com/yevhen/Nake/wiki/Color)      	| Printing to console in color                      |
+| [Location](https://github.com/yevhen/Nake/wiki/Location)	| Current directory and special paths (working, startup) |
 
 Also, see 'by use-case' reference on [wiki](https://github.com/yevhen/Nake/wiki).
 
