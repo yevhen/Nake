@@ -1,79 +1,76 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
-using NUnit.Framework;	
+using Medallion.Shell;
 
-namespace Nake.Utility	
+namespace Nake
 {
-    public class RunFixture
+    /// <summary>
+    /// Shortcuts for running external programs or shell commands
+    /// </summary>
+    public static partial class Shell
     {
-        [Test]
-        public async Task Invoking_via_await()
+        /// <summary>
+        /// Runs the specified  program or command using default options.
+        /// </summary>
+        /// <param name="command">
+        /// <para>
+        /// The command(s) to run. These can be system commands, such as <c>attrib</c> (<c>chmod</c>),
+        /// or an executable, such as <c>docker</c>, <c>run.bat</c>, or <c>setup.msi</c>.
+        /// </para>
+        /// <para>This parameter can contain multiple lines of commands.</para>
+        /// </param>
+        /// <returns>
+        ///     <see cref="Result"/> object which could be further inspected
+        ///     for exit code and std out and error messages</returns>
+        /// <exception cref="ApplicationException">If command fails</exception>
+        public static TaskAwaiter<CommandResult> GetAwaiter(this string command) => Run(command).Task.GetAwaiter();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="ignoreExitCode"></param>
+        /// <param name="workingDirectory"></param>
+        /// <param name="quiet"></param>
+        /// <param name="environmentVariables"></param>
+        /// <returns></returns>
+        public static Command Run(
+            string command,
+            bool ignoreExitCode = false,
+            string workingDirectory = null, 
+            bool quiet = false,
+            IEnumerable<KeyValuePair<string, string>> environmentVariables = null)
         {
-            var result = await "echo 42";
-            Assert.That(result.StdOut[0], Is.EqualTo("42"));
+            if (string.IsNullOrWhiteSpace(command))
+                throw new ArgumentException("command is null or contains whitespace only");
+
+            var args = ToCommandLineArgs(Prepare(command));
+            if (args.Length == 0)
+                throw new ArgumentException("command is null or contains whitespace only");
+
+            var executable = args[0];
+            var arguments = args.Skip(1);
+
+            var result = Command.Run(executable, arguments, o => o
+                .WorkingDirectory(workingDirectory ?? Location.CurrentDirectory)
+                .EnvironmentVariables(environmentVariables ?? Env.Var)
+                .ThrowOnError(!ignoreExitCode));
+
+            if (!quiet)
+                result.RedirectTo(Console.Out);
+
+            return result;
         }
 
-        [Test]
-        public void Non_zero_exit_code() => Assert.Throws<ApplicationException>(() =>
-            Shell.Run("foo blah", quiet: true));
-
-        [Test]
-        public void Ignore_exit_code()
+        internal static string[] ToCommandLineArgs(string command)
         {
-            var result = Shell.Run("foo blah", ignoreExitCode: true, quiet: true);
-            Assert.That(result.ExitCode != 0);
-            Assert.That(result.StdError.Count > 0);
-            Assert.That(result.StdOut.Count == 0);
-        }
+            if (string.IsNullOrWhiteSpace(command))
+                return new string[0];
 
-        [Test]
-        public void Bash_style_line_continuations()
-        {
-            var result = Shell.Run(@"dotnet \
-                                    tool --help");
-
-            Assert.That(result.ExitCode == 0);
-            Assert.That(result.StdError.Count == 0);
-            Assert.That(((string) result).Contains("Usage: dotnet tool"));
-
-            result = Shell.Run(@"dotnet \
-                                 tool \  
-                                 list");
-
-            Assert.That(result.ExitCode == 0);
-            Assert.That(result.StdError.Count == 0);
-            Assert.That(((string) result).Contains("---------------"));
-        }
-
-        [Test]
-        [TestCase("d", "d")]
-        [TestCase("dotnet pack", "dotnet", "pack")]
-        [TestCase("dotnet   pack", "dotnet", "pack")]
-        [TestCase("dotnet   pack -c  Release", "dotnet", "pack", "-c", "Release")]
-        [TestCase(@"dotnet 'C:\Program Files'", "dotnet", @"C:\Program Files")]
-        [TestCase(@"dotnet 'C:\Program Files'  pack", "dotnet", @"C:\Program Files", "pack")]
-        [TestCase(@"dotnet  '''C:\Program Files''' pack", "dotnet", @"'C:\Program Files'", "pack")]
-        [TestCase(@"dotnet   '''C:\Program'' Files'''  pack", "dotnet", @"'C:\Program' Files'", "pack")]
-        public void Command_line_splitting(string command, params string[] args)
-        {
-            CollectionAssert.AreEqual(args, ToCommandLineArgs(command));
-        }
-
-        [Test]
-        public void Unbalanced_quote()
-        {
-            const string command = @"dotnet '''C:\Program' Files'''  pack";
-            var exception = Assert.Throws<Exception>(()=> ToCommandLineArgs(command));
-            Assert.AreEqual("The command contains unbalanced quote at position 27", exception.Message);
-        }
-
-        static string[] ToCommandLineArgs(string command)
-        {
             var input = command.Trim();
             if (!input.Contains("'"))
                 return input.Split(' ', StringSplitOptions.RemoveEmptyEntries);
@@ -212,5 +209,5 @@ namespace Nake.Utility
                 return count;
             }
         }
-    }	
+    }
 }

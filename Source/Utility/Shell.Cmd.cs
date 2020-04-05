@@ -2,9 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
-using System.Threading.Tasks;
 
 using Microsoft.Build.Tasks;
 
@@ -13,26 +11,11 @@ namespace Nake
     /// <summary>
     /// Shortcuts for running external programs or shell commands
     /// </summary>
-    public static class Shell
+    public static partial class Shell
     {
         /// <summary>
-        /// Runs the specified  program or command using default options.
-        /// </summary>
-        /// <param name="command">
-        /// <para>
-        /// The command(s) to run. These can be system commands, such as <c>attrib</c> (<c>chmod</c>),
-        /// or an executable, such as <c>docker</c>, <c>run.bat</c>, or <c>setup.msi</c>.
-        /// </para>
-        /// <para>This parameter can contain multiple lines of commands.</para>
-        /// </param>
-        /// <returns>
-        ///     <see cref="Result"/> object which could be further inspected
-        ///     for exit code and std out and error messages</returns>
-        /// <exception cref="ApplicationException">If command fails</exception>
-        public static TaskAwaiter<Result> GetAwaiter(this string command) => Task.FromResult(Run(command)).GetAwaiter();
-
-        /// <summary>
-        /// Runs the specified program or command.
+        /// Runs the specified program or command using OS command interpreter.
+        /// For linux it wil be run via <c>"/bin/bash -c"</c> on Windows via <c>cmd</c>
         /// </summary>
         /// <param name="command">
         /// <para>
@@ -52,7 +35,7 @@ namespace Nake
         ///     <see cref="Result"/> object which could be further inspected
         ///     for exit code and std out and error messages</returns>
         /// <exception cref="ApplicationException">If command fails</exception>
-        public static Result Run(
+        public static Result Cmd(
             string command, 
             string[] environmentVariables = null, 
             string workingDirectory = null, 
@@ -62,6 +45,9 @@ namespace Nake
             bool useCommandProcessor = false,
             bool quiet = false)
         {
+            if (string.IsNullOrWhiteSpace(command))
+                throw new ArgumentException("command is null or contains whitespace only");
+
             var engine = new MSBuildEngineStub(quiet);
 
             var task = new Exec
@@ -84,47 +70,6 @@ namespace Nake
             return new Result(task.ExitCode, output, engine.StdError);
         }
 
-        static string Prepare(string command)
-        {
-            var lines = command.Split(Environment.NewLine);
-            return lines.Length == 1 ? command : PrepareMultiline(Line.From(lines));
-        }
-
-        static string PrepareMultiline(Line[] lines)
-        {
-            var result = new StringBuilder();
-            Array.ForEach(lines, each => each.Append(result));
-            return result.ToString();
-        }
-
-        class Line
-        {
-            public static Line[] From(IEnumerable<string> lines) => lines.Aggregate(new List<Line>(), (list, line) =>
-            {
-                list.Add(new Line(line, list.LastOrDefault()));
-                return list;
-            })
-            .ToArray();
-
-            readonly bool continues;
-            readonly string value;
-
-            Line(string line, Line previous = null)
-            {
-                var trimmed = line.TrimEnd();
-                continues = trimmed.EndsWith(" \\");
-                
-                value = continues 
-                    ? trimmed.Substring(0, trimmed.Length - 1) 
-                    : $"{line}{Environment.NewLine}";
-
-                if (previous?.continues == true)
-                    value = value.TrimStart();
-            }
-
-            public void Append(StringBuilder result) => result.Append(value);
-        }
-        
         /// <summary>
         /// Represents the result of shell command or program execution.
         /// Contains properties to iterate over console output.
@@ -189,6 +134,47 @@ namespace Nake
                 stdOut = StdOut;
                 stdError = StdError;
             }
+        }
+
+        static string Prepare(string command)
+        {
+            var lines = command.Split(Environment.NewLine);
+            return lines.Length == 1 ? command : PrepareMultiline(Line.From(lines));
+        }
+
+        static string PrepareMultiline(Line[] lines)
+        {
+            var result = new StringBuilder();
+            Array.ForEach(lines, each => each.Append(result));
+            return result.ToString();
+        }
+
+        class Line
+        {
+            public static Line[] From(IEnumerable<string> lines) => lines.Aggregate(new List<Line>(), (list, line) =>
+            {
+                list.Add(new Line(line, list.LastOrDefault()));
+                return list;
+            })
+            .ToArray();
+
+            readonly bool continues;
+            readonly string value;
+
+            Line(string line, Line previous = null)
+            {
+                var trimmed = line.TrimEnd();
+                continues = trimmed.EndsWith(" \\");
+                
+                value = continues 
+                    ? trimmed.Substring(0, trimmed.Length - 1) 
+                    : $"{line}{Environment.NewLine}";
+
+                if (previous?.continues == true)
+                    value = value.TrimStart();
+            }
+
+            public void Append(StringBuilder result) => result.Append(value);
         }
     }
 }

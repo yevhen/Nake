@@ -18,7 +18,7 @@ namespace Nake
     [Obsolete("Please use Shell class")]
     public static class Run
     {
-        [Obsolete("Please use Shell.Run")]
+        [Obsolete("Please use Shell.Cmd")]
         public static int Cmd(
             string command,
             string[] environmentVariables = null,
@@ -28,11 +28,11 @@ namespace Nake
             bool ignoreExitCode = false,
             bool disableStdOutLogging = false)
         {
-            var result = Shell.Run(command, environmentVariables, workingDirectory, echoOff, ignoreStdOutErrors, ignoreExitCode, quiet: disableStdOutLogging);
+            var result = Shell.Cmd(command, environmentVariables, workingDirectory, echoOff, ignoreStdOutErrors, ignoreExitCode, quiet: disableStdOutLogging);
             return result.ExitCode;
         }
 
-        [Obsolete("Unsupported. We recommend using functionality of MedallionShell package")]
+        [Obsolete("Unsupported. We recommend using functionality of MedallionShell package or Shell.Run method")]
         public static int Exec(
             string fileName, 
             string arguments, 

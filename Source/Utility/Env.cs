@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Nake
@@ -38,7 +39,7 @@ namespace Nake
     /// <summary>
     /// Contains actual methods to deal with environment variables
     /// </summary>
-    public class EnvironmentScope
+    public class EnvironmentScope : IEnumerable<KeyValuePair<string, string>>
     {
         readonly EnvironmentVariableTarget target;
 
@@ -68,8 +69,15 @@ namespace Nake
         /// Returns all environment variables as name=value pairs
         /// </summary>
         /// <returns>Array of environment variable pairs</returns>
-        public string[] All() =>
+        public string[] All() => this.Select(x => $"{x.Key}={x.Value}").ToArray();
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        public IEnumerator<KeyValuePair<string, string>> GetEnumerator() =>
             (from DictionaryEntry entry in Environment.GetEnvironmentVariables(target)
-             select entry.Key + "=" + entry.Value).ToArray();
+             select new KeyValuePair<string,string>((string) entry.Key, (string) entry.Value)).GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

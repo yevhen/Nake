@@ -45,6 +45,7 @@
     <PropertyGroup>
 
 		<!-- Infrastructure packages -->
+        <MedallionShellVersion>1.6.1</MedallionShellVersion>
 		<DotnetScriptDependencyModelVersion>0.50.0</DotnetScriptDependencyModelVersion>
 		<DotnetScriptDependencyModelNugetVersion>0.50.1</DotnetScriptDependencyModelNugetVersion>
 
