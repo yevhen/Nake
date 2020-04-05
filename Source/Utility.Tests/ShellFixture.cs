@@ -1,6 +1,8 @@
 ﻿using System;
-using NUnit.Framework;	
+using System.Linq;
+using System.Threading.Tasks;
 
+using NUnit.Framework;	
 using static Nake.Shell;
 
 namespace Nake.Utility	
@@ -60,9 +62,20 @@ namespace Nake.Utility
             [TestCase(@"dotnet 'C:\Program Files'  pack", "dotnet", @"C:\Program Files", "pack")]
             [TestCase(@"dotnet  '''C:\Program Files''' pack", "dotnet", @"'C:\Program Files'", "pack")]
             [TestCase(@"dotnet   '''C:\Program'' Files'''  pack", "dotnet", @"'C:\Program' Files'", "pack")]
-            public void Command_line_splitting(string command, params string[] args)
+            public async Task Command_line_splitting(string command, params string[] expected)
             {
-                CollectionAssert.AreEqual(args, ToCommandLineArgs(command));
+                var echo = typeof(TestEcho.Program).Assembly.Location;
+                echo = echo.Replace(@"Source\Utility.Tests", @"Source\TestEcho");
+
+                var result = await Run($"dotnet '{echo}' {command}");
+                Assert.That(result.Success);
+
+                Assert.That(result.StdError.Count, Is.EqualTo(0));
+                Assert.That(result.StdOut.Count, Is.GreaterThan(0));
+               
+                var count = int.Parse(result.StdOut.First());
+                Assert.That(expected.Length, Is.EqualTo(count));
+                CollectionAssert.AreEqual(expected, result.StdOut.Skip(1).Take(count));
             }
 
             [Test]

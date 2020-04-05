@@ -13,7 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Utility\Utility.csproj"/>
+    <ProjectReference Include="..\TestEcho\TestEcho.csproj" />
+    <ProjectReference Include="..\Utility\Utility.csproj" />
   </ItemGroup>
   
   <ItemGroup>

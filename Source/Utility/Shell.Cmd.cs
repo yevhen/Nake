@@ -67,7 +67,12 @@ namespace Nake
                 throw new ApplicationException($"{task.GetType()} failed");
 
             var output = task.ConsoleOutput.Select(x => x.ItemSpec).ToList();
-            return new Result(task.ExitCode, output, engine.StdError);
+
+            // HACK: I can't find way for now to get error output cleanly separated
+            var errors = new HashSet<string>(engine.StdError);
+            var stdOut = output.Where(x => !errors.Contains(x)).ToList();
+
+            return new Result(task.ExitCode, stdOut, engine.StdError, output);
         }
 
         /// <summary>
@@ -76,6 +81,11 @@ namespace Nake
         /// </summary>
         public class Result : IEnumerable<string>
         {
+            /// <summary>
+            /// Returns true ff the exit code is 0 (indicating success)
+            /// </summary>
+            public bool Success => ExitCode == 0;
+
             /// <summary>
             /// The exit code
             /// </summary>
@@ -96,12 +106,11 @@ namespace Nake
             /// </summary>
             public readonly List<string> Output;
 
-            internal Result(int exitCode, List<string> output, List<string> stdError)
+            internal Result(int exitCode, List<string> stdOut, List<string> stdError, List<string> output)
             {
                 ExitCode = exitCode;
+                StdOut = stdOut;
                 StdError = stdError;
-                var errors = new HashSet<string>(stdError);
-                StdOut = output.Where(x => !errors.Contains(x)).ToList();
                 Output = output;
             }
 
