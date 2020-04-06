@@ -119,20 +119,20 @@ Write("$$esc$$");                   //  will simply print $esc$ (no env variable
 Cmd($"docker build -f {spec} .");   //    you can use Nake.Utility to execute programs and 
 Cmd($"echo {title}");               //        shell commands in the most succint way ...
 
-await $"docker rm {cid} .";         //    simply await the string to get it executed
-await $"docker container ls";       //    and you can get the result of the execution
-var result = await                  //   by using functionality provided by MedallionShell
-    Run($"docker container ls");    //     this includes fancy redirects and piping
-Write(result.StandardOutput);				    
+await $"docker rm {cid} .";         //      simply await the string to get it executed
+r = await Run($"docker images");    //      and you can get the result of the execution
+Write(result.StandardOutput);       //    by using functionality provided by MedallionShell
+Run("myapp") < File("input")        //   this includes fancy composable piping and redirects
 
 await $@"docker logs --tail 10 \    //         bash-style line continuations (\)
          {container}";              //        could be used with verbatim strings
 
 await "app 'quoted arg'"            //   use ' quote for arguments that contain spaces
 await "app 'quoted '' quote'"       //       '' quote to insert a single quote
+
 await $"app '{path}'"               //   you may quote interpolations that may contain space
 await $"app {path}"                 //     but Nake will do it automatically for you ;)
-await $"app arg\\;;;"               //   and MedallionShel will properly escape the arguments
+await $"app {arg}\\;;;"             //   and MedallionShel will properly escape the arguments
 
 class Azure                         //  namespace declarations cannot be used with scripts,
 {                                   //  but could be easily emulated with class declarations
