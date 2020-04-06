@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.CompilerServices;
 
 namespace Nake
 {
@@ -9,17 +10,29 @@ namespace Nake
     public static class Location
     {
         /// <summary> 
+        /// Gets the calling script path
+        /// </summary>
+        /// <returns> The file path</returns>
+        public static string NakeScriptPath([CallerFilePath] string path = null) => path;
+
+        /// <summary> 
+        /// Gets the calling script directory
+        /// </summary>
+        /// <returns> The directory path</returns>
+        public static string NakeScriptDirectory([CallerFilePath] string path = null) => Path.GetDirectoryName(path);
+        
+        /// <summary> 
         /// Gets the working directory passed to Nake runner.
         /// If not specified from cli will return <see cref="NakeStartupDirectory"/>
         /// </summary>
-        /// <value> The directory path</value>
+        /// <returns> The directory path</returns>
         public static string NakeWorkingDirectory { get; } = Env.Var["NakeWorkingDirectory"];
 
         /// <summary> 
         /// Gets the Nake startup directory, which is whatever <see cref="Environment.CurrentDirectory"/>
         /// was pointing to at the time the Nake was started. 
         /// </summary>
-        /// <value> The directory path</value>
+        /// <returns> The directory path</returns>
         public static string NakeStartupDirectory { get; } = Env.Var["NakeStartupDirectory"];
 
         /// <summary>
