@@ -32,7 +32,7 @@ namespace Nake
                 Build(@"                
                     const string inlined = ""%var%"";                    
 
-                    [Task] void Interpolate() => Env.Var[""Inlined""] = inlined;                    
+                    [Nake] void Interpolate() => Env.Var[""Inlined""] = inlined;                    
                 ");
 
                 Env.Var["var"] = "changed";
@@ -48,7 +48,7 @@ namespace Nake
                 var path = Build(@"                
                     const string inlined = ""%NakeScriptDirectory%"";
 
-                    [Task] void Interpolate() => Env.Var[""Constant_NakeScriptDirectory""] = inlined;                    
+                    [Nake] void Interpolate() => Env.Var[""Constant_NakeScriptDirectory""] = inlined;                    
                 ", 
                 createScriptFile: true);
 
@@ -66,7 +66,7 @@ namespace Nake
                 Build($@"                
                     const string inlined = {surrounding};                    
 
-                    [Task] void Interpolate() => Env.Var[""Inlined""] = inlined;                    
+                    [Nake] void Interpolate() => Env.Var[""Inlined""] = inlined;                    
                 ");
 
                 Invoke("Interpolate");
@@ -83,7 +83,7 @@ namespace Nake
 
                     const string fieldConst = ""%var%"";
                         
-                    [Task] 
+                    [Nake] 
                     public static void Interpolate(string optionalParameterDefaultValue = ""%var%"")
                     {
                         const string localConst = ""%var%"";
@@ -114,7 +114,7 @@ namespace Nake
                     const string esc = ""%%whatever%%"";
                     const string esc_inline = ""%%whatever%%_%whatever%_%%whatever%%"";
 
-                    [Task] public static void Interpolate()
+                    [Nake] public static void Interpolate()
                     {
                         Env.Var[""Const_DoubledDollarSign""] = esc;
                         Env.Var[""Const_DoubledDollarSignWithInline""] = esc_inline;
@@ -133,7 +133,7 @@ namespace Nake
             {
                 Build(@"
                     
-                    [Task] public static void Interpolate()
+                    [Nake] public static void Interpolate()
                     {
                         Env.Var[""Const_StartsFromDoubledDollarSign""] = ""%%1"";
                         Env.Var[""Const_EndsWithDoubledDollarSign""] = ""1%%"";
@@ -157,7 +157,7 @@ namespace Nake
 
                 Build(@"                
                 
-                    [Task] void Interpolate() 
+                    [Nake] void Interpolate() 
                     { 
                         var inlined = ""%var%"";                    
                         Env.Var[""Inlined""] = inlined;
@@ -176,7 +176,7 @@ namespace Nake
             {
                 var path = Build(@"                
 
-                    [Task] void Interpolate() 
+                    [Nake] void Interpolate() 
                     { 
                         var inlined = ""%NakeScriptDirectory%"";                    
                         Env.Var[""Runtime_NakeScriptDirectory""] = inlined;
@@ -196,7 +196,7 @@ namespace Nake
             {
                 Build($@"                
                 
-                    [Task] void Interpolate() 
+                    [Nake] void Interpolate() 
                     {{ 
                         var inlined = {surrounding};                    
                         Env.Var[""Inlined""] = inlined;
@@ -229,7 +229,7 @@ namespace Nake
 
                 Build(@"
                     
-                    [Task] public static void Interpolate()
+                    [Nake] public static void Interpolate()
                     {
                         Env.Var[""Soft_DoubledDollarSign""] = ""%%whatever%%"";
                         Env.Var[""Soft_DoubledDollarSignWithInline""] = ""%%whatever%%_%whatever%_%%whatever%%"";
@@ -248,7 +248,7 @@ namespace Nake
             {
                 Build(@"
                     
-                    [Task] public static void Interpolate()
+                    [Nake] public static void Interpolate()
                     {
                         Env.Var[""Soft_StartsFromDoubledDollarSign""] = ""%%1"";
                         Env.Var[""Soft_EndsWithDoubledDollarSign""] = ""1%%"";
@@ -268,7 +268,7 @@ namespace Nake
         {
             Build(@"
                 
-                [Task] public static void Interpolate()
+                [Nake] public static void Interpolate()
                 {
                     Env.Var[""Result""] = @""%undefined%"";
                 }                    

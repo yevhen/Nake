@@ -26,7 +26,7 @@ namespace Nake
                     public static string PublicField = ""0"";
                 }          
 
-                [Task] void Test()
+                [Nake] void Test()
                 {
                     Env.Var[""ScriptLevelVar""]            = scriptLevelVar;
                     Env.Var[""PublicConstField""]          = PublicConstField;
@@ -66,7 +66,7 @@ namespace Nake
                 public static int IntField = 0;
                 public static decimal UnsupportedField = 0;
                                                 
-                [Task] public static void Test()
+                [Nake] public static void Test()
                 {
                     Env.Var[""StringField""] = StringField;
                     Env.Var[""BooleanField""] = BooleanField.ToString();
@@ -98,7 +98,7 @@ namespace Nake
                 public static bool BooleanField = false;
                 public static int IntField = 0;
                                                 
-                [Task] public static void Test()
+                [Nake] public static void Test()
                 {
                     Env.Var[""BooleanField""] = BooleanField.ToString();
                     Env.Var[""IntField""] = IntField.ToString();
@@ -124,7 +124,7 @@ namespace Nake
                 public static int Field = 0;
                 public static int field = 0;
                                                 
-                [Task] public static void Test()
+                [Nake] public static void Test()
                 {
                     Env.Var[""PascalCaseField""] = Field.ToString();
                     Env.Var[""LowerCaseField""] = field.ToString();
@@ -149,7 +149,7 @@ namespace Nake
                 public static string Path = ""path"";
                 public static string Quoted = ""quoted"";
                                                 
-                [Task] public static void Test()
+                [Nake] public static void Test()
                 {
                     Env.Var[""Path""] = Path;
                     Env.Var[""Quoted""] = Quoted;
@@ -174,7 +174,7 @@ namespace Nake
 
                 public static int Field1 = 0, Field2 = 0;
                                                 
-                [Task] public static void Test()
+                [Nake] public static void Test()
                 {
                     Env.Var[""Field1""] = Field1.ToString();
                     Env.Var[""Field2""] = Field2.ToString();

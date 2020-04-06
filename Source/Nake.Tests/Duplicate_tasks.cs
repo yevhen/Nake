@@ -10,8 +10,8 @@ namespace Nake
         {
             Assert.Throws<DuplicateTaskException>(() => Build(@"
             
-                [Task] public static void Task() {}
-                [Task] public static void Task(string s) {}
+                [Nake] public static void Task() {}
+                [Nake] public static void Task(string s) {}
 
             "));
         } 
@@ -21,8 +21,8 @@ namespace Nake
         {
             Assert.Throws<DuplicateTaskException>(() => Build(@"
             
-                [Task] public static void Task() {}
-                [Task] public static void task() {}
+                [Nake] public static void Task() {}
+                [Nake] public static void task() {}
 
             "));
         } 

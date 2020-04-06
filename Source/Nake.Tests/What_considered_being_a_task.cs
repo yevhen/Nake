@@ -32,22 +32,22 @@ namespace Nake
                 ),                
 
                 TaskDeclaration(
-                    @"[Task] void GlobalTask() {}"
+                    @"[Nake] void GlobalTask() {}"
                 ),
 
                 TaskDeclaration(
-                    @"[Task] async void GlobalTask() {}"
+                    @"[Nake] async void GlobalTask() {}"
                 ),
                 
                 TaskDeclaration(
-                    @"[Task] async Task GlobalTask() {}"
+                    @"[Nake] async Task GlobalTask() {}"
                 ),
 
                 TaskDeclaration(
                     @" 
                       class Namespace
                       {
-                         [Task] void NamespaceTask(){}
+                         [Nake] void NamespaceTask(){}
                       }
                     "
                 ),
@@ -58,25 +58,25 @@ namespace Nake
                     {
                         class Namespace
                         {
-                            [Task] void Task(){}
+                            [Nake] void Task(){}
                         }
                     }
                     "
                 ),
 
                 TaskDeclaration(
-                    @"[Task] static void StaticPrivate() {}"
+                    @"[Nake] static void StaticPrivate() {}"
                 ),                
 
                 TaskDeclaration(
-                    @"[Task] public static void StaticPublic() {}"
+                    @"[Nake] public static void StaticPublic() {}"
                 ),                
 
                 TaskDeclaration(
                     @"
                     class InternalClass
                     {
-                        [Task] static void PrivateStaticTask(){}
+                        [Nake] static void PrivateStaticTask(){}
                     }
                     "
                 ),
@@ -85,13 +85,13 @@ namespace Nake
                     @"
                     class InternalClass
                     {
-                        [Task] public static void PublicStaticTask(){}
+                        [Nake] public static void PublicStaticTask(){}
                     }
                     "
                 ),
 
                 TaskDeclaration(
-                    @"[Task] void AllParametersAreConvertChangeTypeCompatible(
+                    @"[Nake] void AllParametersAreConvertChangeTypeCompatible(
                         int p0, bool p1, string p3    
                     ){}"
                 ),
@@ -100,33 +100,33 @@ namespace Nake
                     @"                    
                     enum Days {Sat, Sun, Mon, Tue, Wed, Thu, Fri};
                     
-                    [Task] void EnumsCouldBeUsedAsParameters(
+                    [Nake] void EnumsCouldBeUsedAsParameters(
                         Days days
                     ){}"
                 ),
 
                 BadTaskDeclaration<TaskSignatureViolationException>(
-                    @"[Task] void HasIncompatibleParam(object o) {}"
+                    @"[Nake] void HasIncompatibleParam(object o) {}"
                 ),
 
                 BadTaskDeclaration<TaskSignatureViolationException>(
-                    @"[Task] string NotVoid() { return null; }"
+                    @"[Nake] string NotVoid() { return null; }"
                 ),
 
                 BadTaskDeclaration<TaskSignatureViolationException>(
-                    @"[Task] public static void Generic<T>() {}"
+                    @"[Nake] public static void Generic<T>() {}"
                 ),
 
                 BadTaskDeclaration<TaskSignatureViolationException>(
-                    @"[Task] public static void HasOutParameters(out int p) { p = 1;}"
+                    @"[Nake] public static void HasOutParameters(out int p) { p = 1;}"
                 ),
 
                 BadTaskDeclaration<TaskSignatureViolationException>(
-                    @"[Task] public static void HasRefParameters(ref int p) {}"
+                    @"[Nake] public static void HasRefParameters(ref int p) {}"
                 ),
 
                 BadTaskDeclaration<TaskSignatureViolationException>(
-                    @"[Task] void DuplicateParams(int p, int P) {}"
+                    @"[Nake] void DuplicateParams(int p, int P) {}"
                 )
             };
         }

@@ -10,18 +10,18 @@ namespace Nake
         {
             Build(@"
             
-                [Task] void ExpTask() => System.Console.WriteLine(""Expression"");
+                [Nake] void ExpTask() => System.Console.WriteLine(""Expression"");
 
-                [Task] void ExpTriviaTask() => 
+                [Nake] void ExpTriviaTask() => 
                     /*weirdly formatted*/ 
                     System.Console.WriteLine(""Expression"");
 
-                [Task] void BodyTask() 
+                [Nake] void BodyTask() 
                 {
                    System.Console.WriteLine(""Body"");
                 }
 
-                [Task] void BodyBSDFormattedTask() {
+                [Nake] void BodyBSDFormattedTask() {
                    System.Console.WriteLine(""Body"");
                 }
             ");

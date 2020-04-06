@@ -66,12 +66,12 @@ namespace Nake
         {
             Assert.Throws<CyclicDependencyException>(() => Build(@"
             
-                [Task] void Task1() 
+                [Nake] void Task1() 
                 {
                     Task2();
                 }
 
-                [Task] void Task2() 
+                [Nake] void Task2() 
                 {
                     Task1();
                 }

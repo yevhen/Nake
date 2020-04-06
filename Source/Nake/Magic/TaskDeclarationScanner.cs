@@ -74,7 +74,7 @@ namespace Nake.Magic
 
         static bool IsTask(MethodDeclarationSyntax node)
         {
-            return node.AttributeLists.Any(x => x.Attributes.Any(y => y.Name.ToString() == "Task"));
+            return node.AttributeLists.Any(x => x.Attributes.Any(y => y.Name.ToString() == "Nake"));
         }
 
         static bool IsStep(MethodDeclarationSyntax node)

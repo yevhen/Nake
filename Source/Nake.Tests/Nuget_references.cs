@@ -14,7 +14,7 @@ namespace Nake
 
                 using Streamstone;
 
-                [Task] void Test() 
+                [Nake] void Test() 
                 {
                     Env.Var[""ResolvedShard""] = Shard.Resolve(""A"", 10).ToString();
                 }

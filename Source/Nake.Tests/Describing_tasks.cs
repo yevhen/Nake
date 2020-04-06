@@ -35,25 +35,25 @@ namespace Nake
             return new[]
             {
                 TaskDeclaration(
-                    @"[Task] public static void NotDescribed() {}", ""
+                    @"[Nake] public static void NotDescribed() {}", ""
                 ),
 
                 TaskDeclaration(
                     @"
                     /// 
-                    [Task] public static void WhitespaceOnlyInSummary() {}", ""
+                    [Nake] public static void WhitespaceOnlyInSummary() {}", ""
                 ),
 
                 TaskDeclaration(
                     @"
                     /// described in F#-style summary doc
-                    [Task] public static void ProperlyDescribed() {}", "described in F#-style summary doc"
+                    [Nake] public static void ProperlyDescribed() {}", "described in F#-style summary doc"
                 ),
 
                 TaskDeclaration(
                     @"
                     // described in simple comment style
-                    [Task] public static void InvalidXmlDoc() {}", ""
+                    [Nake] public static void InvalidXmlDoc() {}", ""
                 )
             };
         }

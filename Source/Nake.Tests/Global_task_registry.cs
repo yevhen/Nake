@@ -10,7 +10,7 @@ namespace Nake
         [Test]
         public void Should_be_able_to_find_task_case_insensitive()
         {
-            Build("[Task] public static void Test() {}");
+            Build("[Nake] public static void Test() {}");
 
             Assert.That(Find("test"), Is.Not.Null);
             Assert.That(Find("Test"), Is.Not.Null, "Task names are case-insensitive");

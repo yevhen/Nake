@@ -3,7 +3,7 @@
 namespace Nake
 {
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-    public class TaskAttribute : Attribute
+    public class NakeAttribute : Attribute
     {
 
     }    

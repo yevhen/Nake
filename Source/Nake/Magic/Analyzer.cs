@@ -59,7 +59,7 @@ namespace Nake.Magic
             current = null;
         }
 
-        static bool IsTask(ISymbol symbol) => HasAttribute(symbol, "TaskAttribute");
+        static bool IsTask(ISymbol symbol) => HasAttribute(symbol, "NakeAttribute");
         static bool IsStep(ISymbol symbol) => HasAttribute(symbol, "StepAttribute");
 
         static bool HasAttribute(ISymbol symbol, string attribute) => 

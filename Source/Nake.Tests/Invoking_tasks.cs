@@ -15,12 +15,12 @@ namespace Nake
             
                 var counter = 0;
 
-                [Task] void Task1() 
+                [Nake] void Task1() 
                 {
                     Env.Var[""Task1ExecutedCount""] = (++counter).ToString();
                 }
 
-                [Task] void Task2() 
+                [Nake] void Task2() 
                 {
                     Task1();
                     Task1();
@@ -117,7 +117,7 @@ namespace Nake
         {
             Build(@"
             
-                [Task] void Task() 
+                [Nake] void Task() 
                 {
                     throw new ApplicationException(""crash"");
                 }
@@ -131,7 +131,7 @@ namespace Nake
         [Test]
         public void Invoking_tasks_with_parameters()
         {
-            Build("[Task] public static void Task(string arg1, int arg2, bool arg3 = false, int arg4 = 10) {}");
+            Build("[Nake] public static void Task(string arg1, int arg2, bool arg3 = false, int arg4 = 10) {}");
 
             Assert.Throws<TaskArgumentException>(() => Invoke("Task"));
 
@@ -169,7 +169,7 @@ namespace Nake
             
             enum Days {Sat, Sun, Mon, Tue, Wed, Thu, Fri};
 
-            [Task] void Task(Days days) {}
+            [Nake] void Task(Days days) {}
             
             ");
 
@@ -200,7 +200,7 @@ namespace Nake
                 counter++;
                 counter++;
 
-                [Task] void Task() 
+                [Nake] void Task() 
                 {
                     Env.Var[""counter""] = counter.ToString();
                 }
@@ -217,10 +217,10 @@ namespace Nake
         public void Parameter_names_are_case_insensitive()
         {
             Assert.Throws<TaskSignatureViolationException>(() => Build(
-                "[Task] void Task(string paramValue, string paramvalue){}"));
+                "[Nake] void Task(string paramValue, string paramvalue){}"));
 
             Build(@"  
-                [Task] void Task(string paramValue) 
+                [Nake] void Task(string paramValue) 
                 {
                      Env.Var[""paramValue""] = paramValue;
                 }
@@ -238,7 +238,7 @@ namespace Nake
         {
             Build(@"
             
-                [Task] async Task IAmAsync() 
+                [Nake] async Task IAmAsync() 
                 {
                     await Task.Delay(100);
                     Env.Var[""counter""] = ""42"";
