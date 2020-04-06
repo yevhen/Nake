@@ -12,9 +12,9 @@ environment:
 
 init:
   - git config --global core.autocrlf input
-  - dotnet tool restore
 
 build_script:
+  - dotnet tool restore
   - Nake.bat AppVeyorJobId=%APPVEYOR_JOB_ID% pack
 
 test: off
