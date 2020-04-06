@@ -143,10 +143,8 @@ class Azure                         //  namespace declarations cannot be used wi
     }
 }
 
-[Task] void Default()               //          running Nake without any options 
-{                                   //       will cause it to run the "default" task
-	Build();
-}
+[Nake] void Default() => Build();   //          running Nake without any options 
+                                    //       will cause it to run the "default" task
 ```
 
 ## Command line reference
