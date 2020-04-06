@@ -14,7 +14,7 @@ namespace Nake.Utility
             [Test]
             public void Runs_via_shell_interpreter()
             {
-                var result = Cmd("echo 42");
+                var result = Cmd("echo 42", captureOutput: true);
                 Assert.That(result.StdOut[0], Is.EqualTo("42"));
             }
 
@@ -35,7 +35,8 @@ namespace Nake.Utility
             public void Bash_style_line_continuations()
             {
                 var result = Cmd(@"dotnet \
-                                    tool --help");
+                                    tool --help", 
+                                captureOutput: true);
 
                 Assert.That(result.ExitCode == 0);
                 Assert.That(result.StdError.Count == 0);
@@ -43,7 +44,8 @@ namespace Nake.Utility
 
                 result = Cmd(@"dotnet \
                                  tool \  
-                                 list");
+                                 list", 
+                            captureOutput: true);
 
                 Assert.That(result.ExitCode == 0);
                 Assert.That(result.StdError.Count == 0);
@@ -67,15 +69,18 @@ namespace Nake.Utility
                 var echo = typeof(TestEcho.Program).Assembly.Location;
                 echo = echo.Replace(@"Source\Utility.Tests", @"Source\TestEcho");
 
-                var result = await Run($"dotnet '{echo}' {command}");
+                var tee = new Tee(Log.Out);
+                var process = Run($"dotnet '{echo}' {command}").With(tee);
+
+                var result = await process;
                 Assert.That(result.Success);
 
-                Assert.That(result.StdError.Count, Is.EqualTo(0));
-                Assert.That(result.StdOut.Count, Is.GreaterThan(0));
+                Assert.That(tee.StandardError().Count, Is.EqualTo(0));
+                Assert.That(tee.StandardOutput().Count, Is.GreaterThan(0));
                
-                var count = int.Parse(result.StdOut.First());
+                var count = int.Parse(tee.StandardOutput().First());
                 Assert.That(expected.Length, Is.EqualTo(count));
-                CollectionAssert.AreEqual(expected, result.StdOut.Skip(1).Take(count));
+                CollectionAssert.AreEqual(expected, tee.StandardOutput().Skip(1).Take(count));
             }
 
             [Test]

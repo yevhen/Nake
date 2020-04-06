@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 using Medallion.Shell;
@@ -18,7 +15,8 @@ namespace Nake
     public static partial class Shell
     {
         /// <summary>
-        /// Runs the specified  program or command using default options.
+        /// Runs the specified program or command using platform-agnostic argument specification syntax,
+        /// with default options and standard error and output redirected to <see cref="Console"/>.
         /// </summary>
         /// <param name="command">
         /// <para>
@@ -27,50 +25,52 @@ namespace Nake
         /// </para>
         /// <para>This parameter can contain multiple lines of commands.</para>
         /// </param>
-        /// <returns>
-        ///     <see cref="Result"/> object which could be further inspected
-        ///     for exit code and std out and error messages</returns>
         /// <exception cref="ApplicationException">If command fails</exception>
-        public static TaskAwaiter<Result> GetAwaiter(this string command) => GetAwaiter(Run(command));
-
-        /// <summary>
-        /// Runs the specified  program or command using default options.
-        /// </summary>
-        /// <param name="command">
-        /// <para>
-        /// The command(s) to run. These can be system commands, such as <c>attrib</c> (<c>chmod</c>),
-        /// or an executable, such as <c>docker</c>, <c>run.bat</c>, or <c>setup.msi</c>.
-        /// </para>
-        /// <para>This parameter can contain multiple lines of commands.</para>
-        /// </param>
-        /// <returns>
-        ///     <see cref="Result"/> object which could be further inspected
-        ///     for exit code and std out and error messages</returns>
-        /// <exception cref="ApplicationException">If command fails</exception>
-        public static TaskAwaiter<Result> GetAwaiter(this Command command)
+        public static TaskAwaiter GetAwaiter(this string command)
         {
-            return RunTee(command).GetAwaiter();
+            return Execute(Run(command), command).GetAwaiter();
 
-            async Task<Result> RunTee(Command cmd)
+            static async Task Execute(Command process, string command)
             {
-                var tee = new Tee(cmd, Log.Out);
-                var result = await command.Task;
-                return new Result(result.ExitCode, tee.StandardOutput(), tee.StandardError(), tee.MergedOutput());
+                var result = await process
+                    .RedirectTo(Console.Out)
+                    .RedirectStandardErrorTo(Console.Error);
+
+                if (!result.Success)
+                    throw new ApplicationException(
+                        $"The following command returned exit code {result.ExitCode}:" +
+                        $"{Environment.NewLine}{command}");
             }
         }
 
         /// <summary>
-        /// 
+        /// Executes the specified command.
         /// </summary>
-        /// <param name="command"></param>
-        /// <param name="ignoreExitCode"></param>
-        /// <param name="workingDirectory"></param>
-        /// <param name="environmentVariables"></param>
-        /// <returns></returns>
+        /// <param name="command">The instance of <see cref="Command"/></param>
+        /// <returns>
+        ///     <see cref="CommandResult"/> object which could be further inspected
+        ///     for exit code and std out and error messages (if captured)
+        /// </returns>
+        public static TaskAwaiter<CommandResult> GetAwaiter(this Command command) => command.Task.GetAwaiter();
+
+        /// <summary>
+        /// Runs the specified program or command using platform-agnostic argument specification syntax.
+        /// </summary>
+        /// <param name="command">
+        /// <para>
+        /// The command(s) to run. These can be system commands, such as <c>attrib</c> (<c>chmod</c>),
+        /// or an executable, such as <c>docker</c>, <c>run.bat</c>, or <c>setup.msi</c>.
+        /// </para>
+        /// </param>
+        /// <param name="environmentVariables">The environment variables pairs to pass. Default is all vars defined within a process</param>
+        /// <param name="workingDirectory">The working directory. Default is current directory</param>
+        /// <param name="ignoreExitCode">if set to <c>true</c> ignores exit code</param>
+        /// <returns><see cref="Command"/> object which could be further composed or awaited</returns>
+        /// <exception cref="ArgumentException">If command is null or empty</exception>
         public static Command Run(
             string command,
             bool ignoreExitCode = false,
-            string workingDirectory = null, 
+            string workingDirectory = null,
             IEnumerable<KeyValuePair<string, string>> environmentVariables = null)
         {
             if (string.IsNullOrWhiteSpace(command))
@@ -87,67 +87,8 @@ namespace Nake
                 .WorkingDirectory(workingDirectory ?? Location.CurrentDirectory)
                 .EnvironmentVariables(environmentVariables ?? Env.Var)
                 .ThrowOnError(!ignoreExitCode));
-            
+
             return result;
-        }
-
-        class Tee
-        {
-            long seq; 
-
-            readonly Action<string> onAddLine;
-            readonly ConcurrentCollection standardOutput;
-            readonly ConcurrentCollection standardError;
-
-            public Tee(Command command, Action<string> onAddLine)
-            {
-                this.onAddLine = onAddLine;
-                
-                standardOutput = new ConcurrentCollection(this);
-                standardError = new ConcurrentCollection(this);
-
-                command.RedirectTo(standardOutput);
-                command.RedirectStandardErrorTo(standardError);
-            }
-
-            public long Seq() => Interlocked.Increment(ref seq);
-
-            public List<string> StandardOutput() => standardOutput.Items.Select(x => x.line).ToList();
-            public List<string> StandardError() => standardError.Items.Select(x => x.line).ToList();
-
-            public List<string> MergedOutput() => 
-                standardOutput.Items
-                    .Concat(standardError.Items)
-                    .OrderBy(x => x.seq)
-                    .Select(x => x.line)
-                    .ToList();
-
-            class ConcurrentCollection : ICollection<string>
-            {
-                readonly ConcurrentQueue<(long, string)> bag = new ConcurrentQueue<(long, string)>();
-
-                readonly Tee tee;
-                public ConcurrentCollection(Tee tee) => this.tee = tee;
-
-                public void Add(string item)
-                {
-                    bag.Enqueue((tee.Seq(), item));
-                    tee.onAddLine(item);
-                }
-
-                public IEnumerable<(long seq, string line)> Items => bag.ToArray();
-
-                #region Unused
-                public void Clear() => throw new NotImplementedException();
-                public bool Contains(string item) => throw new NotImplementedException();
-                public void CopyTo(string[] array, int arrayIndex) => throw new NotImplementedException();
-                public bool Remove(string item) => throw new NotImplementedException();
-                public IEnumerator<string> GetEnumerator() => throw new NotImplementedException();
-                IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-                public int Count { get; }
-                public bool IsReadOnly { get; }
-                #endregion
-            }
         }
 
         internal static string[] ToCommandLineArgs(string command)

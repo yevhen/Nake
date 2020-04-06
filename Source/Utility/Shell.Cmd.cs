@@ -29,11 +29,12 @@ namespace Nake
         /// <param name="echoOff">if set to <c>true</c>disables echoing command output to std out</param>
         /// <param name="ignoreStdError">if set to <c>true</c> ignores errors logged to std out</param>
         /// <param name="ignoreExitCode">if set to <c>true</c> ignores exit code</param>
+        /// <param name="captureOutput">set to <c>true</c> to capture the standard error and output</param>
         /// <param name="useCommandProcessor">if set to <c>true</c> the command(s) will be executed via the batch file using the command-processor, rather than executed directly.</param>
         /// <param name="quiet">if set to <c>true</c> completely disable any std out logging</param>
         /// <returns>
         ///     <see cref="Result"/> object which could be further inspected
-        ///     for exit code and std out and error messages</returns>
+        ///     for exit code and std out and error messages, if captured</returns>
         /// <exception cref="ApplicationException">If command fails</exception>
         public static Result Cmd(
             string command, 
@@ -42,6 +43,7 @@ namespace Nake
             bool echoOff = true,
             bool ignoreStdError = false, 
             bool ignoreExitCode = false,
+            bool captureOutput = false,
             bool useCommandProcessor = false,
             bool quiet = false)
         {
@@ -58,7 +60,7 @@ namespace Nake
                 IgnoreExitCode = ignoreExitCode,
                 LogStandardErrorAsError = !ignoreStdError,
                 EnvironmentVariables = environmentVariables ?? Env.Var.All(),
-                ConsoleToMSBuild = true,
+                ConsoleToMSBuild = captureOutput,
                 UseCommandProcessor = useCommandProcessor,
                 BuildEngine = engine,
             };
@@ -92,17 +94,17 @@ namespace Nake
             public readonly int ExitCode;
 
             /// <summary>
-            /// The standard output
+            /// The standard output, if captured
             /// </summary>
             public readonly List<string> StdOut;
 
             /// <summary>
-            /// The standard error
+            /// The standard error, if captured
             /// </summary>
             public readonly List<string> StdError;
 
             /// <summary>
-            /// The console output (standard out + error)
+            /// The merged console output (standard out + error), if captured 
             /// </summary>
             public readonly List<string> Output;
 
