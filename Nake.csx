@@ -1,7 +1,7 @@
 ﻿#r "System.Net.WebClient"
 
-#r "nuget: Nake.Meta, 3.0.0-alpha-9"
-#r "nuget: Nake.Utility, 3.0.0-alpha-9"
+#r "nuget: Nake.Meta, 3.0.0-beta-01"
+#r "nuget: Nake.Utility, 3.0.0-beta-01"
 
 using System.IO;
 using System.Text;
@@ -25,15 +25,15 @@ var Version = "3.0.0-dev";
 MakeDir(ArtifactsPath);
 
 /// Restores packages and builds sources in Debug mode
-[Step] async Task Default() => await Build();
+[Nake] async Task Default() => await Build();
 
 /// Builds sources using specified configuration
-[Step] async Task Build(string config = "Debug", bool verbose = false) => await 
+[Nake] async Task Build(string config = "Debug", bool verbose = false) => await 
     $@"dotnet build {RootPath}/Nake.sln \
     /p:Configuration={config} {(verbose ? "/v:d" : "")}";
 
 /// Runs unit tests 
-[Step] async Task Test(bool slow = false)
+[Nake] async Task Test(bool slow = false)
 {
     await Build("Debug");
 
@@ -61,19 +61,19 @@ MakeDir(ArtifactsPath);
 }
 
 /// Builds official NuGet packages 
-[Step] async Task Pack(bool skipFullCheck = false)
+[Nake] async Task Pack(bool skipFullCheck = false)
 {
     await Test(!skipFullCheck);
     await $"dotnet pack -c Release -p:PackageVersion={Version} Nake.sln";
 }
 
 /// Publishes package to NuGet gallery
-[Step] async Task Publish() => await 
+[Nake] async Task Publish() => await 
     $@"dotnet nuget push {ReleasePackagesPath}/**/*.{Version}.nupkg \
     -k %NuGetApiKey% -s https://nuget.org/ -ss https://nuget.smbsrc.net --skip-duplicate";
 
 /// Unlists nake packages from Nuget.org
-[Step] async Task Unlist() 
+[Nake] async Task Unlist() 
 {
     await Delete("Nake");
     await Delete("Nake.Utility");

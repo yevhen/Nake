@@ -3,9 +3,9 @@
   "isRoot": true,
   "tools": {
     "nake": {
-      "version": "3.0.0-alpha-9",
+      "version": "3.0.0-beta-01",
       "commands": [
-        "nake"
+        "Nake"
       ]
     }
   }
