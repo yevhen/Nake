@@ -1,7 +1,7 @@
 ﻿#r "System.Net.WebClient"
 
-#r "nuget: Nake.Meta, 3.0.0-alpha-8"
-#r "nuget: Nake.Utility, 3.0.0-alpha-8"
+#r "nuget: Nake.Meta, 3.0.0-alpha-9"
+#r "nuget: Nake.Utility, 3.0.0-alpha-9"
 
 using System.IO;
 using System.Text;
@@ -24,17 +24,18 @@ var Version = "3.0.0-dev";
 // global init
 MakeDir(ArtifactsPath);
 
-/// Installs dependencies and builds sources in Debug mode
-[Task] void Default() => Build();
+/// Restores packages and builds sources in Debug mode
+[Step] async Task Default() => await Build();
 
 /// Builds sources using specified configuration
-[Step] async void Build(string config = "Debug", bool verbose = false) => 
-    await $"dotnet build {RootPath}/Nake.sln /p:Configuration={config} {(verbose ? "/v:d" : "")}";
+[Step] async Task Build(string config = "Debug", bool verbose = false) => await 
+    $@"dotnet build {RootPath}/Nake.sln \
+    /p:Configuration={config} {(verbose ? "/v:d" : "")}";
 
 /// Runs unit tests 
-[Step] async void Test(bool slow = false)
+[Step] async Task Test(bool slow = false)
 {
-    Build("Debug");
+    await Build("Debug");
 
     var tests = new FileSet{$"{RootPath}/**/bin/Debug/**/*.Tests.dll"}.ToString(" ");
     var results = $@"{ArtifactsPath}/nunit-test-results.xml";
@@ -60,25 +61,25 @@ MakeDir(ArtifactsPath);
 }
 
 /// Builds official NuGet packages 
-[Step] async void Pack(bool skipFullCheck = false)
+[Step] async Task Pack(bool skipFullCheck = false)
 {
-    Test(!skipFullCheck);
+    await Test(!skipFullCheck);
     await $"dotnet pack -c Release -p:PackageVersion={Version} Nake.sln";
 }
 
 /// Publishes package to NuGet gallery
-[Step] async void Publish() => await 
+[Step] async Task Publish() => await 
     $@"dotnet nuget push {ReleasePackagesPath}/**/*.{Version}.nupkg \
     -k %NuGetApiKey% -s https://nuget.org/ -ss https://nuget.smbsrc.net --skip-duplicate";
 
 /// Unlists nake packages from Nuget.org
-[Task] void Unlist() 
+[Step] async Task Unlist() 
 {
-    Delete("Nake");
-    Delete("Nake.Utility");
-    Delete("Nake.Meta");
+    await Delete("Nake");
+    await Delete("Nake.Utility");
+    await Delete("Nake.Meta");
         
-    async void Delete(string package) => await 
+    async Task Delete(string package) => await 
         $@"dotnet nuget delete {package} {Version} \
         -k %NuGetApiKey% -s https://nuget.org/ --non-interactive";
 }

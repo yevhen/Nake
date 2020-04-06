@@ -1,2 +1,2 @@
 #!/bin/bash
-dotnet $(pwd)/Tools/Nake/Nake.dll -f $(pwd)/Nake.csx -d $(pwd) "$@"
+dotnet nake -f $(pwd)/Nake.csx -d $(pwd) "$@"
