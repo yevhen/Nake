@@ -11,7 +11,7 @@ Nake is a magic task runner tool for .NET Core. It's a hybrid of Shovel and Rake
 
 Nake is built as dotnet tool. You can install it either globally of [locally](https://stu.dev/dotnet-core-3-local-tools/) (recommended):
 
-	PM> dotnet tool install Nake --version 3.0.0-alpha-8
+	PM> dotnet tool install Nake --version 3.0.0-beta-01
 
 ## Scripting reference
 
@@ -52,12 +52,12 @@ var greeting = "Hello";             //   you can override any script-level varia
 var who = "world";                  //  with the values passed from the command line
 
 /// Prints greeting                 //  this F#-style summary is shown in task listing
-[Task] void Welcome()               //  [Task] makes method runnable from command line
+[Nake] void Welcome()               //  [Nake] makes method runnable from command line
 {                                       
     Write($"{greeting},{who}!");    //  forget ugly string.Format & string concatenation 
 }                                   //   with built-in support for string interpolation
 
-[Task] void Tell(
+[Nake] void Tell(
     string what = "Hello",          //     for parameterized tasks you can supply
     string whom = "world",          //     arguments directly from the command line
     int times = 1,                  //          (string, int, boolean and 
@@ -70,7 +70,7 @@ var who = "world";                  //  with the values passed from the command 
 	    WriteLine($"{what}, {whom} on {when}{emphasis}");
 }                                   
 
-[Step] void Clean()                  //     Steps are Tasks with 'run once' semantics      
+[Step] void Clean()                  //     Steps are tasks with 'run once' semantics      
 {                                    //     (foundation of any build automation tool)
     Delete($"{OutputPath}/*.*");	
 }                                   
@@ -110,8 +110,8 @@ Write("$APIKEY$");                  //       evaluated at invocation-time (dynam
 Write("$NakeStartupDirectory$");    //       these special environment variables
 Write("$NakeWorkingDirectory$");    //        are automatically created by Nake
 
-var root = "$NakeScriptDirectory$"; //   this is how you can get script directory and it's
-Env.Var["NakeScriptDirectory"];     //   always inlined and not available from environment
+var root = "$NakeScriptDirectory$"; //   this is how you can get script directory inlined
+Write(Location.NakeScriptDirectory) //   alternatively call this method from Nake.Utility
 
 Write("{{esc}}");                   //  will simply print {esc} (no string interpolation)
 Write("$$esc$$");                   //  will simply print $esc$ (no env variable inlining)
@@ -120,11 +120,19 @@ Cmd($"docker build -f {spec} .");   //    you can use Nake.Utility to execute pr
 Cmd($"echo {title}");               //        shell commands in the most succint way ...
 
 await $"docker rm {cid} .";         //    simply await the string to get it executed
-var (exitCode, output) =            //    and you can get the result of the execution
-   await $"docker container ls";    
+await $"docker container ls";       //    and you can get the result of the execution
+var result = await                  //   by using functionality provided by MedallionShell
+    Run($"docker container ls");    //     this includes fancy redirects and piping
+Write(result.StandardOutput);				    
 
 await $@"docker logs --tail 10 \    //         bash-style line continuations (\)
          {container}";              //        could be used with verbatim strings
+
+await "app 'quoted arg'"            //   use ' quote for arguments that contain spaces
+await "app 'quoted '' quote'"       //       '' quote to insert a single quote
+await $"app '{path}'"               //   you may quote interpolations that may contain space
+await $"app {path}"                 //     but Nake will do it automatically for you ;)
+await $"app arg\\;;;"               //   and MedallionShel will properly escape the arguments
 
 class Azure                         //  namespace declarations cannot be used with scripts,
 {                                   //  but could be easily emulated with class declarations
