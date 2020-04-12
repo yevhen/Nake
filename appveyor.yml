@@ -17,7 +17,7 @@ init:
 
 build_script:
   - dotnet tool restore
-  - dotnet nake AppVeyorJobId=$APPVEYOR_JOB_ID pack
+  - dotnet nake pack
 
 test: off
 
