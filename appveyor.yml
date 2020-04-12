@@ -16,7 +16,7 @@ init:
   - git config --global core.autocrlf input
 
 build_script:
-  - mkdir Artifacts\Release
+  - mkdir Artifacts/Release
   - dotnet tool restore
   - Nake.bat AppVeyorJobId=%APPVEYOR_JOB_ID% pack
 
@@ -29,4 +29,4 @@ for:
       - image: Visual Studio 2019
 
   artifacts:
-    - path: Artifacts\Release\*.nupkg
+    - path: Artifacts/Release/*.nupkg
