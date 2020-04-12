@@ -243,12 +243,12 @@ Have a look at [Nake.csx](https://github.com/yevhen/Nake/blob/master/Nake.csx). 
 
 ## Community
 
-General discussion group could be found [here](https://groups.google.com/forum/#!forum/naketool). Also, for news you can follow Nake's [official](https://twitter.com/NakeTool) twitter account (or [my](https://twitter.com/yevhen) account for that matter). The twitter's hashtag is `#naketool`.
+General discussion group could be found [here](https://gitter.im/yevhen/Nake). Also, for news you can follow Nake's [official](https://twitter.com/NakeTool) twitter account (or [my](https://twitter.com/yevhen) account for that matter). The twitter's hashtag is `#naketool`.
 
 ## Credits
 - Thanks to everyone in the Roslyn compiler team for making this happen
 - Thanks to everyone in the dotnet-script team
-- Thanks to MedallioShell community for the great project
+- Thanks to MedallionShell community for the great project
 - Special thanks to Anton Martynenko for giving me an idea and steering Nake's DSL in the right direction
 - Hugs and kisses to my lovely Valery for being so patient and supportive, and for feeding me food and beer, while I was sitting in my cage working on Nake, instead of spending that time with her
 
