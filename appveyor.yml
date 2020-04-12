@@ -14,10 +14,11 @@ init:
   - git config --global core.autocrlf input
 
 build_script:
+  - md Artifacts/Release
   - dotnet tool restore
   - Nake.bat AppVeyorJobId=%APPVEYOR_JOB_ID% pack
 
 test: off
 
 artifacts:
-- path: Artifacts\Release\*.nupkg
+- path: Artifacts/Release/*.nupkg
