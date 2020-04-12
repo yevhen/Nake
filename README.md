@@ -141,7 +141,7 @@ class Azure                         //  namespace declarations cannot be used wi
     class Queue                     //     and you can nest them infinitely as you like
     {    
         [Task] void Clean()         //     then from the command line you would invoke
-        {}                          //   this task by its full path (ie, azure.queue clean)
+        {}                          //   this task by its class path (ie, azure queue clean)
     }
 }
 
