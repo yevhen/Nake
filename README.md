@@ -229,11 +229,11 @@ class Azure
 
 ## Backlog
 
-- Interactive mode
+- Check the open issues
 
 ## Contributing
 
-Gimme your pull requests!
+Make sure you follow the coding guidelines which exists on a project (either as R# formatting settings or .editorconfig). Nothing else)
 
 ## Samples and Documentation
 
@@ -245,8 +245,9 @@ General discussion group could be found [here](https://groups.google.com/forum/#
 
 ## Credits
 - Thanks to everyone in the Roslyn compiler team for making this happen
-- Thanks to all members of the [scriptcs](https://github.com/scriptcs) team for lending me their script pre-processing code
-- Special thanks to [Anton Martynenko](https://twitter.com/aamartynenko) for giving me an idea and steering Nake's DSL in the right direction
+- Thanks to everyone in the dotnet-script team
+- Thanks to MedallioShell community for the great project
+- Special thanks to Anton Martynenko for giving me an idea and steering Nake's DSL in the right direction
 - Hugs and kisses to my lovely Valery for being so patient and supportive, and for feeding me food and beer, while I was sitting in my cage working on Nake, instead of spending that time with her
 
 ## License
