@@ -126,7 +126,7 @@ Write(result.StandardOutput);       //    by using functionality provided by Med
 
 Run("app") < new FileInfo("input")  //   this includes fancy composable piping and redirects
 
-await $@"docker logs --tail 10 \    //         bash-style line continuations (\)
+await $@"docker logs --tail 10 \    //      backslash (\) as line continuation symbol
          {container}";              //        could be used with verbatim strings
 
 await "app 'quoted arg'"            //   use ' quote for arguments that contain spaces
