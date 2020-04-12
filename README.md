@@ -13,7 +13,7 @@ Nake is built as dotnet tool. You can install it either globally of [locally](ht
 
 	PM> dotnet tool install Nake --version 3.0.0-beta-01
 
-## Scripting reference
+## Syntax cheatsheet
 
 ```cs
 #r "System                          //
