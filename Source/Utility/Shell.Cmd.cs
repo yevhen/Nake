@@ -149,7 +149,7 @@ namespace Nake
 
         static string Prepare(string command)
         {
-            var lines = command.Split(Environment.NewLine);
+            var lines = command.Split("\n");
             return lines.Length == 1 ? command : PrepareMultiline(Line.From(lines));
         }
 

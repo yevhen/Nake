@@ -35,7 +35,7 @@ namespace Nake.Utility
             public void Bash_style_line_continuations()
             {
                 var result = Cmd(@"dotnet \
-                                    tool --help", 
+                                   tool --help", 
                                 captureOutput: true);
 
                 Assert.That(result.ExitCode == 0);
