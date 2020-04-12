@@ -120,9 +120,11 @@ Cmd($"docker build -f {spec} .");   //    you can use Nake.Utility to execute pr
 Cmd($"echo {title}");               //        shell commands in the most succint way ...
 
 await $"docker rm {cid} .";         //      simply await the string to get it executed
+
 r = await Run($"docker images");    //      and you can get the result of the execution
 Write(result.StandardOutput);       //    by using functionality provided by MedallionShell
-Run("myapp") < File("input")        //   this includes fancy composable piping and redirects
+
+Run("app") < new FileInfo("input")  //   this includes fancy composable piping and redirects
 
 await $@"docker logs --tail 10 \    //         bash-style line continuations (\)
          {container}";              //        could be used with verbatim strings
