@@ -2,7 +2,9 @@ skip_tags: true
 
 version: 2.0.{build}
 
-image: Visual Studio 2019
+image: 
+  - Visual Studio 2019
+  - Ubuntu
 
 environment:
   github_access_token:
@@ -20,5 +22,11 @@ build_script:
 
 test: off
 
-artifacts:
-- path: Artifacts\Release\*.nupkg
+for:
+-
+  matrix:
+    only:
+      - image: Visual Studio 2019
+
+  artifacts:
+    - path: Artifacts\Release\*.nupkg
