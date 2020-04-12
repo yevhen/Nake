@@ -19,13 +19,5 @@ build_script:
   - dotnet tool restore
   - dotnet nake pack
 
-test: off
-
-for:
--
-  matrix:
-    only:
-      - image: Visual Studio 2019
-
-  artifacts:
-    - path: Artifacts\Release\*.nupkg
+artifacts:
+  - path: Artifacts\Release\*.nupkg
