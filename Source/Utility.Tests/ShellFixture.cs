@@ -67,7 +67,7 @@ namespace Nake.Utility
             public async Task Command_line_splitting(string command, params string[] expected)
             {
                 var echo = typeof(TestEcho.Program).Assembly.Location;
-                echo = echo.Replace(@"Source\Utility.Tests", @"Source\TestEcho");
+                echo = echo.Replace("Utility.Tests", "TestEcho");
 
                 var tee = new Tee(Log.Out);
                 var process = Run($"dotnet '{echo}' {command}").With(tee);
