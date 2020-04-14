@@ -134,7 +134,7 @@ await "app 'quoted '' quote'"       //       '' quote to insert a single quote
 
 await $"app '{path}'"               //   you may quote interpolations that may contain space
 await $"app {path}"                 //     but Nake will do it automatically for you ;)
-await $"app {arg}\\;;;"             //   and MedallionShel will properly escape the arguments
+await $"app {arg}\\;;;"             //   and MedallionShell will properly escape the arguments
 
 class Azure                         //  namespace declarations cannot be used with scripts,
 {                                   //  but could be easily emulated with class declarations
