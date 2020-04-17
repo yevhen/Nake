@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 
-namespace Nake
+namespace Nake.Utility
 {
     /// <summary>
     /// Helper methods for controlling Nake runner session

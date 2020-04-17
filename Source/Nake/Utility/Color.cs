@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 
-namespace Nake
+namespace Nake.Utility
 {
     /// <summary>
     /// Helps printing console messages with given color

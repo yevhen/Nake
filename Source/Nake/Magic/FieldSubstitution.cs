@@ -2,6 +2,8 @@
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
+using Nake.Utility;
+
 namespace Nake.Magic
 {
     class FieldSubstitution

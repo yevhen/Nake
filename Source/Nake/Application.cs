@@ -9,6 +9,7 @@ using AsyncTask = System.Threading.Tasks.Task;
 
 using Nake.Magic;
 using Nake.Scripting;
+using Nake.Utility;
 
 namespace Nake
 {

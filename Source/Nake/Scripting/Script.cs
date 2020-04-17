@@ -9,6 +9,7 @@ using System.Xml;
 using System.Xml.Linq;
 
 using Dotnet.Script.DependencyModel.Compilation;
+using Dotnet.Script.DependencyModel.Logging;
 using Dotnet.Script.DependencyModel.NuGet;
 
 using Microsoft.CodeAnalysis;
@@ -16,6 +17,8 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.CSharp.RuntimeBinder;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
+
+using Nake.Utility;
 
 namespace Nake.Scripting
 {
@@ -97,7 +100,27 @@ namespace Nake.Scripting
                 .Distinct()
                 .ToDictionary(Path.GetFileName);
 
-            var dependencyResolver = new CompilationDependencyResolver(t => (l, m, e) => Log.Out(m));
+            var dependencyResolver = new CompilationDependencyResolver(t => (level, message, exception) =>
+            {
+                switch (level)
+                {
+                    case LogLevel.Trace:
+                    case LogLevel.Debug:
+                        Log.Trace(message);
+                        break;
+                    case LogLevel.Info:
+                    case LogLevel.Warning:
+                        Log.Info(message);
+                        break;
+                    case LogLevel.Error:
+                    case LogLevel.Critical:
+                        Log.Error(exception);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(level), level, null);
+                }
+            });
+
             var dependencies = dependencyResolver.GetDependencies(
                 source.File.DirectoryName, 
                 source.AllFiles().Select(x => x.File.ToString()), 
