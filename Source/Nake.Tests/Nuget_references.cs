@@ -1,4 +1,6 @@
-﻿using NUnit.Framework;
+﻿using System.IO;
+
+using NUnit.Framework;
 
 namespace Nake
 {
@@ -19,7 +21,7 @@ namespace Nake
                     Env.Var[""ResolvedShard""] = Shard.Resolve(""A"", 10).ToString();
                 }
             ", 
-            createScriptFile: true);
+            scriptFile: Path.GetTempFileName());
 
             Invoke("Test");
 
