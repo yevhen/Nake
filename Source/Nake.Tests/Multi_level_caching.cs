@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 
 using NUnit.Framework;
-using NLog = Nake.Utility.Log;
 
 namespace Nake
 {
@@ -15,54 +12,27 @@ namespace Nake
         {
             var path = Path.GetTempFileName();
 
-            using var firstTime = new TraceStandardOutput();
-            {
-                Build(@"                
+            var output = Build(@"                
 
-                    #r ""nuget: Streamstone, 2.3.0""
-                    using Streamstone;
+                #r ""nuget: Streamstone, 2.3.0""
+                using Streamstone;
 
-                    [Nake] void Test() => Env.Var[""ResolvedShard""] = Shard.Resolve(""A"", 10).ToString();
-                ",
-                scriptFile: path);
-            }
+                [Nake] void Test() => Env.Var[""ResolvedShard""] = Shard.Resolve(""A"", 10).ToString();
+            ",
+            scriptFile: path);
 
-            Assert.That(firstTime.Output(), Contains.Substring("dotnet restore"));
-            
-            using var secondTime = new TraceStandardOutput();
-            {
-                Build(@"                
+            Assert.That(output, Contains.Substring("dotnet restore"));
 
-                    #r ""nuget: Streamstone, 2.3.0""
-                    using Streamstone;
+            output = Build(@"                
 
-                    [Nake] void Test() => Env.Var[""ResolvedShard""] = Shard.Resolve(""B"", 10).ToString();
-                ",
-                scriptFile: path);
-            }
+                #r ""nuget: Streamstone, 2.3.0""
+                using Streamstone;
 
-            Assert.That(secondTime.Output(), !Contains.Substring("dotnet restore"));
-        }
+                [Nake] void Test() => Env.Var[""ResolvedShard""] = Shard.Resolve(""B"", 10).ToString();
+            ",
+            scriptFile: path);
 
-        class TraceStandardOutput : IDisposable
-        {
-            readonly Action<string> writer;
-            readonly List<string> output = new List<string>();
-
-            public TraceStandardOutput()
-            {
-                NLog.EnableTrace();
-                writer = NLog.Out;
-                NLog.Out = output.Add;
-            }
-
-            public void Dispose()
-            {
-                NLog.DisableTrace();
-                NLog.Out = writer;
-            }
-
-            public string Output() => string.Join(Environment.NewLine, output);
+            Assert.That(output, !Contains.Substring("dotnet restore"));
         }
     }
 }

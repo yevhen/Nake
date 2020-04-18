@@ -1,5 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
+
+using Dotnet.Script.DependencyModel.Logging;
+
 using NUnit.Framework;
 
 namespace Nake
@@ -17,7 +21,7 @@ namespace Nake
         protected static void Invoke(string taskName, params TaskArgument[] args) => 
             TaskRegistry.InvokeTask(taskName, args).GetAwaiter().GetResult();
 
-        protected static void Build(string code, Dictionary<string, string> substitutions = null, string scriptFile = null)
+        protected static string Build(string code, Dictionary<string, string> substitutions = null, string scriptFile = null)
         {
             var additionalReferences = new[]
             {
@@ -25,7 +29,15 @@ namespace Nake
                 new AssemblyReference(typeof(Env).Assembly.Location)
             };
 
-            var engine = new Engine(additionalReferences);
+            var output = new List<string>();
+            void Logger(LogLevel level, string message, Exception exception)
+            {
+                output.Add(message);
+                if (exception != null)
+                    output.Add(exception.StackTrace);
+            }
+
+            var engine = new Engine(Logger, additionalReferences);
             var source = new ScriptSource(code);
 
             if (scriptFile != null)
@@ -38,6 +50,8 @@ namespace Nake
                 substitutions ?? new Dictionary<string, string>(), false);
             
             TaskRegistry.Global = new TaskRegistry(result);
+            
+            return string.Join(Environment.NewLine, output);
         }
 
         protected static IEnumerable<Task> Tasks => TaskRegistry.Global.Tasks;

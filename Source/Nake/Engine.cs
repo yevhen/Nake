@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
+using Dotnet.Script.DependencyModel.Logging;
+
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Emit;
 
@@ -14,13 +16,15 @@ namespace Nake
 {
     class Engine
     {
+        readonly Logger logger;
         readonly IEnumerable<AssemblyReference> references;
         readonly IEnumerable<string> namespaces;
 
-        public Engine(
-            IEnumerable<AssemblyReference> references = null,
-            IEnumerable<string> namespaces = null)
+        public Engine(Logger logger,
+          IEnumerable<AssemblyReference> references = null,
+          IEnumerable<string> namespaces = null)
         {
+            this.logger = logger;
             this.references = references ?? Enumerable.Empty<AssemblyReference>();
             this.namespaces = namespaces ?? Enumerable.Empty<string>();
         }
@@ -33,7 +37,7 @@ namespace Nake
 
         CompiledScript Compile(ScriptSource source)
         {
-            var script = new Script();
+            var script = new Script(logger);
 
             foreach (var each in references)
                 script.AddReference(each);

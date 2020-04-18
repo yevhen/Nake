@@ -18,8 +18,6 @@ using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.CSharp.RuntimeBinder;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 
-using Nake.Utility;
-
 namespace Nake.Scripting
 {
     class Script
@@ -56,11 +54,13 @@ namespace Nake.Scripting
 
         static MetadataReference Reference(Type type) => MetadataReference.CreateFromFile(type.Assembly.Location);
 
+        readonly Logger logger;
         readonly HashSet<string> namespaces;
         readonly List<MetadataReference> references;
 
-        public Script()
+        public Script(Logger logger)
         {
+            this.logger = logger;
             namespaces = new HashSet<string>(DefaultNamespaces);
             references = new List<MetadataReference>(
                 NakeReferences.Concat(DefaultReferences.Select(x => x.Value)));
@@ -100,26 +100,7 @@ namespace Nake.Scripting
                 .Distinct()
                 .ToDictionary(Path.GetFileName);
 
-            var dependencyResolver = new CompilationDependencyResolver(t => (level, message, exception) =>
-            {
-                switch (level)
-                {
-                    case LogLevel.Trace:
-                    case LogLevel.Debug:
-                        Log.Trace(message);
-                        break;
-                    case LogLevel.Info:
-                    case LogLevel.Warning:
-                        Log.Info(message);
-                        break;
-                    case LogLevel.Error:
-                    case LogLevel.Critical:
-                        Log.Error(exception);
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(level), level, null);
-                }
-            });
+            var dependencyResolver = new CompilationDependencyResolver(t => logger);
 
             var dependencies = dependencyResolver.GetDependencies(
                 source.File.DirectoryName, 

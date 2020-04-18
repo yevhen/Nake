@@ -95,7 +95,7 @@ namespace Nake
 
         BuildResult Build(ScriptSource source, IEnumerable<TaskDeclaration> declarations)
         {
-            var engine = new Engine();
+            var engine = new Engine(DotnetScript.Logger());
 
             var scriptFile = new ScriptSource(source.Code, source.File);
 
