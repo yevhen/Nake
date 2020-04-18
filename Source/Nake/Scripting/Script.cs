@@ -56,13 +56,17 @@ namespace Nake.Scripting
 
         static MetadataReference Reference(Type type) => MetadataReference.CreateFromFile(type.Assembly.Location);
 
+        readonly bool useRestoreCache;
         readonly Logger logger;
+
         readonly HashSet<string> namespaces;
         readonly List<MetadataReference> references;
 
-        public Script(Logger logger)
+        public Script(bool useRestoreCache, Logger logger)
         {
+            this.useRestoreCache = useRestoreCache;
             this.logger = logger;
+
             namespaces = new HashSet<string>(DefaultNamespaces);
             references = new List<MetadataReference>(
                 NakeReferences.Concat(DefaultReferences.Select(x => x.Value)));
@@ -103,11 +107,13 @@ namespace Nake.Scripting
                 .ToDictionary(Path.GetFileName);
 
             var dependencyResolver = new CompilationDependencyResolver(t => logger);
-
-            var restorerField = dependencyResolver.GetType().GetField("_restorer", BindingFlags.Instance | BindingFlags.NonPublic);
-            // ReSharper disable once PossibleNullReferenceException
-            var currentRestorer = (IRestorer) restorerField.GetValue(dependencyResolver);
-            restorerField.SetValue(dependencyResolver, new CachedRestorer(currentRestorer, t => logger));
+            if (useRestoreCache)
+            {
+                var restorerField = dependencyResolver.GetType().GetField("_restorer", BindingFlags.Instance | BindingFlags.NonPublic);
+                // ReSharper disable once PossibleNullReferenceException
+                var currentRestorer = (IRestorer) restorerField.GetValue(dependencyResolver);
+                restorerField.SetValue(dependencyResolver, new CachedRestorer(currentRestorer, t => logger));
+            }
 
             var dependencies = dependencyResolver.GetDependencies(
                 source.File.DirectoryName, 

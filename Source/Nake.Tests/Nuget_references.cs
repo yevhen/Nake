@@ -1,6 +1,4 @@
-﻿using System.IO;
-
-using NUnit.Framework;
+﻿using NUnit.Framework;
 
 namespace Nake
 {
@@ -10,7 +8,7 @@ namespace Nake
         [Test]
         public void Nuget_references_are_resolved_via_dotnet_script()
         {
-            Build(@"
+            BuildFile(@"
                 
                 #r ""nuget: Streamstone, 2.3.0""
 
@@ -20,8 +18,7 @@ namespace Nake
                 {
                     Env.Var[""ResolvedShard""] = Shard.Resolve(""A"", 10).ToString();
                 }
-            ", 
-            scriptFile: Path.GetTempFileName());
+            ");
 
             Invoke("Test");
 

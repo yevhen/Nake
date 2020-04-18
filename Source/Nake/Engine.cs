@@ -16,14 +16,16 @@ namespace Nake
 {
     class Engine
     {
+        readonly bool useRestoreCache;
         readonly Logger logger;
         readonly IEnumerable<AssemblyReference> references;
         readonly IEnumerable<string> namespaces;
 
-        public Engine(Logger logger,
+        public Engine(bool useRestoreCache, Logger logger,
           IEnumerable<AssemblyReference> references = null,
           IEnumerable<string> namespaces = null)
         {
+            this.useRestoreCache = useRestoreCache;
             this.logger = logger;
             this.references = references ?? Enumerable.Empty<AssemblyReference>();
             this.namespaces = namespaces ?? Enumerable.Empty<string>();
@@ -37,7 +39,7 @@ namespace Nake
 
         CompiledScript Compile(ScriptSource source)
         {
-            var script = new Script(logger);
+            var script = new Script(useRestoreCache, logger);
 
             foreach (var each in references)
                 script.AddReference(each);

@@ -10,6 +10,20 @@ namespace Nake
 {
     using Scripting;
 
+    class BuildOptions
+    {
+        public readonly Dictionary<string, string> Substitutions;
+        public readonly FileInfo Script;
+        public readonly bool Cache;
+
+        public BuildOptions(Dictionary<string, string> substitutions = null, FileInfo script = null, bool cache = true)
+        {
+            Substitutions = substitutions;
+            Script = script;
+            Cache = cache;
+        }
+    }
+
     abstract class CodeFixture
     {
         [SetUp]
@@ -21,7 +35,21 @@ namespace Nake
         protected static void Invoke(string taskName, params TaskArgument[] args) => 
             TaskRegistry.InvokeTask(taskName, args).GetAwaiter().GetResult();
 
-        protected static string Build(string code, Dictionary<string, string> substitutions = null, string scriptFile = null)
+        protected static string Build(string code) => Build(new BuildOptions(), code);
+        
+        protected static FileInfo BuildFile(string code)
+        {
+            var path = TempFilePath();
+            Build(new BuildOptions(null, path), code);
+            return path;
+        }
+
+        protected static string BuildFile(FileInfo path, string code) => Build(new BuildOptions(null, path), code);
+        protected static string BuildFileNoCache(FileInfo path, string code) => Build(new BuildOptions(null, path, false), code);
+
+        protected static string Build(string code, Dictionary<string, string> substitutions) => Build(new BuildOptions(substitutions), code);
+
+        protected static string Build(BuildOptions options, string code)
         {
             var additionalReferences = new[]
             {
@@ -37,17 +65,18 @@ namespace Nake
                     output.Add(exception.StackTrace);
             }
 
-            var engine = new Engine(Logger, additionalReferences);
+            var engine = new Engine(options.Cache, Logger, additionalReferences);
             var source = new ScriptSource(code);
 
-            if (scriptFile != null)
+            if (options.Script != null)
             {
-                File.WriteAllText(scriptFile, code);
-                source = new ScriptSource(code, new FileInfo(scriptFile));
+                Directory.CreateDirectory(options.Script.DirectoryName);
+                File.WriteAllText(options.Script.FullName, code);
+                source = new ScriptSource(code, options.Script);
             }
 
             var result = engine.Build(source, 
-                substitutions ?? new Dictionary<string, string>(), false);
+                options.Substitutions ?? new Dictionary<string, string>(), false);
             
             TaskRegistry.Global = new TaskRegistry(result);
             
@@ -56,5 +85,11 @@ namespace Nake
 
         protected static IEnumerable<Task> Tasks => TaskRegistry.Global.Tasks;
         protected static Task Find(string taskName) => TaskRegistry.Global.FindTask(taskName);
+
+        protected static FileInfo TempFilePath()
+        {
+            var dir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+            return new FileInfo(Path.Combine(dir, $"{Guid.NewGuid():N}.tmp"));
+        }
     }
 }
