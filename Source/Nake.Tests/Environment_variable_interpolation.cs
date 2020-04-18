@@ -57,7 +57,7 @@ namespace Nake
 
                 Invoke("Interpolate");
 
-                Assert.That(Env.Var["Constant_NakeScriptDirectory"], Is.EqualTo(path));
+                Assert.That(Env.Var["Constant_NakeScriptDirectory"], Is.EqualTo(Path.GetDirectoryName(path)));
             }
 
             [Test]
@@ -191,7 +191,7 @@ namespace Nake
 
                 Invoke("Interpolate");
 
-                Assert.That(Env.Var["Runtime_NakeScriptDirectory"], Is.EqualTo(path));
+                Assert.That(Env.Var["Runtime_NakeScriptDirectory"], Is.EqualTo(Path.GetDirectoryName(path)));
             }
             
             [Test]
