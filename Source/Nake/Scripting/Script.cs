@@ -5,10 +5,12 @@ using System.ComponentModel;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Xml;
 using System.Xml.Linq;
 
 using Dotnet.Script.DependencyModel.Compilation;
+using Dotnet.Script.DependencyModel.Context;
 using Dotnet.Script.DependencyModel.Logging;
 using Dotnet.Script.DependencyModel.NuGet;
 
@@ -101,6 +103,11 @@ namespace Nake.Scripting
                 .ToDictionary(Path.GetFileName);
 
             var dependencyResolver = new CompilationDependencyResolver(t => logger);
+
+            var restorerField = dependencyResolver.GetType().GetField("_restorer", BindingFlags.Instance | BindingFlags.NonPublic);
+            // ReSharper disable once PossibleNullReferenceException
+            var currentRestorer = (IRestorer) restorerField.GetValue(dependencyResolver);
+            restorerField.SetValue(dependencyResolver, new CachedRestorer(currentRestorer, t => logger));
 
             var dependencies = dependencyResolver.GetDependencies(
                 source.File.DirectoryName, 
