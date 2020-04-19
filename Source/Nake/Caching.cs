@@ -48,19 +48,22 @@ namespace Nake
 
     class CacheKey
     {
-        static readonly string rootCacheFolder;
+        public static readonly string RootCacheFolder;
 
         static CacheKey()
         {
             var version = Assembly.GetExecutingAssembly().GetName().Version;
-            rootCacheFolder = Path.Combine(Path.GetTempPath(), "Nake." + version);
+            RootCacheFolder = Path.Combine(Path.GetTempPath(), "Nake." + version);
         }
+
+        public readonly string ScriptFolder;
+        public readonly string CompilationFolder;
 
         readonly SHA1 sha1 = SHA1.Create();
         readonly bool debug;
         readonly ScriptSource source;
         readonly IEnumerable<KeyValuePair<string, string>> substitutions;
-
+        
         public CacheKey(ScriptSource source, IEnumerable<KeyValuePair<string, string>> substitutions, bool debug)
         {
             Debug.Assert(source.IsFile);
@@ -69,15 +72,14 @@ namespace Nake
             this.debug = debug;
             this.substitutions = substitutions;
 
-            var scriptBaseFolder = Path.Combine(rootCacheFolder, StringHash(source.File.FullName));
-            CacheFolder = Path.Combine(scriptBaseFolder, ComputeScriptHash());
+            ScriptFolder = Path.Combine(RootCacheFolder, StringHash(source.File.FullName));
+            CompilationFolder = Path.Combine(ScriptFolder, ComputeScriptHash());
         }
 
-        string CacheFolder { get; }
-        string AssemblyFile => Path.Combine(CacheFolder, source.File.Name + ".dll");
-        string PdbFile => Path.Combine(CacheFolder, source.File.Name + ".pdb");
-        string ReferencesFile => Path.Combine(CacheFolder, "references");
-        string CapturedVariablesFile => Path.Combine(CacheFolder, "variables");
+        string AssemblyFile => Path.Combine(CompilationFolder, source.File.Name + ".dll");
+        string PdbFile => Path.Combine(CompilationFolder, source.File.Name + ".pdb");
+        string ReferencesFile => Path.Combine(CompilationFolder, "references");
+        string CapturedVariablesFile => Path.Combine(CompilationFolder, "variables");
         string ComputeScriptHash() => StringHash(source.Code + ToDeterministicString(substitutions) + debug);
 
         static string ToDeterministicString(IEnumerable<KeyValuePair<string, string>> substitutions) =>
@@ -97,7 +99,7 @@ namespace Nake
             // Workaround it by replacing dangerous character with '_' symbol.
             // It's used in some alternative Base64 implementations:
             // http://en.wikipedia.org/wiki/Base64#Variants_summary_table
-            return s.Replace(@"/", "_");
+            return s.Replace("/", "_").Replace("\\", "_").Replace("+", "_").Replace("=", "_");
         }
 
         public BuildResult Find(Task[] tasks)
@@ -152,7 +154,7 @@ namespace Nake
             WriteSymbols(result);
         }
 
-        void CreateCacheFolder() => Directory.CreateDirectory(CacheFolder);
+        void CreateCacheFolder() => Directory.CreateDirectory(CompilationFolder);
         void WriteReferences(BuildResult result) => File.WriteAllLines(ReferencesFile, result.References.Select(x => x.FullPath));
 
         void WriteVariables(BuildResult result)
@@ -180,8 +182,8 @@ namespace Nake
 
         public void Reset()
         {
-            if (Directory.Exists(CacheFolder))
-                Directory.Delete(CacheFolder, recursive: true);
+            if (Directory.Exists(CompilationFolder))
+                Directory.Delete(CompilationFolder, recursive: true);
         }
     }
 }

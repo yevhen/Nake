@@ -43,8 +43,11 @@ namespace Nake
         protected static string BuildFile(FileInfo path, string code) => 
             Build(new BuildOptions(null, path), code).Output;
 
-        protected static string BuildFileNoCache(FileInfo path, string code) => 
+        protected static string BuildFileNoRestoreCache(FileInfo path, string code) => 
             Build(new BuildOptions(null, path, false), code).Output;
+
+        protected static CacheKey BuildFileWithCompilationCache(FileInfo path, string code) => 
+            Build(new BuildOptions(null, path, true, true), code).Cached;
 
         protected static string Build(string code, Dictionary<string, string> substitutions) => 
             Build(new BuildOptions(substitutions), code).Output;
