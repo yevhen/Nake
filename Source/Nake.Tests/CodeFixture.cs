@@ -31,7 +31,7 @@ namespace Nake
         }
 
         protected static string Build(string code) => 
-            Build(new BuildOptions(), code);
+            Build(new BuildOptions(), code).Output;
         
         protected static FileInfo BuildFile(string code)
         {
@@ -41,15 +41,15 @@ namespace Nake
         }
 
         protected static string BuildFile(FileInfo path, string code) => 
-            Build(new BuildOptions(null, path), code);
+            Build(new BuildOptions(null, path), code).Output;
 
         protected static string BuildFileNoCache(FileInfo path, string code) => 
-            Build(new BuildOptions(null, path, false), code);
+            Build(new BuildOptions(null, path, false), code).Output;
 
         protected static string Build(string code, Dictionary<string, string> substitutions) => 
-            Build(new BuildOptions(substitutions), code);
+            Build(new BuildOptions(substitutions), code).Output;
 
-        protected static string Build(BuildOptions options, string code)
+        protected static BuildEffects Build(BuildOptions options, string code)
         {
             var additionalReferences = new[]
             {
@@ -80,7 +80,7 @@ namespace Nake
             
             TaskRegistry.Global = new TaskRegistry(result);
             
-            return string.Join(Environment.NewLine, output);
+            return new BuildEffects(string.Join(Environment.NewLine, output), null);
         }
 
         protected class BuildOptions
@@ -94,6 +94,18 @@ namespace Nake
                 Substitutions = substitutions;
                 Script = script;
                 Cache = cache;
+            }
+        }
+
+        protected class BuildEffects
+        {
+            public readonly string Output;
+            public readonly CacheKey Cached;
+
+            public BuildEffects(string output, CacheKey cached)
+            {
+                Output = output;
+                Cached = cached;
             }
         }
     }
