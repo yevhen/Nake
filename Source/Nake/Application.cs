@@ -95,19 +95,13 @@ namespace Nake
 
         BuildResult Build(ScriptSource source, IEnumerable<TaskDeclaration> declarations)
         {
-            var engine = new Engine(!options.ResetCache, DotnetScript.Logger());
-
             var scriptFile = new ScriptSource(source.Code, source.File);
+            var input = new BuildInput(scriptFile, VariableSubstitutions(), options.DebugScript);
 
-            var cachingEngine = new CachingEngine(
-                engine, scriptFile, declarations.Select(x => new Task(x)).ToArray(), options.ResetCache              
-            );
+            var builder = new BuildEngine(!options.ResetCache, DotnetScript.Logger());
+            var engine = new CachingBuildEngine(builder, Task.From(declarations), options.ResetCache);
 
-            var result = cachingEngine.Build(
-                VariableSubstitutions(), options.DebugScript
-            );
-
-            return result;
+            return engine.Build(input).result;
         }
 
         Dictionary<string, string> VariableSubstitutions() => 

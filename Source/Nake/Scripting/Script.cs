@@ -26,7 +26,7 @@ namespace Nake.Scripting
     {
         static readonly List<MetadataReference> NakeReferences = new List<MetadataReference>
         {
-            Reference(typeof(Engine)),
+            Reference(typeof(BuildEngine)),
         };
 
         static readonly Dictionary<string, MetadataReference> DefaultReferences = new Dictionary<string, MetadataReference>

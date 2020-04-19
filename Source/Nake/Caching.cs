@@ -12,36 +12,37 @@ using Nake.Scripting;
 
 namespace Nake
 {
-    class CachingEngine
+    class CachingBuildEngine
     {
-        readonly Engine engine;
-        readonly ScriptSource script;
+        readonly BuildEngine engine;
         readonly Task[] tasks;
         readonly bool reset;
 
-        public CachingEngine(Engine engine, ScriptSource script, Task[] tasks, bool reset)
+        public CachingBuildEngine(BuildEngine engine, Task[] tasks, bool reset)
         {
             this.engine = engine;
-            this.script = script;
             this.tasks = tasks;
             this.reset = reset;
         }
 
-        public BuildResult Build(IDictionary<string, string> substitutions, bool debug)
+        public (BuildResult result, CacheKey cached) Build(BuildInput input)
         {
-            var key = new CacheKey(script, substitutions, debug);
+            if (input.Script.File == null)
+                return (engine.Build(input), null);
+
+            var key = new CacheKey(input.Script, input.Substitutions, input.Debug);
 
             var cached = key.Find(tasks);
             if (cached != null && !reset)
-                return cached;
+                return (cached, key);
 
             if (reset)
                 key.Reset();
 
-            var output = engine.Build(script, substitutions, debug);
+            var output = engine.Build(input);
             key.Store(output);
 
-            return output;
+            return (output, key);
         }
     }
 
@@ -179,7 +180,8 @@ namespace Nake
 
         public void Reset()
         {
-            Directory.Delete(CacheFolder, recursive: true);
+            if (Directory.Exists(CacheFolder))
+                Directory.Delete(CacheFolder, recursive: true);
         }
     }
 }

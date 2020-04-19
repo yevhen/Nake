@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 
 using Dotnet.Script.DependencyModel.Logging;
-
 using NUnit.Framework;
 
 namespace Nake
 {
+    using Magic;
     using Scripting;
 
     abstract class CodeFixture
@@ -51,6 +51,8 @@ namespace Nake
 
         protected static BuildEffects Build(BuildOptions options, string code)
         {
+            var source = options.Source(code);
+
             var additionalReferences = new[]
             {
                 new AssemblyReference(typeof(StepAttribute).Assembly.Location),
@@ -65,35 +67,41 @@ namespace Nake
                     output.Add(exception.StackTrace);
             }
 
-            var engine = new Engine(options.Cache, Logger, additionalReferences);
-            var source = new ScriptSource(code);
-
-            if (options.Script != null)
-            {
-                Directory.CreateDirectory(options.Script.DirectoryName);
-                File.WriteAllText(options.Script.FullName, code);
-                source = new ScriptSource(code, options.Script);
-            }
-
-            var result = engine.Build(source, 
-                options.Substitutions ?? new Dictionary<string, string>(), false);
+            var declarations = TaskDeclarationScanner.Scan(source);
+            var builder = new BuildEngine(options.RestoreCache, Logger, additionalReferences);
+            var engine = new CachingBuildEngine(builder, Task.From(declarations), !options.CompilationCache);
+            var input = new BuildInput(source, options.Substitutions, false);
             
+            var (result, cached) = engine.Build(input);
             TaskRegistry.Global = new TaskRegistry(result);
-            
-            return new BuildEffects(string.Join(Environment.NewLine, output), null);
+
+            return new BuildEffects(string.Join(Environment.NewLine, output), cached);
         }
 
         protected class BuildOptions
         {
             public readonly Dictionary<string, string> Substitutions;
             public readonly FileInfo Script;
-            public readonly bool Cache;
+            public readonly bool RestoreCache;
+            public readonly bool CompilationCache;
 
-            public BuildOptions(Dictionary<string, string> substitutions = null, FileInfo script = null, bool cache = true)
+            public BuildOptions(Dictionary<string, string> substitutions = null, FileInfo script = null, bool restoreCache = true, bool compilationCache = false)
             {
-                Substitutions = substitutions;
+                Substitutions = substitutions ?? new Dictionary<string, string>();
+                CompilationCache = compilationCache;
                 Script = script;
-                Cache = cache;
+                RestoreCache = restoreCache;
+            }
+
+            public ScriptSource Source(string code)
+            {
+                if (Script == null)
+                    return new ScriptSource(code);
+
+                Directory.CreateDirectory(Script.DirectoryName);
+                File.WriteAllText(Script.FullName, code);
+
+                return new ScriptSource(code, Script);
             }
         }
 
