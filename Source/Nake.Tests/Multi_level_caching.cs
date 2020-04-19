@@ -14,21 +14,21 @@ namespace Nake
 
                 var output = BuildFile(path, @"                
 
-                #r ""nuget: Streamstone, 2.3.0""
-                using Streamstone;
+                    #r ""nuget: Streamstone, 2.3.0""
+                    using Streamstone;
 
-                [Nake] void Test() => Env.Var[""ResolvedShard""] = Shard.Resolve(""A"", 10).ToString();
-            ");
+                    [Nake] void Test() => Env.Var[""ResolvedShard""] = Shard.Resolve(""A"", 10).ToString();
+                ");
 
                 Assert.That(output, Contains.Substring("dotnet restore"));
 
                 output = BuildFile(path, @"                
 
-                #r ""nuget: Streamstone, 2.3.0""
-                using Streamstone;
+                    #r ""nuget: Streamstone, 2.3.0""
+                    using Streamstone;
 
-                [Nake] void Test() => Env.Var[""ResolvedShard""] = Shard.Resolve(""B"", 10).ToString();
-            ");
+                    [Nake] void Test() => Env.Var[""ResolvedShard""] = Shard.Resolve(""B"", 10).ToString();
+                ");
 
                 Assert.That(output, !Contains.Substring("dotnet restore"));
             }
@@ -40,21 +40,21 @@ namespace Nake
 
                 var output = BuildFileNoCache(path, @"                
 
-                #r ""nuget: Streamstone, 2.3.0""
-                using Streamstone;
+                    #r ""nuget: Streamstone, 2.3.0""
+                    using Streamstone;
 
-                [Nake] void Test() => Env.Var[""ResolvedShard""] = Shard.Resolve(""A"", 10).ToString();
-            ");
+                    [Nake] void Test() => Env.Var[""ResolvedShard""] = Shard.Resolve(""A"", 10).ToString();
+                ");
 
                 Assert.That(output, Contains.Substring("dotnet restore"));
 
                 output = BuildFileNoCache(path, @"                
 
-                #r ""nuget: Streamstone, 2.3.0""
-                using Streamstone;
+                    #r ""nuget: Streamstone, 2.3.0""
+                    using Streamstone;
 
-                [Nake] void Test() => Env.Var[""ResolvedShard""] = Shard.Resolve(""B"", 10).ToString();
-            ");
+                    [Nake] void Test() => Env.Var[""ResolvedShard""] = Shard.Resolve(""B"", 10).ToString();
+                ");
 
                 Assert.That(output, Contains.Substring("dotnet restore"));
             }
