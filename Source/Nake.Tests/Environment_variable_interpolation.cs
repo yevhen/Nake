@@ -44,6 +44,7 @@ namespace Nake
             }
 
             [Test]
+            [Category("Slow")]
             public void NakeScriptDirectory_inlined_at_compile_time()
             {
                 var path = BuildFile(@"                
@@ -172,6 +173,7 @@ namespace Nake
             }
 
             [Test]
+            [Category("Slow")]
             public void NakeScriptDirectory_inlined_at_compile_time()
             {
                 var path = BuildFile(@"                

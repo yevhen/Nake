@@ -6,6 +6,7 @@ namespace Nake
     class Nuget_references : CodeFixture
     {
         [Test]
+        [Category("Slow")]
         public void Nuget_references_are_resolved_via_dotnet_script()
         {
             BuildFile(@"

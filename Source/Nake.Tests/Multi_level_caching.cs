@@ -6,7 +6,7 @@ using NUnit.Framework;
 
 namespace Nake
 {
-    [TestFixture]
+    [TestFixture(Category = "Slow")]
     class Multi_level_caching : CodeFixture
     {
         class Restore_dependencies
@@ -17,6 +17,7 @@ namespace Nake
             public void SetUp() => path = TempFilePath();
 
             [Test]
+            [Category("Slow")]
             public void Does_not_run_restore_when_no_dependencies_were_changed()
             {
                 var output = BuildFile(path, @"                
