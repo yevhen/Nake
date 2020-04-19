@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 using NUnit.Framework;
@@ -45,16 +46,15 @@ namespace Nake
             [Test]
             public void NakeScriptDirectory_inlined_at_compile_time()
             {
-                var path = Build(@"                
+                var path = BuildFile(@"                
                     const string inlined = ""%NakeScriptDirectory%"";
 
                     [Nake] void Interpolate() => Env.Var[""Constant_NakeScriptDirectory""] = inlined;                    
-                ", 
-                createScriptFile: true);
+                ");
 
                 Invoke("Interpolate");
 
-                Assert.That(Env.Var["Constant_NakeScriptDirectory"], Is.EqualTo(Path.GetDirectoryName(path)));
+                Assert.That(Env.Var["Constant_NakeScriptDirectory"], Is.EqualTo(path.DirectoryName));
             }
 
             [Test]
@@ -174,19 +174,18 @@ namespace Nake
             [Test]
             public void NakeScriptDirectory_inlined_at_compile_time()
             {
-                var path = Build(@"                
+                var path = BuildFile(@"                
 
                     [Nake] void Interpolate() 
                     { 
                         var inlined = ""%NakeScriptDirectory%"";                    
                         Env.Var[""Runtime_NakeScriptDirectory""] = inlined;
                     }
-                ", 
-                createScriptFile: true);
+                ");
 
                 Invoke("Interpolate");
 
-                Assert.That(Env.Var["Runtime_NakeScriptDirectory"], Is.EqualTo(Path.GetDirectoryName(path)));
+                Assert.That(Env.Var["Runtime_NakeScriptDirectory"], Is.EqualTo(path.DirectoryName));
             }
             
             [Test]

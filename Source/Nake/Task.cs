@@ -16,6 +16,9 @@ namespace Nake
 
     class Task
     {
+        public static Task[] From(IEnumerable<TaskDeclaration> declarations) => 
+            declarations.Select(x => new Task(x)).ToArray();
+
         internal const string ScriptClass = "Submission#0";
         const string SystemThreadingTaskType = "System.Threading.Tasks.Task";
 

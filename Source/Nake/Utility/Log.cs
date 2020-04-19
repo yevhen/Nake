@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
+
 using static System.Environment;
 
-namespace Nake
+namespace Nake.Utility
 {
     /// <summary>
     /// Shortcut methods for outputting messages to std out
@@ -19,6 +21,9 @@ namespace Nake
         static readonly bool QuietMode = GetEnvironmentVariable("NakeQuietMode") != null;
         static readonly bool SilentMode = GetEnvironmentVariable("NakeSilentMode") != null;
         static readonly bool TraceEnabled = GetEnvironmentVariable("NakeTraceEnabled") != null;
+
+        public static void EnableTrace() => SetEnvironmentVariable("NakeTraceEnabled", "true");
+        public static void DisableTrace() => SetEnvironmentVariable("NakeTraceEnabled", null);
 
         /// <summary>
         /// Prints trace-level message using specified format string and arguments. The message will be printed in DarkGreen color.

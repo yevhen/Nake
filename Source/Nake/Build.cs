@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
+using Dotnet.Script.DependencyModel.Logging;
+
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Emit;
 
@@ -12,28 +14,48 @@ using Nake.Scripting;
 
 namespace Nake
 {
-    class Engine
+    class BuildInput
     {
+        public BuildInput(ScriptSource script, IDictionary<string, string> substitutions, bool debug)
+        {
+            Script = script;
+            Substitutions = substitutions;
+            Debug = debug;
+        }
+
+        public ScriptSource Script { get; }
+        public IDictionary<string, string> Substitutions { get; }
+        public bool Debug { get; }
+    }
+
+    class BuildEngine
+    {
+        readonly bool useRestoreCache;
+        readonly Logger logger;
         readonly IEnumerable<AssemblyReference> references;
         readonly IEnumerable<string> namespaces;
 
-        public Engine(
+        public BuildEngine(
+            bool useRestoreCache, 
+            Logger logger,
             IEnumerable<AssemblyReference> references = null,
             IEnumerable<string> namespaces = null)
         {
+            this.useRestoreCache = useRestoreCache;
+            this.logger = logger;
             this.references = references ?? Enumerable.Empty<AssemblyReference>();
             this.namespaces = namespaces ?? Enumerable.Empty<string>();
         }
 
-        public BuildResult Build(ScriptSource source, IDictionary<string, string> substitutions, bool debug)
+        public BuildResult Build(BuildInput input)
         {
-            var magic = new PixieDust(Compile(source));
-            return magic.Apply(substitutions, debug);
+            var magic = new PixieDust(Compile(input.Script));
+            return magic.Apply(input.Substitutions, input.Debug);
         }
 
         CompiledScript Compile(ScriptSource source)
         {
-            var script = new Script();
+            var script = new Script(useRestoreCache, logger);
 
             foreach (var each in references)
                 script.AddReference(each);

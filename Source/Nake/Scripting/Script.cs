@@ -5,10 +5,13 @@ using System.ComponentModel;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Xml;
 using System.Xml.Linq;
 
 using Dotnet.Script.DependencyModel.Compilation;
+using Dotnet.Script.DependencyModel.Context;
+using Dotnet.Script.DependencyModel.Logging;
 using Dotnet.Script.DependencyModel.NuGet;
 
 using Microsoft.CodeAnalysis;
@@ -23,7 +26,7 @@ namespace Nake.Scripting
     {
         static readonly List<MetadataReference> NakeReferences = new List<MetadataReference>
         {
-            Reference(typeof(Engine)),
+            Reference(typeof(BuildEngine)),
         };
 
         static readonly Dictionary<string, MetadataReference> DefaultReferences = new Dictionary<string, MetadataReference>
@@ -53,11 +56,17 @@ namespace Nake.Scripting
 
         static MetadataReference Reference(Type type) => MetadataReference.CreateFromFile(type.Assembly.Location);
 
+        readonly bool useRestoreCache;
+        readonly Logger logger;
+
         readonly HashSet<string> namespaces;
         readonly List<MetadataReference> references;
 
-        public Script()
+        public Script(bool useRestoreCache, Logger logger)
         {
+            this.useRestoreCache = useRestoreCache;
+            this.logger = logger;
+
             namespaces = new HashSet<string>(DefaultNamespaces);
             references = new List<MetadataReference>(
                 NakeReferences.Concat(DefaultReferences.Select(x => x.Value)));
@@ -97,7 +106,15 @@ namespace Nake.Scripting
                 .Distinct()
                 .ToDictionary(Path.GetFileName);
 
-            var dependencyResolver = new CompilationDependencyResolver(t => (l, m, e) => Log.Out(m));
+            var dependencyResolver = new CompilationDependencyResolver(t => logger);
+            if (useRestoreCache)
+            {
+                var restorerField = dependencyResolver.GetType().GetField("_restorer", BindingFlags.Instance | BindingFlags.NonPublic);
+                // ReSharper disable once PossibleNullReferenceException
+                var currentRestorer = (IRestorer) restorerField.GetValue(dependencyResolver);
+                restorerField.SetValue(dependencyResolver, new CachedRestorer(currentRestorer, t => logger));
+            }
+
             var dependencies = dependencyResolver.GetDependencies(
                 source.File.DirectoryName, 
                 source.AllFiles().Select(x => x.File.ToString()), 
