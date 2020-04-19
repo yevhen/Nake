@@ -10,20 +10,6 @@ namespace Nake
 {
     using Scripting;
 
-    class BuildOptions
-    {
-        public readonly Dictionary<string, string> Substitutions;
-        public readonly FileInfo Script;
-        public readonly bool Cache;
-
-        public BuildOptions(Dictionary<string, string> substitutions = null, FileInfo script = null, bool cache = true)
-        {
-            Substitutions = substitutions;
-            Script = script;
-            Cache = cache;
-        }
-    }
-
     abstract class CodeFixture
     {
         [SetUp]
@@ -35,7 +21,17 @@ namespace Nake
         protected static void Invoke(string taskName, params TaskArgument[] args) => 
             TaskRegistry.InvokeTask(taskName, args).GetAwaiter().GetResult();
 
-        protected static string Build(string code) => Build(new BuildOptions(), code);
+        protected static IEnumerable<Task> Tasks => TaskRegistry.Global.Tasks;
+        protected static Task Find(string taskName) => TaskRegistry.Global.FindTask(taskName);
+
+        protected static FileInfo TempFilePath()
+        {
+            var dir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+            return new FileInfo(Path.Combine(dir, $"{Guid.NewGuid():N}.tmp"));
+        }
+
+        protected static string Build(string code) => 
+            Build(new BuildOptions(), code);
         
         protected static FileInfo BuildFile(string code)
         {
@@ -44,10 +40,14 @@ namespace Nake
             return path;
         }
 
-        protected static string BuildFile(FileInfo path, string code) => Build(new BuildOptions(null, path), code);
-        protected static string BuildFileNoCache(FileInfo path, string code) => Build(new BuildOptions(null, path, false), code);
+        protected static string BuildFile(FileInfo path, string code) => 
+            Build(new BuildOptions(null, path), code);
 
-        protected static string Build(string code, Dictionary<string, string> substitutions) => Build(new BuildOptions(substitutions), code);
+        protected static string BuildFileNoCache(FileInfo path, string code) => 
+            Build(new BuildOptions(null, path, false), code);
+
+        protected static string Build(string code, Dictionary<string, string> substitutions) => 
+            Build(new BuildOptions(substitutions), code);
 
         protected static string Build(BuildOptions options, string code)
         {
@@ -83,13 +83,18 @@ namespace Nake
             return string.Join(Environment.NewLine, output);
         }
 
-        protected static IEnumerable<Task> Tasks => TaskRegistry.Global.Tasks;
-        protected static Task Find(string taskName) => TaskRegistry.Global.FindTask(taskName);
-
-        protected static FileInfo TempFilePath()
+        protected class BuildOptions
         {
-            var dir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
-            return new FileInfo(Path.Combine(dir, $"{Guid.NewGuid():N}.tmp"));
+            public readonly Dictionary<string, string> Substitutions;
+            public readonly FileInfo Script;
+            public readonly bool Cache;
+
+            public BuildOptions(Dictionary<string, string> substitutions = null, FileInfo script = null, bool cache = true)
+            {
+                Substitutions = substitutions;
+                Script = script;
+                Cache = cache;
+            }
         }
     }
 }
