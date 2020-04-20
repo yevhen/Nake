@@ -129,6 +129,7 @@ namespace Nake.Scripting
                 AddReference(each);
         }
 
+        public void AddReference(AssemblyReference reference) => AddReference(reference.FullPath);
         public void AddReference(string path) => AddReference(MetadataReference.CreateFromFile(path));
         
         void AddReference(MetadataReference reference)

@@ -139,7 +139,7 @@ namespace Nake
     class BuildResult
     {
         public readonly Task[] Tasks;
-        public readonly Scripting.AssemblyReference[] References;
+        public readonly AssemblyReference[] References;
         public readonly EnvironmentVariable[] Variables;
         public readonly Assembly Assembly;
         public readonly byte[] AssemblyBytes;
@@ -147,7 +147,7 @@ namespace Nake
 
         public BuildResult(
             Task[] tasks,
-            Scripting.AssemblyReference[] references,
+            AssemblyReference[] references,
             EnvironmentVariable[] variables,
             byte[] assembly,
             byte[] symbols)
@@ -178,27 +178,5 @@ namespace Nake
             foreach (var task in Tasks)
                 task.Reflect(Assembly);
         }
-    }
-
-    struct AssemblyReference : IEquatable<AssemblyReference>
-    {
-        public readonly string AssemblyName;
-
-        public AssemblyReference(string path) => 
-            AssemblyName = path;
-
-        public bool Equals(AssemblyReference other) => string.Equals(AssemblyName, other.AssemblyName);
-
-        public override bool Equals(object obj) => 
-            !ReferenceEquals(null, obj) && 
-            obj is AssemblyReference reference && Equals(reference);
-
-        public override int GetHashCode() => AssemblyName.GetHashCode();
-        public override string ToString() => AssemblyName;
-
-        public static bool operator ==(AssemblyReference left, AssemblyReference right) => left.Equals(right);
-        public static bool operator !=(AssemblyReference left, AssemblyReference right) => !left.Equals(right);
-
-        public static implicit operator string(AssemblyReference obj) => obj.AssemblyName;
     }
 }
