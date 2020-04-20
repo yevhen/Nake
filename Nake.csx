@@ -70,7 +70,7 @@ MakeDir(ArtifactsPath);
         $@"[assembly:System.Reflection.AssemblyInformationalVersion(""{Version}"")]");
 
     await $"dotnet pack -c Release -p:PackageVersion={Version} Nake.sln";
-    await $"git checkout {versionFile}"
+    await $"git checkout {versionFile}";
 }
 
 /// Publishes package to NuGet gallery
