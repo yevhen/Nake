@@ -42,8 +42,8 @@ namespace Nake
                 SetTrace();
 
             var file = Find();
-            var script = Parse(file);
-            var declarations = Scan(script);
+            var source = Parse(file);
+            var declarations = Scan(source);
 
             if (options.ShowTasks)
                 ShowTasks(declarations);
@@ -51,7 +51,7 @@ namespace Nake
             OverrideEnvironmentVariables();
             DefineNakeEnvironmentVariables();
 
-            await Invoke(script, declarations);
+            await Invoke(source, declarations);
         }
 
         void SetCurrentDirectory()
@@ -96,8 +96,7 @@ namespace Nake
 
         BuildResult Build(ScriptSource source, IEnumerable<TaskDeclaration> declarations)
         {
-            var scriptFile = new ScriptSource(source.Code, source.File);
-            var input = new BuildInput(scriptFile, VariableSubstitutions(), options.DebugScript);
+            var input = new BuildInput(source, VariableSubstitutions(), options.DebugScript);
 
             var engine = new CachingBuildEngine(
                 new BuildEngine(), 

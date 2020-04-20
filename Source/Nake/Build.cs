@@ -15,22 +15,22 @@ namespace Nake
     {
         AssemblyReference[] cached;
 
-        public readonly ScriptSource Script;
+        public readonly ScriptSource Source;
         public readonly IDictionary<string, string> Substitutions;
         public readonly bool Debug;
 
-        public BuildInput(ScriptSource script, IDictionary<string, string> substitutions, bool debug)
+        public BuildInput(ScriptSource source, IDictionary<string, string> substitutions, bool debug)
         {
-            Script = script;
+            Source = source;
             Substitutions = substitutions;
             Debug = debug;
         }
 
         public BuildInput WithCached(AssemblyReference[] dependencies) => 
-            new BuildInput(Script, Substitutions, Debug) {cached = dependencies};
+            new BuildInput(Source, Substitutions, Debug) {cached = dependencies};
 
         public IEnumerable<AssemblyReference> Dependencies() => 
-            Script.ComputeDependencies(cached);
+            Source.ComputeDependencies(cached);
     }
 
     class BuildEngine
@@ -48,7 +48,7 @@ namespace Nake
 
         public BuildResult Build(BuildInput input)
         {
-            var magic = new PixieDust(Compile(input.Script, input.Dependencies()));
+            var magic = new PixieDust(Compile(input.Source, input.Dependencies()));
             return magic.Apply(input.Substitutions, input.Debug);
         }
 

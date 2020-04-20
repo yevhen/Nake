@@ -25,9 +25,9 @@ namespace Nake
             this.reset = reset;
         }
 
-        public (BuildResult result, CacheKey cached) Build(BuildInput input)
+        public (BuildResult result, CacheKey cache) Build(BuildInput input)
         {
-            if (!input.Script.IsFile)
+            if (!input.Source.IsFile)
                 return (engine.Build(input), null);
 
             var cache = new CacheKey(input);
@@ -72,9 +72,9 @@ namespace Nake
         
         public CacheKey(BuildInput input)
         {
-            Debug.Assert(input.Script.IsFile);
+            Debug.Assert(input.Source.IsFile);
 
-            source = input.Script;
+            source = input.Source;
             debug = input.Debug;
             substitutions = input.Substitutions;
 
