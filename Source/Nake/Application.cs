@@ -99,8 +99,10 @@ namespace Nake
             var scriptFile = new ScriptSource(source.Code, source.File);
             var input = new BuildInput(scriptFile, VariableSubstitutions(), options.DebugScript);
 
-            var builder = new BuildEngine(DotnetScript.Logger());
-            var engine = new CachingBuildEngine(builder, Task.From(declarations), options.ResetCache);
+            var engine = new CachingBuildEngine(
+                new BuildEngine(), 
+                Task.From(declarations), 
+                options.ResetCache);
 
             return engine.Build(input).result;
         }

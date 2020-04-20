@@ -1,10 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-
-using Dotnet.Script.DependencyModel.Logging;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Emit;
@@ -16,6 +13,8 @@ namespace Nake
 {
     class BuildInput
     {
+        AssemblyReference[] cached;
+
         public readonly ScriptSource Script;
         public readonly IDictionary<string, string> Substitutions;
         public readonly bool Debug;
@@ -27,45 +26,43 @@ namespace Nake
             Debug = debug;
         }
 
-        public void Include(AssemblyReference[] dependencies) => 
-            Dependencies = dependencies;
+        public BuildInput WithCached(AssemblyReference[] dependencies) => 
+            new BuildInput(Script, Substitutions, Debug) {cached = dependencies};
 
-        public AssemblyReference[] Dependencies { get; private set; }
+        public IEnumerable<AssemblyReference> Dependencies() => 
+            Script.ComputeDependencies(cached);
     }
 
     class BuildEngine
     {
-        readonly Logger logger;
         readonly IEnumerable<AssemblyReference> references;
         readonly IEnumerable<string> namespaces;
 
         public BuildEngine(
-            Logger logger,
             IEnumerable<AssemblyReference> references = null,
             IEnumerable<string> namespaces = null)
         {
-            this.logger = logger;
             this.references = references ?? Enumerable.Empty<AssemblyReference>();
             this.namespaces = namespaces ?? Enumerable.Empty<string>();
         }
 
         public BuildResult Build(BuildInput input)
         {
-            var magic = new PixieDust(Compile(input.Script, input.Dependencies));
+            var magic = new PixieDust(Compile(input.Script, input.Dependencies()));
             return magic.Apply(input.Substitutions, input.Debug);
         }
 
-        CompiledScript Compile(ScriptSource source, AssemblyReference[] dependencies)
+        CompiledScript Compile(ScriptSource source, IEnumerable<AssemblyReference> dependencies)
         {
-            var script = new Script(logger);
+            var script = new Script();
 
-            foreach (var each in references)
+            foreach (var each in dependencies.Concat(references))
                 script.AddReference(each);
 
             foreach (var each in namespaces)
                 script.ImportNamespace(each);
 
-            return script.Compile(source, dependencies);
+            return script.Compile(source);
         }
     }
 

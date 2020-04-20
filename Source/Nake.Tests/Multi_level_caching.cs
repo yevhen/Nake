@@ -88,13 +88,13 @@ namespace Nake
                     [Nake] void Test(){}
                 ");
 
-                var assert = new CacheAssert(firstRun.Cached);
+                var assert = new CacheAssert(firstRun.Cache);
 
                 var nextRun = BuildFileWithCompilationCache(path, @"                
                     [Nake] void Test(){}
                 ");
 
-                assert.SameCompilation(nextRun.Cached);
+                assert.SameCompilation(nextRun.Cache);
             }
 
             class CacheAssert

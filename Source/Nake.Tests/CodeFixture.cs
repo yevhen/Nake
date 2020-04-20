@@ -51,15 +51,8 @@ namespace Nake
 
         protected static BuildEffects Build(BuildOptions options, string code)
         {
-            var source = options.Source(code);
-
-            var additionalReferences = new[]
-            {
-                new AssemblyReference(typeof(StepAttribute).Assembly.Location),
-                new AssemblyReference(typeof(Env).Assembly.Location)
-            };
-
             var output = new List<string>();
+
             void Logger(LogLevel level, string message, Exception exception)
             {
                 output.Add(message);
@@ -67,8 +60,16 @@ namespace Nake
                     output.Add(exception.StackTrace);
             }
 
+            var source = options.Source(code, Logger);
+
+            var additionalReferences = new[]
+            {
+                new AssemblyReference(typeof(StepAttribute).Assembly.Location),
+                new AssemblyReference(typeof(Env).Assembly.Location)
+            };
+
             var declarations = TaskDeclarationScanner.Scan(source);
-            var builder = new BuildEngine(Logger, additionalReferences);
+            var builder = new BuildEngine(additionalReferences);
             var engine = new CachingBuildEngine(builder, Task.From(declarations), options.ResetCache);
             var input = new BuildInput(source, options.Substitutions, false);
             
@@ -91,7 +92,7 @@ namespace Nake
                 ResetCache = resetCache;
             }
 
-            public ScriptSource Source(string code)
+            public ScriptSource Source(string code, Logger log = null)
             {
                 if (Script == null)
                     return new ScriptSource(code);
@@ -99,25 +100,25 @@ namespace Nake
                 Directory.CreateDirectory(Script.DirectoryName);
                 File.WriteAllText(Script.FullName, code);
 
-                return new ScriptSource(code, Script);
+                return new ScriptSource(code, Script, log);
             }
         }
 
         protected class BuildEffects
         {
-            public void Deconstruct(out string output, out CacheKey cached)
+            public void Deconstruct(out string output, out CacheKey cache)
             {
                 output = Output;
-                cached = Cached;
+                cache = Cache;
             }
 
             public readonly string Output;
-            public readonly CacheKey Cached;
+            public readonly CacheKey Cache;
 
-            public BuildEffects(string output, CacheKey cached)
+            public BuildEffects(string output, CacheKey cache)
             {
                 Output = output;
-                Cached = cached;
+                Cache = cache;
             }
         }
     }

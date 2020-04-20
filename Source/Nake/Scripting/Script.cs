@@ -2,13 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 
-using Dotnet.Script.DependencyModel.Compilation;
-using Dotnet.Script.DependencyModel.Logging;
 using Dotnet.Script.DependencyModel.NuGet;
 
 using Microsoft.CodeAnalysis;
@@ -53,29 +50,20 @@ namespace Nake.Scripting
 
         static MetadataReference Reference(Type type) => MetadataReference.CreateFromFile(type.Assembly.Location);
 
-        readonly Logger logger;
         readonly HashSet<string> namespaces;
         readonly List<MetadataReference> references;
 
-        public Script(Logger logger)
+        public Script()
         {
-            this.logger = logger;
             namespaces = new HashSet<string>(DefaultNamespaces);
             references = new List<MetadataReference>(NakeReferences.Concat(DefaultReferences.Select(x => x.Value)));
         }
 
-        public CompiledScript Compile(ScriptSource source, AssemblyReference[] dependencies)
+        public CompiledScript Compile(ScriptSource source)
         {
-            if (dependencies == null && source.IsFile)
-                dependencies = CompilationDependencies(source);
-
-            if (dependencies != null)
-                foreach (var each in dependencies)
-                    AddReference(each);
-
             var options = ScriptOptions.Default
                 .AddImports(namespaces)
-                .AddReferences(references)
+                .AddReferences(this.references)
                 .WithMetadataResolver(new NuGetMetadataReferenceResolver(ScriptOptions.Default.MetadataResolver));
 
             if (source.IsFile)
@@ -91,29 +79,7 @@ namespace Nake.Scripting
             if (errors.Any())   
                 throw new ScriptCompilationException(errors);
 
-            return new CompiledScript(references.Select(x => new AssemblyReference(x)), compilation);
-        }
-
-        AssemblyReference[] CompilationDependencies(ScriptSource source)
-        {
-            logger.Debug("Computing compilation dependencies");
-
-            var loaded = AppDomain.CurrentDomain.GetAssemblies()
-                .Where(a => !a.IsDynamic)
-                .Select(a => a.Location)
-                .Distinct()
-                .ToDictionary(Path.GetFileName);
-
-            var dependencyResolver = new CompilationDependencyResolver(t => logger);
-            var dependencies = dependencyResolver.GetDependencies(
-                source.File.DirectoryName, 
-                source.AllFiles().Select(x => x.File.ToString()), 
-                true, "netcoreapp3.1");
-
-            return dependencies
-                .SelectMany(d => d.AssemblyPaths)
-                .Select(l => new AssemblyReference(loaded.TryGetValue(Path.GetFileName(l), out var e) ? e : l))
-                .ToArray();
+            return new CompiledScript(this.references.Select(x => new AssemblyReference(x)), compilation);
         }
 
         public void AddReference(AssemblyReference reference) => AddReference(reference.FullPath);

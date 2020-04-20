@@ -8,10 +8,6 @@ using System.Security.Cryptography;
 using System.Text;
 using static System.Environment;
 
-using Dotnet.Script.DependencyModel.ProjectSystem;
-
-using Nake.Utility;
-
 namespace Nake
 {
     using Scripting;
@@ -31,35 +27,27 @@ namespace Nake
 
         public (BuildResult result, CacheKey cached) Build(BuildInput input)
         {
-            if (input.Script.File == null)
+            if (!input.Script.IsFile)
                 return (engine.Build(input), null);
 
-            var key = new CacheKey(input.Script, input.Substitutions, input.Debug);
+            var cache = new CacheKey(input);
             if (reset)
-                key.Reset();
+                cache.Reset();
 
-            AssemblyReference[] dependencies = null;
-            if (!reset)
-            {
-                dependencies = key.FindDependencies();
-                if (dependencies != null)
-                {
-                    var compilation = key.FindCompilation(tasks, dependencies);
-                    if (compilation != null)
-                        return (compilation, key);
-                }
-            }
-
+            var dependencies = cache.FindDependencies();
             if (dependencies != null)
             {
-                Log.Trace("Reusing compilation dependencies from previous build");
-                input.Include(dependencies);
+                input = input.WithCached(dependencies);
+
+                var compilation = cache.FindCompilation(tasks, dependencies);
+                if (compilation != null)
+                    return (compilation, cache);
             }
 
             var output = engine.Build(input);
-            key.Store(output);
+            cache.Store(output);
 
-            return (output, key);
+            return (output, cache);
         }
     }
 
@@ -82,13 +70,13 @@ namespace Nake
         readonly ScriptSource source;
         readonly IEnumerable<KeyValuePair<string, string>> substitutions;
         
-        public CacheKey(ScriptSource source, IEnumerable<KeyValuePair<string, string>> substitutions, bool debug)
+        public CacheKey(BuildInput input)
         {
-            Debug.Assert(source.IsFile);
+            Debug.Assert(input.Script.IsFile);
 
-            this.source = source;
-            this.debug = debug;
-            this.substitutions = substitutions;
+            source = input.Script;
+            debug = input.Debug;
+            substitutions = input.Substitutions;
 
             ScriptFolder = Path.Combine(RootCacheFolder, StringHash(source.File.FullName));
             ProjectFolder = Path.Combine(ScriptFolder, ComputeProjectHash());
@@ -102,16 +90,7 @@ namespace Nake
         string CapturedVariablesFile => Path.Combine(CompilationFolder, "variables");
         
         string ComputeCompilationHash() => StringHash(source.Code + ToDeterministicString(substitutions) + debug);
-        string ComputeProjectHash() => StringHash(ProjectFileContents(source));
-
-        static string ProjectFileContents(ScriptSource source)
-        {
-            var provider = new ScriptProjectProvider(_ => DotnetScript.Logger());
-            var scriptFiles = source.AllFiles().Select(x => x.File.ToString());
-            var targetDirectory = source.File.DirectoryName;
-            var project = provider.CreateProject(targetDirectory, scriptFiles, "netcoreapp3.1", true);
-            return File.ReadAllText(project.Path);
-        }
+        string ComputeProjectHash() => StringHash(source.ProjectFileContents());
 
         static string ToDeterministicString(IEnumerable<KeyValuePair<string, string>> substitutions) =>
             string.Join("", substitutions
