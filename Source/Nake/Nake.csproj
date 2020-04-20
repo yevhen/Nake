@@ -9,9 +9,9 @@
     <ToolCommandName>nake</ToolCommandName>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)'=='Release'">
-    <DocumentationFile>bin\Release\Nake.xml</DocumentationFile>
-  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\AssemblyVersion.cs" Link="Properties\AssemblyVersion.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="$(MicrosoftCodeAnalysisScriptingVersion)" />

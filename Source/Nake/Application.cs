@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -119,7 +120,10 @@ namespace Nake
 
         static void ShowVersion()
         {
-            Log.Info(Assembly.GetExecutingAssembly().GetName().Version.ToString());
+            var version = Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>();
+
+            Debug.Assert(version != null, nameof(version) + " != null");
+            Log.Info(version.InformationalVersion);
 
             Session.Exit(); ;
         }

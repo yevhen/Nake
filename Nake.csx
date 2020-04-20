@@ -64,7 +64,13 @@ MakeDir(ArtifactsPath);
 [Nake] async Task Pack(bool skipFullCheck = false)
 {
     await Test(!skipFullCheck);
+    
+    var versionFile = $"{RootPath}/Source/AssemblyVersion.cs";
+    await File.WriteAllTextAsync(versionFile,
+        $@"[assembly:System.Reflection.AssemblyInformationalVersion(""{Version}"")]");
+
     await $"dotnet pack -c Release -p:PackageVersion={Version} Nake.sln";
+    await $"git checkout {versionFile}"
 }
 
 /// Publishes package to NuGet gallery

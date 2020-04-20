@@ -11,4 +11,8 @@
     <DocumentationFile>bin\Release\Nake.Meta.xml</DocumentationFile>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Include="..\AssemblyVersion.cs" Link="Properties\AssemblyVersion.cs" />
+  </ItemGroup>
+
 </Project>
