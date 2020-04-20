@@ -8,10 +8,14 @@ using System.Security.Cryptography;
 using System.Text;
 using static System.Environment;
 
-using Nake.Scripting;
+using Dotnet.Script.DependencyModel.ProjectSystem;
+
+using Nake.Utility;
 
 namespace Nake
 {
+    using Scripting;
+
     class CachingBuildEngine
     {
         readonly BuildEngine engine;
@@ -31,13 +35,26 @@ namespace Nake
                 return (engine.Build(input), null);
 
             var key = new CacheKey(input.Script, input.Substitutions, input.Debug);
-
-            var cached = key.Find(tasks);
-            if (cached != null && !reset)
-                return (cached, key);
-
             if (reset)
                 key.Reset();
+
+            AssemblyReference[] dependencies = null;
+            if (!reset)
+            {
+                dependencies = key.FindDependencies();
+                if (dependencies != null)
+                {
+                    var compilation = key.FindCompilation(tasks, dependencies);
+                    if (compilation != null)
+                        return (compilation, key);
+                }
+            }
+
+            if (dependencies != null)
+            {
+                Log.Trace("Reusing compilation dependencies from previous build");
+                input.Include(dependencies);
+            }
 
             var output = engine.Build(input);
             key.Store(output);
@@ -57,6 +74,7 @@ namespace Nake
         }
 
         public readonly string ScriptFolder;
+        public readonly string ProjectFolder;
         public readonly string CompilationFolder;
 
         readonly SHA1 sha1 = SHA1.Create();
@@ -73,14 +91,27 @@ namespace Nake
             this.substitutions = substitutions;
 
             ScriptFolder = Path.Combine(RootCacheFolder, StringHash(source.File.FullName));
-            CompilationFolder = Path.Combine(ScriptFolder, ComputeScriptHash());
+            ProjectFolder = Path.Combine(ScriptFolder, ComputeProjectHash());
+            CompilationFolder = Path.Combine(ProjectFolder, ComputeCompilationHash());
         }
 
         string AssemblyFile => Path.Combine(CompilationFolder, source.File.Name + ".dll");
         string PdbFile => Path.Combine(CompilationFolder, source.File.Name + ".pdb");
-        string ReferencesFile => Path.Combine(CompilationFolder, "references");
+        
+        string ReferencesFile => Path.Combine(ProjectFolder, "references");
         string CapturedVariablesFile => Path.Combine(CompilationFolder, "variables");
-        string ComputeScriptHash() => StringHash(source.Code + ToDeterministicString(substitutions) + debug);
+        
+        string ComputeCompilationHash() => StringHash(source.Code + ToDeterministicString(substitutions) + debug);
+        string ComputeProjectHash() => StringHash(ProjectFileContents(source));
+
+        static string ProjectFileContents(ScriptSource source)
+        {
+            var provider = new ScriptProjectProvider(_ => DotnetScript.Logger());
+            var scriptFiles = source.AllFiles().Select(x => x.File.ToString());
+            var targetDirectory = source.File.DirectoryName;
+            var project = provider.CreateProject(targetDirectory, scriptFiles, "netcoreapp3.1", true);
+            return File.ReadAllText(project.Path);
+        }
 
         static string ToDeterministicString(IEnumerable<KeyValuePair<string, string>> substitutions) =>
             string.Join("", substitutions
@@ -102,7 +133,12 @@ namespace Nake
             return s.Replace("/", "_").Replace("\\", "_").Replace("+", "_").Replace("=", "_");
         }
 
-        public BuildResult Find(Task[] tasks)
+        public AssemblyReference[] FindDependencies() =>
+            ProjectFolderExists()
+                ? ReadReferences()
+                : null;
+
+        public BuildResult FindCompilation(Task[] tasks, AssemblyReference[] references)
         {
             if (!CachedAssemblyExists())
                 return null;
@@ -110,13 +146,13 @@ namespace Nake
             if (CapturedVariablesMismatch())
                 return null;
 
-            var references = ReadReferences();
             var assembly = ReadAssembly();
             var symbols = ReadSymbols();
 
             return new BuildResult(tasks, references, null, assembly, debug ? symbols : null);
         }
 
+        bool ProjectFolderExists() => Directory.Exists(ProjectFolder);
         bool CachedAssemblyExists() => File.Exists(AssemblyFile);
 
         bool CapturedVariablesMismatch()
@@ -136,9 +172,9 @@ namespace Nake
             return StringHash(current.ToString()) != captured;
         }
 
-        Scripting.AssemblyReference[] ReadReferences() =>
+        AssemblyReference[] ReadReferences() =>
             File.ReadAllLines(ReferencesFile)
-                .Select(line => new Scripting.AssemblyReference(line))
+                .Select(line => new AssemblyReference(line))
                 .ToArray();
 
         byte[] ReadAssembly() => File.ReadAllBytes(AssemblyFile);
@@ -146,7 +182,7 @@ namespace Nake
 
         public void Store(BuildResult result)
         {
-            CreateCacheFolder();
+            CreateCacheFolders();
 
             WriteReferences(result);
             WriteVariables(result);
@@ -154,7 +190,7 @@ namespace Nake
             WriteSymbols(result);
         }
 
-        void CreateCacheFolder() => Directory.CreateDirectory(CompilationFolder);
+        void CreateCacheFolders() => Directory.CreateDirectory(CompilationFolder);
         void WriteReferences(BuildResult result) => File.WriteAllLines(ReferencesFile, result.References.Select(x => x.FullPath));
 
         void WriteVariables(BuildResult result)
@@ -182,8 +218,8 @@ namespace Nake
 
         public void Reset()
         {
-            if (Directory.Exists(CompilationFolder))
-                Directory.Delete(CompilationFolder, recursive: true);
+            if (Directory.Exists(ScriptFolder))
+                Directory.Delete(ScriptFolder, recursive: true);
         }
     }
 }

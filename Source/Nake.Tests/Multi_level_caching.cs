@@ -20,6 +20,32 @@ namespace Nake
             [Category("Slow")]
             public void Does_not_run_restore_when_no_dependencies_were_changed()
             {
+                var (output, _) = BuildFileWithCompilationCache(path, @"                
+
+                    #r ""nuget: Streamstone, 2.3.0""
+                    using Streamstone;
+
+                    [Nake] void Test() => Env.Var[""ResolvedShard""] = Shard.Resolve(""A"", 10).ToString();
+                ");
+
+                Assert.That(output, Contains.Substring("dotnet restore"));
+                Assert.That(output, Contains.Substring("dotnet build"));
+
+                (output, _) = BuildFileWithCompilationCache(path, @"                
+
+                    #r ""nuget: Streamstone, 2.3.0""
+                    using Streamstone;
+
+                    [Nake] void Test() => Env.Var[""ResolvedShard""] = Shard.Resolve(""B"", 10).ToString();
+                ");
+
+                Assert.That(output, !Contains.Substring("dotnet restore"));
+                Assert.That(output, !Contains.Substring("dotnet build"));
+            }
+
+            [Test]
+            public void Runs_restore_when_cache_disabled_even_when_no_dependencies_were_changed()
+            {
                 var output = BuildFile(path, @"                
 
                     #r ""nuget: Streamstone, 2.3.0""
@@ -31,30 +57,6 @@ namespace Nake
                 Assert.That(output, Contains.Substring("dotnet restore"));
 
                 output = BuildFile(path, @"                
-
-                    #r ""nuget: Streamstone, 2.3.0""
-                    using Streamstone;
-
-                    [Nake] void Test() => Env.Var[""ResolvedShard""] = Shard.Resolve(""B"", 10).ToString();
-                ");
-
-                Assert.That(output, !Contains.Substring("dotnet restore"));
-            }
-
-            [Test]
-            public void Runs_restore_when_cache_disabled_even_when_no_dependencies_were_changed()
-            {
-                var output = BuildFileNoRestoreCache(path, @"                
-
-                    #r ""nuget: Streamstone, 2.3.0""
-                    using Streamstone;
-
-                    [Nake] void Test() => Env.Var[""ResolvedShard""] = Shard.Resolve(""A"", 10).ToString();
-                ");
-
-                Assert.That(output, Contains.Substring("dotnet restore"));
-
-                output = BuildFileNoRestoreCache(path, @"                
 
                     #r ""nuget: Streamstone, 2.3.0""
                     using Streamstone;
@@ -86,13 +88,13 @@ namespace Nake
                     [Nake] void Test(){}
                 ");
 
-                var assert = new CacheAssert(firstRun);
+                var assert = new CacheAssert(firstRun.Cached);
 
                 var nextRun = BuildFileWithCompilationCache(path, @"                
                     [Nake] void Test(){}
                 ");
 
-                assert.SameCompilation(nextRun);
+                assert.SameCompilation(nextRun.Cached);
             }
 
             class CacheAssert
@@ -106,23 +108,37 @@ namespace Nake
                 {
                     this.firstRun = firstRun;
 
-                    var compilations = Directory.GetDirectories(firstRun.ScriptFolder);
+                    var projects = Directory.GetDirectories(firstRun.ScriptFolder);
+                    Assert.That(projects.Length, Is.EqualTo(1));
+                    Assert.That(projects[0], Is.EqualTo(firstRun.ProjectFolder));
+
+                    var compilations = Directory.GetDirectories(firstRun.ProjectFolder);
                     Assert.That(compilations.Length, Is.EqualTo(1));
                     Assert.That(compilations[0], Is.EqualTo(firstRun.CompilationFolder));
 
-                    firstRunFiles = Directory.GetFiles(firstRun.CompilationFolder).OrderBy(x => x).ToArray();
+                    firstRunFiles = Directory.GetFiles(firstRun.ProjectFolder)
+                        .Concat(Directory.GetFiles(firstRun.CompilationFolder))
+                        .OrderBy(x => x).ToArray();
+
                     firstRunBytes = firstRunFiles.Select(x => (name: x, bytes: File.ReadAllBytes(x))).ToArray();
                     firstRunModified = firstRunFiles.Select(x => (name: x, modified: File.GetLastWriteTime(x))).ToArray();
                 }
 
                 public void SameCompilation(CacheKey nextRun)
                 {
-                    var compilations = Directory.GetDirectories(nextRun.ScriptFolder);
+                    var projects = Directory.GetDirectories(nextRun.ScriptFolder);
                     Assert.That(nextRun.ScriptFolder, Is.EqualTo(firstRun.ScriptFolder), "It's the same script folder");
+                    Assert.That(projects.Length, Is.EqualTo(1));
+                    
+                    var compilations = Directory.GetDirectories(nextRun.ProjectFolder);
+                    Assert.That(nextRun.ProjectFolder, Is.EqualTo(firstRun.ProjectFolder), "It's the same project folder");
                     Assert.That(compilations.Length, Is.EqualTo(1), "Still a single compilation");
                     Assert.That(compilations[0], Is.EqualTo(firstRun.CompilationFolder), "Still same compilation key");
 
-                    var nextRunFiles = Directory.GetFiles(nextRun.CompilationFolder).OrderBy(x => x).ToArray();
+                    var nextRunFiles = Directory.GetFiles(nextRun.ProjectFolder)
+                        .Concat(Directory.GetFiles(nextRun.CompilationFolder))
+                        .OrderBy(x => x).ToArray();
+
                     var nextRunBytes = nextRunFiles.Select(x => new {name = x, bytes = File.ReadAllBytes(x)}).ToArray();
                     var nextRunModified = nextRunFiles.Select(x => new {name = x, modified = File.GetLastWriteTime(x)}).ToArray();
 

@@ -1,16 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.ComponentModel;
 using System.Data;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Xml;
 using System.Xml.Linq;
 
 using Dotnet.Script.DependencyModel.Compilation;
-using Dotnet.Script.DependencyModel.Context;
 using Dotnet.Script.DependencyModel.Logging;
 using Dotnet.Script.DependencyModel.NuGet;
 
@@ -56,26 +53,25 @@ namespace Nake.Scripting
 
         static MetadataReference Reference(Type type) => MetadataReference.CreateFromFile(type.Assembly.Location);
 
-        readonly bool useRestoreCache;
         readonly Logger logger;
-
         readonly HashSet<string> namespaces;
         readonly List<MetadataReference> references;
 
-        public Script(bool useRestoreCache, Logger logger)
+        public Script(Logger logger)
         {
-            this.useRestoreCache = useRestoreCache;
             this.logger = logger;
-
             namespaces = new HashSet<string>(DefaultNamespaces);
-            references = new List<MetadataReference>(
-                NakeReferences.Concat(DefaultReferences.Select(x => x.Value)));
+            references = new List<MetadataReference>(NakeReferences.Concat(DefaultReferences.Select(x => x.Value)));
         }
 
-        public CompiledScript Compile(ScriptSource source)
+        public CompiledScript Compile(ScriptSource source, AssemblyReference[] dependencies)
         {
-            if (source.IsFile)
-                AddCompilationDependencies(source);
+            if (dependencies == null && source.IsFile)
+                dependencies = CompilationDependencies(source);
+
+            if (dependencies != null)
+                foreach (var each in dependencies)
+                    AddReference(each);
 
             var options = ScriptOptions.Default
                 .AddImports(namespaces)
@@ -98,8 +94,10 @@ namespace Nake.Scripting
             return new CompiledScript(references.Select(x => new AssemblyReference(x)), compilation);
         }
 
-        void AddCompilationDependencies(ScriptSource source)
+        AssemblyReference[] CompilationDependencies(ScriptSource source)
         {
+            logger.Debug("Computing compilation dependencies");
+
             var loaded = AppDomain.CurrentDomain.GetAssemblies()
                 .Where(a => !a.IsDynamic)
                 .Select(a => a.Location)
@@ -107,26 +105,15 @@ namespace Nake.Scripting
                 .ToDictionary(Path.GetFileName);
 
             var dependencyResolver = new CompilationDependencyResolver(t => logger);
-            if (useRestoreCache)
-            {
-                var restorerField = dependencyResolver.GetType().GetField("_restorer", BindingFlags.Instance | BindingFlags.NonPublic);
-                // ReSharper disable once PossibleNullReferenceException
-                var currentRestorer = (IRestorer) restorerField.GetValue(dependencyResolver);
-                restorerField.SetValue(dependencyResolver, new CachedRestorer(currentRestorer, t => logger));
-            }
-
             var dependencies = dependencyResolver.GetDependencies(
                 source.File.DirectoryName, 
                 source.AllFiles().Select(x => x.File.ToString()), 
                 true, "netcoreapp3.1");
 
-            var assemblyReferences = dependencies
+            return dependencies
                 .SelectMany(d => d.AssemblyPaths)
-                .Select(l => loaded.TryGetValue(Path.GetFileName(l), out var e) ? e : l)
+                .Select(l => new AssemblyReference(loaded.TryGetValue(Path.GetFileName(l), out var e) ? e : l))
                 .ToArray();
-
-            foreach (var each in assemblyReferences)
-                AddReference(each);
         }
 
         public void AddReference(AssemblyReference reference) => AddReference(reference.FullPath);

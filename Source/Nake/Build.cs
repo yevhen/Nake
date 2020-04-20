@@ -16,6 +16,10 @@ namespace Nake
 {
     class BuildInput
     {
+        public readonly ScriptSource Script;
+        public readonly IDictionary<string, string> Substitutions;
+        public readonly bool Debug;
+
         public BuildInput(ScriptSource script, IDictionary<string, string> substitutions, bool debug)
         {
             Script = script;
@@ -23,25 +27,23 @@ namespace Nake
             Debug = debug;
         }
 
-        public ScriptSource Script { get; }
-        public IDictionary<string, string> Substitutions { get; }
-        public bool Debug { get; }
+        public void Include(AssemblyReference[] dependencies) => 
+            Dependencies = dependencies;
+
+        public AssemblyReference[] Dependencies { get; private set; }
     }
 
     class BuildEngine
     {
-        readonly bool useRestoreCache;
         readonly Logger logger;
         readonly IEnumerable<AssemblyReference> references;
         readonly IEnumerable<string> namespaces;
 
         public BuildEngine(
-            bool useRestoreCache, 
             Logger logger,
             IEnumerable<AssemblyReference> references = null,
             IEnumerable<string> namespaces = null)
         {
-            this.useRestoreCache = useRestoreCache;
             this.logger = logger;
             this.references = references ?? Enumerable.Empty<AssemblyReference>();
             this.namespaces = namespaces ?? Enumerable.Empty<string>();
@@ -49,13 +51,13 @@ namespace Nake
 
         public BuildResult Build(BuildInput input)
         {
-            var magic = new PixieDust(Compile(input.Script));
+            var magic = new PixieDust(Compile(input.Script, input.Dependencies));
             return magic.Apply(input.Substitutions, input.Debug);
         }
 
-        CompiledScript Compile(ScriptSource source)
+        CompiledScript Compile(ScriptSource source, AssemblyReference[] dependencies)
         {
-            var script = new Script(useRestoreCache, logger);
+            var script = new Script(logger);
 
             foreach (var each in references)
                 script.AddReference(each);
@@ -63,7 +65,7 @@ namespace Nake
             foreach (var each in namespaces)
                 script.ImportNamespace(each);
 
-            return script.Compile(source);
+            return script.Compile(source, dependencies);
         }
     }
 

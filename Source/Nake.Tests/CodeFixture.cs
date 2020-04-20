@@ -41,13 +41,10 @@ namespace Nake
         }
 
         protected static string BuildFile(FileInfo path, string code) => 
-            Build(new BuildOptions(null, path), code).Output;
+            Build(new BuildOptions(null, path, true), code).Output;
 
-        protected static string BuildFileNoRestoreCache(FileInfo path, string code) => 
-            Build(new BuildOptions(null, path, false), code).Output;
-
-        protected static CacheKey BuildFileWithCompilationCache(FileInfo path, string code) => 
-            Build(new BuildOptions(null, path, true, true), code).Cached;
+        protected static BuildEffects BuildFileWithCompilationCache(FileInfo path, string code) => 
+            Build(new BuildOptions(null, path), code);
 
         protected static string Build(string code, Dictionary<string, string> substitutions) => 
             Build(new BuildOptions(substitutions), code).Output;
@@ -71,8 +68,8 @@ namespace Nake
             }
 
             var declarations = TaskDeclarationScanner.Scan(source);
-            var builder = new BuildEngine(options.RestoreCache, Logger, additionalReferences);
-            var engine = new CachingBuildEngine(builder, Task.From(declarations), !options.CompilationCache);
+            var builder = new BuildEngine(Logger, additionalReferences);
+            var engine = new CachingBuildEngine(builder, Task.From(declarations), options.ResetCache);
             var input = new BuildInput(source, options.Substitutions, false);
             
             var (result, cached) = engine.Build(input);
@@ -85,15 +82,13 @@ namespace Nake
         {
             public readonly Dictionary<string, string> Substitutions;
             public readonly FileInfo Script;
-            public readonly bool RestoreCache;
-            public readonly bool CompilationCache;
+            public readonly bool ResetCache;
 
-            public BuildOptions(Dictionary<string, string> substitutions = null, FileInfo script = null, bool restoreCache = true, bool compilationCache = false)
+            public BuildOptions(Dictionary<string, string> substitutions = null, FileInfo script = null, bool resetCache = false)
             {
                 Substitutions = substitutions ?? new Dictionary<string, string>();
-                CompilationCache = compilationCache;
                 Script = script;
-                RestoreCache = restoreCache;
+                ResetCache = resetCache;
             }
 
             public ScriptSource Source(string code)
@@ -110,6 +105,12 @@ namespace Nake
 
         protected class BuildEffects
         {
+            public void Deconstruct(out string output, out CacheKey cached)
+            {
+                output = Output;
+                cached = Cached;
+            }
+
             public readonly string Output;
             public readonly CacheKey Cached;
 
