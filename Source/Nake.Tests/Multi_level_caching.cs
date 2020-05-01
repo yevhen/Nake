@@ -97,6 +97,32 @@ namespace Nake
                 assert.SameCompilation(nextRun.Cache);
             }
 
+            [Test]
+            [Ignore("Figured out Nake doesn't work with multi-file compilations")]
+            public void Does_recompile_when_code_changes_in_imported_scripts()
+            {
+                var importedScriptPath = TempFilePath();
+
+                BuildFile(importedScriptPath, @"                
+                    [Nake] void Imported() {}
+                ");
+
+                var entryScriptCode = $@"
+                    #load ""{importedScriptPath}""
+                    [Nake] void Test(){{}}
+                ";
+                
+                var firstRun = BuildFileWithCompilationCache(path, entryScriptCode);
+                var assert = new CacheAssert(firstRun.Cache);
+
+                BuildFile(importedScriptPath, @"                
+                    [Nake] void Changed() {}
+                ");
+
+                var nextRun = BuildFileWithCompilationCache(path, entryScriptCode);
+                assert.SameCompilation(nextRun.Cache);
+            }
+
             class CacheAssert
             {
                 readonly CacheKey firstRun;
