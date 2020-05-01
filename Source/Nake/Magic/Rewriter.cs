@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Text;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Nake.Scripting;
 
 namespace Nake.Magic
 {
@@ -14,23 +13,20 @@ namespace Nake.Magic
         public readonly HashSet<EnvironmentVariable> Captured = new HashSet<EnvironmentVariable>();
 
         readonly CSharpSyntaxTree tree;
-        readonly SemanticModel model;
-        readonly CSharpCompilation compilation;
+        readonly CompiledScript script;
         readonly AnalyzerResult result;
         
-        public Rewriter(CSharpCompilation compilation, AnalyzerResult result)
+        public Rewriter(CompiledScript script, AnalyzerResult result)
         {
-            tree = (CSharpSyntaxTree) compilation.SyntaxTrees.Single();
-            model = compilation.GetSemanticModel(tree, ignoreAccessibility: true);
-
-            this.compilation = compilation;
+            this.script = script;
             this.result = result;
+            tree = script.SyntaxTree;
         }
 
         public CSharpCompilation Rewrite()
         {
             var newRoot = tree.GetRoot().Accept(this);
-            return compilation.ReplaceSyntaxTree(tree, CreateTree(newRoot));
+            return script.Compilation.ReplaceSyntaxTree(tree, CreateTree(newRoot));
         }
 
         SyntaxTree CreateTree(SyntaxNode root)

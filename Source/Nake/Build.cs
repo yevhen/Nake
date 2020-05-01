@@ -77,10 +77,10 @@ namespace Nake
 
         public BuildResult Apply(IDictionary<string, string> substitutions, bool debug)
         {
-            var analyzer = new Analyzer(script.Compilation, substitutions);
+            var analyzer = new Analyzer(script, substitutions);
             var analyzed = analyzer.Analyze();
 
-            var rewriter = new Rewriter(script.Compilation, analyzed);
+            var rewriter = new Rewriter(script, analyzed);
             var rewritten = rewriter.Rewrite();
 
             byte[] assembly;

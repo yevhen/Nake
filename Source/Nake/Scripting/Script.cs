@@ -79,7 +79,7 @@ namespace Nake.Scripting
             if (errors.Any())   
                 throw new ScriptCompilationException(errors);
 
-            return new CompiledScript(this.references.Select(x => new AssemblyReference(x)), compilation);
+            return new CompiledScript(source, references.Select(x => new AssemblyReference(x)), compilation);
         }
 
         public void AddReference(AssemblyReference reference) => AddReference(reference.FullPath);
@@ -101,13 +101,30 @@ namespace Nake.Scripting
 
     class CompiledScript
     {
+        public readonly ScriptSource Source;
         public readonly IEnumerable<AssemblyReference> References;
         public readonly CSharpCompilation Compilation;
+        public readonly CSharpSyntaxTree SyntaxTree;
 
-        public CompiledScript(IEnumerable<AssemblyReference> references, CSharpCompilation compilation)
+        public CompiledScript(ScriptSource source, IEnumerable<AssemblyReference> references, CSharpCompilation compilation)
         {
+            Source = source;
             References = references;
             Compilation = compilation;
+            SyntaxTree = ComputeSyntaxTree(Compilation, Source);
         }
+
+        static CSharpSyntaxTree ComputeSyntaxTree(CSharpCompilation compilation, ScriptSource source)
+        {
+            var result = compilation.SyntaxTrees.First();
+            
+            if (compilation.SyntaxTrees.Length != 1)
+                result = compilation.SyntaxTrees.Single(x => x.FilePath == source.File.FullName);
+
+            return (CSharpSyntaxTree) result;
+        }
+
+
+        public SemanticModel SemanticModel => Compilation.GetSemanticModel(SyntaxTree, ignoreAccessibility: false);
     }
 }
