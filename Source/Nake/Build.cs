@@ -1,10 +1,14 @@
+using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
+using Microsoft.CodeAnalysis.Text;
 
 using Nake.Magic;
 using Nake.Scripting;
@@ -77,11 +81,32 @@ namespace Nake
 
         public BuildResult Apply(IDictionary<string, string> substitutions, bool debug)
         {
-            var analyzer = new Analyzer(script, substitutions);
-            var analyzed = analyzer.Analyze();
+            var rewrittenTrees = new Dictionary<string, CSharpSyntaxTree>();
+            var capturedEnvironmentVariables = new HashSet<EnvironmentVariable>();
+            var tasks = new List<Task>();
+            
+            foreach (CSharpSyntaxTree tree in script.Compilation.SyntaxTrees)
+            {
+                var analyzer = new Analyzer(substitutions, tree, script.Compilation.GetSemanticModel(tree, ignoreAccessibility: false));
+                var analyzed = analyzer.Analyze();
 
-            var rewriter = new Rewriter(script, analyzed);
-            var rewritten = rewriter.Rewrite();
+                var rewriter = new Rewriter(analyzed, tree);
+                rewrittenTrees.Add(tree.FilePath, rewriter.RewriteTree());
+
+                Array.ForEach(rewriter.Captured.ToArray(), x => capturedEnvironmentVariables.Add(x));
+                Array.ForEach(analyzed.Tasks.ToArray(), x => tasks.Add(x));
+            }
+
+            var rewrittenTree = rewrittenTrees.Count == 1
+                ? rewrittenTrees.First().Value
+                : rewrittenTrees[script.Source.File.FullName];
+
+            var compilation = script.Compilation;
+            if (script.Source.IsFile)
+                compilation = compilation.WithOptions(compilation.Options.WithSourceReferenceResolver(LoadSourceResolver(rewrittenTrees)));
+
+            compilation = compilation.ReplaceSyntaxTree(script.SyntaxTree, rewrittenTree);
+            var rewritten = compilation;
 
             byte[] assembly;
             byte[] symbols = null;
@@ -92,11 +117,29 @@ namespace Nake
                 Emit(rewritten, out assembly);
 
             return new BuildResult(
-                analyzed.Tasks.ToArray(), 
+                tasks.ToArray(), 
                 script.References.ToArray(), 
-                rewriter.Captured.ToArray(), 
-                assembly, symbols
-            );            
+                capturedEnvironmentVariables.ToArray(), 
+                assembly, symbols);            
+        }
+
+        SourceFileResolver LoadSourceResolver(Dictionary<string, CSharpSyntaxTree> rewrittenTrees)
+        {
+            return new MySourceResolver(rewrittenTrees, script.Source.File.DirectoryName);
+        }
+
+        class MySourceResolver : SourceFileResolver
+        {
+            readonly Dictionary<string, CSharpSyntaxTree> rewrittenTrees;
+
+            public MySourceResolver(Dictionary<string, CSharpSyntaxTree> rewrittenTrees, string baseDirectory)
+                : base(ImmutableArray<string>.Empty, baseDirectory) =>
+                this.rewrittenTrees = rewrittenTrees;
+
+            public override SourceText ReadText(string resolvedPath) =>
+                rewrittenTrees.ContainsKey(resolvedPath)
+                    ? rewrittenTrees[resolvedPath].GetText()
+                    : base.ReadText(resolvedPath);
         }
 
         void Emit(Compilation compilation, out byte[] assembly)

@@ -58,16 +58,23 @@ namespace Nake
 
         public MethodDeclarationSyntax Replace(MethodDeclarationSyntax method)
         {
+            var alreadyExpressionBodied = method.Body == null;
+
             var originalBody = MethodBody(method);
             var proxyBody = ProxyBody(method, originalBody);
 
             var newBody = SyntaxFactory.ParseExpression(proxyBody);
             var expressionBody = SyntaxFactory.ArrowExpressionClause(newBody);
 
-            return method
+            var replacement = method
                 .WithBody(null)
                 .WithoutTrailingTrivia()
                 .WithExpressionBody(expressionBody);
+
+            if (!alreadyExpressionBodied)
+                replacement = replacement.WithTrailingTrivia(SyntaxFactory.EndOfLine(";"));
+
+            return replacement;
         }
 
         string ProxyBody(BaseMethodDeclarationSyntax method, string body)
