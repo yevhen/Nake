@@ -5,7 +5,6 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Nake.Scripting;
 
 namespace Nake.Magic
 {
@@ -19,10 +18,10 @@ namespace Nake.Magic
         bool visitingConstant;
         AnalyzerResult result;
         
-        public Analyzer(CompiledScript script, IDictionary<string, string> substitutions)
+        public Analyzer(IDictionary<string, string> substitutions, CSharpSyntaxTree tree, SemanticModel model)
         {
-            tree = script.SyntaxTree;
-            model = script.SemanticModel;
+            this.tree = tree;
+            this.model = model;
 
             this.substitutions = new Dictionary<string, string>(substitutions, 
                 new CaseInsensitiveEqualityComparer());

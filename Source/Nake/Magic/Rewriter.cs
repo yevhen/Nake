@@ -4,7 +4,6 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Nake.Scripting;
 
 namespace Nake.Magic
 {
@@ -13,29 +12,27 @@ namespace Nake.Magic
         public readonly HashSet<EnvironmentVariable> Captured = new HashSet<EnvironmentVariable>();
 
         readonly CSharpSyntaxTree tree;
-        readonly CompiledScript script;
         readonly AnalyzerResult result;
         
-        public Rewriter(CompiledScript script, AnalyzerResult result)
+        public Rewriter(AnalyzerResult result, CSharpSyntaxTree tree)
         {
-            this.script = script;
             this.result = result;
-            tree = script.SyntaxTree;
+            this.tree = tree;
         }
 
-        public CSharpCompilation Rewrite()
+        public CSharpSyntaxTree RewriteTree()
         {
             var newRoot = tree.GetRoot().Accept(this);
-            return script.Compilation.ReplaceSyntaxTree(tree, CreateTree(newRoot));
+            return CreateTree(newRoot);
         }
 
-        SyntaxTree CreateTree(SyntaxNode root)
+        CSharpSyntaxTree CreateTree(SyntaxNode root)
         {
             var options = new CSharpParseOptions(
                 documentationMode: DocumentationMode.None,
                 kind: SourceCodeKind.Script);
 
-            return CSharpSyntaxTree.Create((CompilationUnitSyntax) root, options, tree.FilePath, Encoding.UTF8);
+            return (CSharpSyntaxTree) CSharpSyntaxTree.Create((CompilationUnitSyntax) root, options, tree.FilePath, Encoding.UTF8);
         }
 
         public override SyntaxNode VisitMethodDeclaration(MethodDeclarationSyntax node)
@@ -44,8 +41,8 @@ namespace Nake.Magic
                 base.VisitMethodDeclaration(node);
 
             var task = result.Find(node);
-            return task != null 
-                ? task.Replace(visited) 
+            return task != null
+                ? task.Replace(visited)
                 : visited;
         }
 
