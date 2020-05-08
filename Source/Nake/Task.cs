@@ -64,10 +64,16 @@ namespace Nake
             var newBody = SyntaxFactory.ParseExpression(proxyBody);
             var expressionBody = SyntaxFactory.ArrowExpressionClause(newBody);
 
-            return method
+            var replacement = method
                 .WithBody(null)
                 .WithoutTrailingTrivia()
                 .WithExpressionBody(expressionBody);
+
+            var methodBody = method.Body != null;
+            if (methodBody)
+                replacement = replacement.WithTrailingTrivia(SyntaxFactory.EndOfLine(";"));
+
+            return replacement;
         }
 
         string ProxyBody(BaseMethodDeclarationSyntax method, string body)
