@@ -30,10 +30,10 @@ namespace Nake
             Debug = debug;
         }
 
-        public BuildInput WithCached(AssemblyReference[] dependencies) => 
+        public BuildInput WithCached(AssemblyReference[] dependencies) =>
             new BuildInput(Source, Substitutions, Debug) {cached = dependencies};
 
-        public IEnumerable<AssemblyReference> Dependencies() => 
+        public IEnumerable<AssemblyReference> Dependencies() =>
             Source.ComputeDependencies(cached);
     }
 
@@ -74,26 +74,40 @@ namespace Nake
     {
         readonly CompiledScript script;
 
-        public PixieDust(CompiledScript script)
-        {
+        public PixieDust(CompiledScript script) =>
             this.script = script;
-        }
 
         public BuildResult Apply(IDictionary<string, string> substitutions, bool debug)
+        {
+            var result = Rewrite(substitutions);
+
+            byte[] assembly;
+            byte[] symbols = null;
+
+            if (debug)
+                EmitDebug(result.Compilation, out assembly, out symbols);
+            else
+                Emit(result.Compilation, out assembly);
+
+            return new BuildResult(
+                result.Tasks,
+                script.References.ToArray(),
+                result.Captured,
+                assembly, symbols);
+        }
+
+        RewriteResult Rewrite(IDictionary<string, string> substitutions)
         {
             var rewrittenTrees = new Dictionary<string, CSharpSyntaxTree>();
             var capturedEnvironmentVariables = new HashSet<EnvironmentVariable>();
             var tasks = new List<Task>();
-            
+
             foreach (CSharpSyntaxTree tree in script.Compilation.SyntaxTrees)
             {
-                var analyzer = new Analyzer(substitutions, tree, script.Compilation.GetSemanticModel(tree, ignoreAccessibility: false));
-                var analyzed = analyzer.Analyze();
+                var analyzed = Analyze(substitutions, tree);
+                var captured = Rewrite(analyzed, tree, rewrittenTrees);
 
-                var rewriter = new Rewriter(analyzed, tree);
-                rewrittenTrees.Add(tree.FilePath, rewriter.RewriteTree());
-
-                Array.ForEach(rewriter.Captured.ToArray(), x => capturedEnvironmentVariables.Add(x));
+                Array.ForEach(captured.ToArray(), x => capturedEnvironmentVariables.Add(x));
                 Array.ForEach(analyzed.Tasks.ToArray(), x => tasks.Add(x));
             }
 
@@ -103,36 +117,49 @@ namespace Nake
 
             var compilation = script.Compilation;
             if (script.Source.IsFile)
-                compilation = compilation.WithOptions(compilation.Options.WithSourceReferenceResolver(LoadSourceResolver(rewrittenTrees)));
+                compilation = compilation.WithOptions(compilation.Options.WithSourceReferenceResolver(Resolver(rewrittenTrees)));
 
             compilation = compilation.ReplaceSyntaxTree(script.SyntaxTree, rewrittenTree);
             var rewritten = compilation;
 
-            byte[] assembly;
-            byte[] symbols = null;
-
-            if (debug)
-                EmitDebug(rewritten, out assembly, out symbols);
-            else
-                Emit(rewritten, out assembly);
-
-            return new BuildResult(
-                tasks.ToArray(), 
-                script.References.ToArray(), 
-                capturedEnvironmentVariables.ToArray(), 
-                assembly, symbols);            
+            return new RewriteResult(rewritten, tasks.ToArray(), capturedEnvironmentVariables.ToArray());
         }
 
-        SourceFileResolver LoadSourceResolver(Dictionary<string, CSharpSyntaxTree> rewrittenTrees)
+        class RewriteResult
         {
-            return new MySourceResolver(rewrittenTrees, script.Source.File.DirectoryName);
+            public readonly CSharpCompilation Compilation;
+            public readonly Task[] Tasks;
+            public readonly EnvironmentVariable[] Captured;
+
+            public RewriteResult(CSharpCompilation compilation, Task[] tasks, EnvironmentVariable[] captured)
+            {
+                Compilation = compilation;
+                Tasks = tasks;
+                Captured = captured;
+            }
         }
 
-        class MySourceResolver : SourceFileResolver
+        static HashSet<EnvironmentVariable> Rewrite(AnalyzerResult analyzed, CSharpSyntaxTree tree, Dictionary<string, CSharpSyntaxTree> rewrittenTrees)
+        {
+            var rewriter = new Rewriter(analyzed, tree);
+            rewrittenTrees.Add(tree.FilePath, rewriter.Rewrite());
+            return rewriter.Captured;
+        }
+
+        AnalyzerResult Analyze(IDictionary<string, string> substitutions, CSharpSyntaxTree tree)
+        {
+            var analyzer = new Analyzer(substitutions, tree, script.Compilation.GetSemanticModel(tree, ignoreAccessibility: false));
+            return analyzer.Analyze();
+        }
+
+        SourceFileResolver Resolver(Dictionary<string, CSharpSyntaxTree> rewrittenTrees) =>
+            new LoadScriptResolver(rewrittenTrees, script.Source.File.DirectoryName);
+
+        class LoadScriptResolver : SourceFileResolver
         {
             readonly Dictionary<string, CSharpSyntaxTree> rewrittenTrees;
 
-            public MySourceResolver(Dictionary<string, CSharpSyntaxTree> rewrittenTrees, string baseDirectory)
+            public LoadScriptResolver(Dictionary<string, CSharpSyntaxTree> rewrittenTrees, string baseDirectory)
                 : base(ImmutableArray<string>.Empty, baseDirectory) =>
                 this.rewrittenTrees = rewrittenTrees;
 
@@ -145,9 +172,9 @@ namespace Nake
         void Emit(Compilation compilation, out byte[] assembly)
         {
             using var assemblyStream = new MemoryStream();
-            
+
             Check(compilation, compilation.Emit(assemblyStream));
-            
+
             assembly = assemblyStream.GetBuffer();
         }
 
@@ -155,9 +182,9 @@ namespace Nake
         {
             using var assemblyStream = new MemoryStream();
             using var symbolStream = new MemoryStream();
-            
+
             Check(compilation, compilation.Emit(assemblyStream, pdbStream: symbolStream));
-            
+
             assembly = assemblyStream.GetBuffer();
             symbols = symbolStream.GetBuffer();
         }
@@ -211,8 +238,8 @@ namespace Nake
                 AssemblyResolver.Add(reference);
 
             return SymbolBytes != null
-                       ? Assembly.Load(AssemblyBytes, SymbolBytes)
-                       : Assembly.Load(AssemblyBytes);
+                ? Assembly.Load(AssemblyBytes, SymbolBytes)
+                : Assembly.Load(AssemblyBytes);
         }
 
         void Reflect()

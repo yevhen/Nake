@@ -20,7 +20,7 @@ namespace Nake.Magic
             this.tree = tree;
         }
 
-        public CSharpSyntaxTree RewriteTree()
+        public CSharpSyntaxTree Rewrite()
         {
             var newRoot = tree.GetRoot().Accept(this);
             return CreateTree(newRoot);
