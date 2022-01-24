@@ -19,6 +19,7 @@ var ArtifactsPath = $"{RootPath}/Artifacts";
 var ReleasePackagesPath = $"{ArtifactsPath}/Release";
 
 var AppVeyorJobId = Var["APPVEYOR_JOB_ID"];
+var TargetFramework = "netcoreapp6.0";
 var Version = "3.0.0-dev";
 
 // global init
@@ -37,7 +38,7 @@ MakeDir(ArtifactsPath);
 {
     await Build("Debug");
 
-    var tests = new FileSet{$"{RootPath}/**/bin/Debug/**/*.Tests.dll"}.ToString(" ");
+    var tests = new FileSet{$"{RootPath}/**/bin/Debug/{TargetFramework}/*.Tests.dll"}.ToString(" ");
     var results = $@"{ArtifactsPath}/nunit-test-results.xml";    
 
     try
