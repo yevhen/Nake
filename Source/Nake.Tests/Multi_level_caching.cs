@@ -28,8 +28,7 @@ namespace Nake
                     [Nake] void Test() => Env.Var[""ResolvedShard""] = Shard.Resolve(""A"", 10).ToString();
                 ");
 
-                Assert.That(output, Contains.Substring("Restored"));
-                Assert.That(output, Contains.Substring("Build succeeded"));
+                Assert.That(output, Contains.Substring("Restoring"));
 
                 (output, _) = BuildFileWithCompilationCache(path, @"                
 
@@ -40,7 +39,6 @@ namespace Nake
                 ");
 
                 Assert.That(output, !Contains.Substring("All projects are up-to-date"));
-                Assert.That(output, !Contains.Substring("Build succeeded"));
             }
 
             [Test]
@@ -54,7 +52,7 @@ namespace Nake
                     [Nake] void Test() => Env.Var[""ResolvedShard""] = Shard.Resolve(""A"", 10).ToString();
                 ");
 
-                Assert.That(output, Contains.Substring("Restored"));
+                Assert.That(output, Contains.Substring("Restoring"));
 
                 output = BuildFile(path, @"                
 
@@ -64,7 +62,7 @@ namespace Nake
                     [Nake] void Test() => Env.Var[""ResolvedShard""] = Shard.Resolve(""B"", 10).ToString();
                 ");
 
-                Assert.That(output, Contains.Substring("All projects are up-to-date"));
+                Assert.That(output, Contains.Substring("Restoring"));
             }
         }
 

@@ -6,13 +6,12 @@ using System.Linq;
 using Dotnet.Script.DependencyModel.Compilation;
 using Dotnet.Script.DependencyModel.Logging;
 using Dotnet.Script.DependencyModel.ProjectSystem;
-using Microsoft.CodeAnalysis.CSharp;
 
 namespace Nake.Scripting
 {
     class ScriptSource
     {
-        const string DefaultTargetFramework = "netcoreapp3.1";
+        const string DefaultTargetFramework = "netcoreapp6.0";
         
         public readonly Logger Log;
         public readonly string Code;
