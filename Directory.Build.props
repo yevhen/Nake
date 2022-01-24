@@ -32,12 +32,12 @@
     <!-- Common project props -->
     <PropertyGroup>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-        <LangVersion>8.0</LangVersion>
+        <LangVersion>10.0</LangVersion>
     </PropertyGroup>
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp3.1</TargetFramework>
-        <ConsoleProjectTargetFramework>netcoreapp3.1</ConsoleProjectTargetFramework>
+        <TargetFramework>netcoreapp6.0</TargetFramework>
+        <ConsoleProjectTargetFramework>netcoreapp6.0</ConsoleProjectTargetFramework>
         <TestProjectTargetFramework>$(ConsoleProjectTargetFramework)</TestProjectTargetFramework>
     </PropertyGroup>
 
@@ -46,8 +46,8 @@
 
 		<!-- Infrastructure packages -->
         <MedallionShellVersion>1.6.1</MedallionShellVersion>
-		<DotnetScriptDependencyModelVersion>0.50.0</DotnetScriptDependencyModelVersion>
-		<DotnetScriptDependencyModelNugetVersion>0.50.1</DotnetScriptDependencyModelNugetVersion>
+		<DotnetScriptDependencyModelVersion>1.3.1</DotnetScriptDependencyModelVersion>
+		<DotnetScriptDependencyModelNugetVersion>1.3.1</DotnetScriptDependencyModelNugetVersion>
 
         <!-- MSBuild packages -->
         <MicrosoftBuildVersion>16.4.0</MicrosoftBuildVersion>
@@ -61,7 +61,7 @@
         <SystemSecurityCryptographyProtectedDataVersion>4.7.0</SystemSecurityCryptographyProtectedDataVersion>
 
         <!-- Roslyn packages -->
-        <MicrosoftCodeAnalysisScriptingVersion>3.4.0</MicrosoftCodeAnalysisScriptingVersion>
+        <MicrosoftCodeAnalysisScriptingVersion>4.1.0-1.final</MicrosoftCodeAnalysisScriptingVersion>
 
         <!-- Microsoft extensions -->
         <MicrosoftExtensionsLoggingVersion>2.1.1</MicrosoftExtensionsLoggingVersion>

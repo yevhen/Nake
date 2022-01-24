@@ -9,7 +9,9 @@ namespace Nake.Magic
 {
     class AnalyzerResult : SyntaxWalker
     {
-        readonly Dictionary<IMethodSymbol, Task> tasksBySymbol = new Dictionary<IMethodSymbol, Task>();
+#pragma warning disable RS1024 // Compare symbols correctly
+        readonly Dictionary<IMethodSymbol, Task> tasksBySymbol = new Dictionary<IMethodSymbol, Task>(SymbolEqualityComparer.Default);
+#pragma warning restore RS1024 // Compare symbols correctly
         readonly Dictionary<MethodDeclarationSyntax, Task> tasksBySyntax = new Dictionary<MethodDeclarationSyntax, Task>();
         readonly Dictionary<string, Task> tasksByName = new Dictionary<string, Task>(new CaseInsensitiveEqualityComparer());
         

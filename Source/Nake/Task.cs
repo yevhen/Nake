@@ -45,8 +45,10 @@ namespace Nake
 
         static void CheckSignature(IMethodSymbol symbol)
         {
+#pragma warning disable RS1024 // Compare symbols correctly
             var hasDuplicateParameters = symbol.Parameters
                 .GroupBy(p => p.Name, StringComparer.OrdinalIgnoreCase)
+#pragma warning restore RS1024 // Compare symbols correctly
                 .Any(p => p.Count() > 1);
 
             if (!symbol.ReturnsVoid && symbol.ReturnType.ToString() != SystemThreadingTaskType ||                

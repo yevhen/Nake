@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 
+using Medallion.Shell;
 using NUnit.Framework;	
 using static Nake.Shell;
 
@@ -40,7 +41,7 @@ namespace Nake.Utility
 
                 Assert.That(result.ExitCode == 0);
                 Assert.That(result.StdError.Count == 0);
-                Assert.That(((string) result).Contains("Usage: dotnet tool"));
+                Assert.That((string) result, Contains.Substring("dotnet [options] tool [command]"));
 
                 result = Cmd(@"dotnet \
                                  tool \  
@@ -49,7 +50,7 @@ namespace Nake.Utility
 
                 Assert.That(result.ExitCode == 0);
                 Assert.That(result.StdError.Count == 0);
-                Assert.That(((string) result).Contains("---------------"));
+                Assert.That((string) result, Contains.Substring("---------------"));
             }
         }
 
