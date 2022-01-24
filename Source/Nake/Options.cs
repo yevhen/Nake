@@ -107,8 +107,12 @@ namespace Nake
         public static Options Parse(string[] args)
         {
             var result = new Options();
-
-            var remaining = ParseSwitches(args, result);
+            
+            var remaining = StripArgSeparator(args);
+            if (remaining.Length == 0)
+                return result;
+            
+            remaining = ParseSwitches(remaining, result);
             if (remaining.Length == 0)
                 return result;
 
@@ -121,6 +125,12 @@ namespace Nake
 
             return result;
         }
+
+        static string[] StripArgSeparator(string[] args) => 
+            args.Length > 1 && args[0] == "--"
+                ? args.Skip(1).ToArray()
+                : args;
+
 
         static string[] ParseSwitches(string[] args, Options options)
         {

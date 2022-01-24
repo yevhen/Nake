@@ -145,6 +145,14 @@ namespace Nake
             Assert.That(switchWithDashes.Value, Is.EqualTo("true"));
         }
 
+        [Test]
+        public void Strips_dotnet_tool_arg_separator()
+        {
+            var options = Parse(@"-- build");
+            Assert.That(options.Tasks.Count, Is.EqualTo(1));
+            Assert.That(options.Tasks[0].Name, Is.EqualTo("build"));
+        }
+
         static Options Parse(string commandLine)
         {
             return Options.Parse(commandLine.Split());
