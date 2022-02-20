@@ -13,7 +13,8 @@
         <Copyright>since 2013 © Yevhen Bobrov. All rights reserved.</Copyright>
         <PackageProjectUrl>https://github.com/yevhen/Nake</PackageProjectUrl>
         <PackageTags>C# Scripting Build Automation Task Runner</PackageTags>
-        <PackageReleaseNotes></PackageReleaseNotes>
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
         <RepositoryUrl>https://github.com/yevhen/Nake</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>

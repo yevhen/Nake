@@ -5,7 +5,12 @@
   	<RootNamespace>Nake</RootNamespace>
     <AssemblyName>Nake.Meta</AssemblyName>
     <IsPackable>true</IsPackable>
+    <PackageIcon>Logo.png</PackageIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\Logo.png" Pack="true" PackagePath=""/>
+  </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <DocumentationFile>bin\Release\Nake.Meta.xml</DocumentationFile>

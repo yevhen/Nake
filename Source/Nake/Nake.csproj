@@ -7,8 +7,13 @@
     <IsPackable>true</IsPackable>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>nake</ToolCommandName>
+    <PackageIcon>Logo.png</PackageIcon>
     <TargetFrameworks>netcoreapp3.1;netcoreapp5.0;netcoreapp6.0</TargetFrameworks>    
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\Logo.png" Pack="true" PackagePath=""/>
+  </ItemGroup>
 
   <ItemGroup>
     <Compile Include="..\AssemblyVersion.cs" Link="Properties\AssemblyVersion.cs" />
