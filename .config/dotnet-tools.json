@@ -3,7 +3,7 @@
   "isRoot": true,
   "tools": {
     "nake": {
-      "version": "3.0.0-RC2",
+      "version": "3.0.0",
       "commands": [
         "Nake"
       ]
