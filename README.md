@@ -11,7 +11,7 @@ Nake is a magic task runner tool for .NET Core. It's a hybrid of Shovel and Rake
 
 Nake is built as dotnet tool. You can install it either globally of [locally](https://stu.dev/dotnet-core-3-local-tools/) (recommended):
 
-	PM> dotnet tool install Nake --version 3.0.0-beta-01
+	PM> dotnet tool install Nake
 
 ## Syntax cheatsheet
 
