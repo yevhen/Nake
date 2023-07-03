@@ -46,32 +46,32 @@
     <PropertyGroup>
 
 		<!-- Infrastructure packages -->
-        <MedallionShellVersion>1.6.1</MedallionShellVersion>
-		<DotnetScriptDependencyModelVersion>1.3.1</DotnetScriptDependencyModelVersion>
-		<DotnetScriptDependencyModelNugetVersion>1.3.1</DotnetScriptDependencyModelNugetVersion>
+        <MedallionShellVersion>1.6.2</MedallionShellVersion>
+		<DotnetScriptDependencyModelVersion>1.4.0</DotnetScriptDependencyModelVersion>
+		<DotnetScriptDependencyModelNugetVersion>1.4.0</DotnetScriptDependencyModelNugetVersion>
 
         <!-- MSBuild packages -->
-        <MicrosoftBuildVersion>16.4.0</MicrosoftBuildVersion>
-        <MicrosoftBuildTasksCoreVersion>16.4.0</MicrosoftBuildTasksCoreVersion>
-        <MicrosoftBuildUtilitiesCoreVersion>16.4.0</MicrosoftBuildUtilitiesCoreVersion>
+        <MicrosoftBuildVersion>17.6.3</MicrosoftBuildVersion>
+        <MicrosoftBuildTasksCoreVersion>17.6.3</MicrosoftBuildTasksCoreVersion>
+        <MicrosoftBuildUtilitiesCoreVersion>17.6.3</MicrosoftBuildUtilitiesCoreVersion>
 
         <!-- Conflicted dependencies -->
-        <MicrosoftWin32RegistryVersion>4.7.0</MicrosoftWin32RegistryVersion>
-        <SystemCodeDomVersion>4.7.0</SystemCodeDomVersion>
-        <SystemSecurityPrincipalWindowsVersion>4.7.0</SystemSecurityPrincipalWindowsVersion>
-        <SystemSecurityCryptographyProtectedDataVersion>4.7.0</SystemSecurityCryptographyProtectedDataVersion>
+        <MicrosoftWin32RegistryVersion>5.0.0</MicrosoftWin32RegistryVersion>
+        <SystemCodeDomVersion>7.0.0</SystemCodeDomVersion>
+        <SystemSecurityPrincipalWindowsVersion>5.0.0</SystemSecurityPrincipalWindowsVersion>
+        <SystemSecurityCryptographyProtectedDataVersion>7.0.1</SystemSecurityCryptographyProtectedDataVersion>
 
         <!-- Roslyn packages -->
-        <MicrosoftCodeAnalysisScriptingVersion>4.1.0-1.final</MicrosoftCodeAnalysisScriptingVersion>
+        <MicrosoftCodeAnalysisScriptingVersion>4.6.0</MicrosoftCodeAnalysisScriptingVersion>
 
         <!-- Microsoft extensions -->
         <MicrosoftExtensionsLoggingVersion>2.1.1</MicrosoftExtensionsLoggingVersion>
         <MicrosoftExtensionsLoggingConsoleVersion>2.1.1</MicrosoftExtensionsLoggingConsoleVersion>
 
         <!-- Testing packages -->
-        <NUnitVersion>3.12.0</NUnitVersion>
-        <NUnit3TestAdapterVersion>3.16.1</NUnit3TestAdapterVersion>
-        <MicrosoftNETTestSdkVersion>16.5.0</MicrosoftNETTestSdkVersion>
+        <NUnitVersion>3.13.3</NUnitVersion>
+        <NUnit3TestAdapterVersion>4.5.0</NUnit3TestAdapterVersion>
+        <MicrosoftNETTestSdkVersion>17.6.3</MicrosoftNETTestSdkVersion>
         <PowerAssertVersion>1.0.79</PowerAssertVersion>
 
         <!-- Tooling related packages -->
