@@ -33,12 +33,12 @@
     <!-- Common project props -->
     <PropertyGroup>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-        <LangVersion>10.0</LangVersion>
+        <LangVersion>11.0</LangVersion>
     </PropertyGroup>
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp6.0</TargetFramework>
-        <ConsoleProjectTargetFramework>netcoreapp6.0</ConsoleProjectTargetFramework>
+        <TargetFramework>netcoreapp7.0</TargetFramework>
+        <ConsoleProjectTargetFramework>netcoreapp7.0</ConsoleProjectTargetFramework>
         <TestProjectTargetFramework>$(ConsoleProjectTargetFramework)</TestProjectTargetFramework>
     </PropertyGroup>
 

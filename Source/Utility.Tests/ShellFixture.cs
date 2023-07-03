@@ -41,7 +41,7 @@ namespace Nake.Utility
 
                 Assert.That(result.ExitCode == 0);
                 Assert.That(result.StdError.Count == 0);
-                Assert.That((string) result, Contains.Substring("dotnet [options] tool [command]"));
+                Assert.That((string) result, Contains.Substring("dotnet tool [command] [options]"));
 
                 result = Cmd(@"dotnet \
                                  tool \  
