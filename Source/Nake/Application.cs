@@ -174,7 +174,7 @@ namespace Nake
             Console.WriteLine();
         }
 
-        static ScriptSource Parse(FileInfo file) => new ScriptSource(File.ReadAllText(file.FullName), file);
+        ScriptSource Parse(FileInfo file) => new ScriptSource(File.ReadAllText(file.FullName), file, null, options.Framework);
         static TaskDeclaration[] Scan(ScriptSource source) => TaskDeclarationScanner.Scan(source);
 
         async AsyncTask Invoke(ScriptSource source, IEnumerable<TaskDeclaration> declarations)

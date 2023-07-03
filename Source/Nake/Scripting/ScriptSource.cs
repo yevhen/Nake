@@ -17,10 +17,12 @@ namespace Nake.Scripting
         public readonly string Code;
         public readonly FileInfo File;
         public readonly ScriptSource[] Imports = Array.Empty<ScriptSource>();
+        readonly string framework;
 
-        public ScriptSource(string code, FileInfo file = null, Logger log = null)
+        public ScriptSource(string code, FileInfo file = null, Logger log = null, string framework = null)
         {
             Log = log ?? DotnetScript.Logger();
+            this.framework = framework ?? DefaultTargetFramework;
             
             Code = code;
             File = file;
@@ -32,7 +34,7 @@ namespace Nake.Scripting
             imports.RemoveWhere(x => x.ToLowerInvariant().Equals(File.FullName.ToLowerInvariant()));
 
             Imports = imports
-                .Select(x => new ScriptSource(System.IO.File.ReadAllText(x), new FileInfo(x), log))
+                .Select(x => new ScriptSource(System.IO.File.ReadAllText(x), new FileInfo(x), log, framework))
                 .ToArray();
         }
 
@@ -68,7 +70,7 @@ namespace Nake.Scripting
             var dependencies = dependencyResolver.GetDependencies(
                 File.DirectoryName, 
                 AllFiles().Select(x => x.File.ToString()), 
-                true, DefaultTargetFramework);
+                true, framework);
 
             return dependencies
                 .SelectMany(d => d.AssemblyPaths)
@@ -81,7 +83,7 @@ namespace Nake.Scripting
             var provider = new ScriptProjectProvider(_ => Log);
             var scriptFiles = AllFiles().Select(x => x.File.ToString());
             var targetDirectory = File.DirectoryName;
-            var project = provider.CreateProject(targetDirectory, scriptFiles, DefaultTargetFramework, true);
+            var project = provider.CreateProject(targetDirectory, scriptFiles, framework, true);
             return System.IO.File.ReadAllText(project.Path);
         }
     }

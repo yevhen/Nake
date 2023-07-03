@@ -9,6 +9,7 @@ namespace Nake
         public string ScriptFile;
         public string CurrentDirectory;
 
+        public string Framework;
         public string RunnerName;
         public bool DebugScript;
         public bool ResetCache;
@@ -65,6 +66,10 @@ namespace Nake
 
             new Switch("debug", "Enables full script debugging in Visual Studio")
                 .OnMatch(options => options.DebugScript = true),
+
+            new Switch("framework ID", "Specify .net framework version to use (eg, netcoreapp6.0)")
+                .Shortcut("n")
+                .OnMatch((options, id) => options.Framework = id),	
 
             new Switch("tasks [PATTERN]", "Display the tasks with descriptions matching optional PATTERN and exit")
                 .Shortcut("T")
