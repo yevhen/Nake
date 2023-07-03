@@ -1,7 +1,7 @@
 ﻿#r "System.Net.WebClient"
 
-#r "nuget: Nake.Meta, 3.0.0-beta-01"
-#r "nuget: Nake.Utility, 3.0.0-beta-01"
+#r "nuget: Nake.Meta, 3.0.0"
+#r "nuget: Nake.Utility, 3.0.0"
 
 using System.IO;
 using System.Text;
@@ -19,7 +19,7 @@ var ArtifactsPath = $"{RootPath}/Artifacts";
 var ReleasePackagesPath = $"{ArtifactsPath}/Release";
 
 var AppVeyorJobId = Var["APPVEYOR_JOB_ID"];
-var TargetFramework = "netcoreapp6.0";
+var TargetFramework = "netcoreapp7.0";
 var Version = "3.0.0-dev";
 
 // global init
