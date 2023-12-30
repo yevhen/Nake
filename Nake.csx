@@ -19,7 +19,7 @@ var ArtifactsPath = $"{RootPath}/Artifacts";
 var ReleasePackagesPath = $"{ArtifactsPath}/Release";
 
 var AppVeyorJobId = Var["APPVEYOR_JOB_ID"];
-var TargetFramework = "netcoreapp7.0";
+var TargetFramework = "net8";
 var Version = "3.0.0-dev";
 
 // global init
