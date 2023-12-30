@@ -126,10 +126,11 @@ Write(Location.NakeScriptDirectory) //   alternatively call this method from Nak
 Write("{{esc}}");                   //  will simply print {esc} (no string interpolation)
 Write("$$esc$$");                   //  will simply print $esc$ (no env variable inlining)
 
-Cmd($"docker build -f {spec} .");   //    you can use Nake.Utility to execute programs and 
-Cmd($"echo {title}");               //        shell commands in the most succint way ...
+Cmd($"docker build -f {spec} .");   //        you can use Shell.Cmd to execute 
+Cmd($"echo {title}");               //         commands via shell interpreter ...
 
-await $"docker rm {cid} .";         //      simply await the string to get it executed
+await $"docker rm {cid} .";         //      or simply await the cli string to get it executed
+                                    //    this is the the most convenient way to execute commands
 
 r = await Run($"docker images");    //      and you can get the result of the execution
 Write(result.StandardOutput);       //    by using functionality provided by MedallionShell
