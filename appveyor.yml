@@ -18,7 +18,7 @@ init:
 install:
   - sh: |
       sudo apt-get update \
-      && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+      && DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends \
       ca-certificates \
       \
       # .NET Core dependencies
@@ -29,7 +29,7 @@ install:
       libssl1.1 \
       libstdc++6 \
       zlib1g \
-      && rm -rf /var/lib/apt/lists/*
+      && sudo rm -rf /var/lib/apt/lists/*
   - sh: sudo snap install dotnet-sdk --channel=8.0/beta --classic
   - sh: sudo snap alias dotnet-sdk.dotnet dotnet
 
