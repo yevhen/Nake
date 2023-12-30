@@ -14,19 +14,20 @@ environment:
 
 init:
   - git config --global core.autocrlf input
-  - sh apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-    ca-certificates \
-    \
-    # .NET Core dependencies
-    libc6 \
-    libgcc1 \
-    libgssapi-krb5-2 \
-    libicu66 \
-    libssl1.1 \
-    libstdc++6 \
-    zlib1g \
-    && rm -rf /var/lib/apt/lists/*
+  - sh: |
+      apt-get update \
+      && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+      ca-certificates \
+      \
+      # .NET Core dependencies
+      libc6 \
+      libgcc1 \
+      libgssapi-krb5-2 \
+      libicu66 \
+      libssl1.1 \
+      libstdc++6 \
+      zlib1g \
+      && rm -rf /var/lib/apt/lists/*
   - sh sudo snap install dotnet-sdk --channel=8.0/beta --classic
   - sh sudo snap alias dotnet-sdk.dotnet dotnet
   
