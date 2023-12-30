@@ -77,7 +77,7 @@ MakeDir(ArtifactsPath);
 /// Publishes package to NuGet gallery
 [Nake] async Task Publish() => await 
     $@"dotnet nuget push {ReleasePackagesPath}/**/*.{Version}.nupkg \
-    -k %NuGetApiKey% -s https://nuget.org/ -ss https://nuget.smbsrc.net --skip-duplicate";
+    -k %NuGetApiKey% -s https://nuget.org/ --skip-duplicate";
 
 /// Unlists nake packages from Nuget.org
 [Nake] async Task Unlist() 
