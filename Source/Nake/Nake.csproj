@@ -8,7 +8,6 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>nake</ToolCommandName>
     <PackageIcon>Logo.png</PackageIcon>
-    <TargetFrameworks>netcoreapp6.0;netcoreapp7.0</TargetFrameworks>    
   </PropertyGroup>
 
   <ItemGroup>

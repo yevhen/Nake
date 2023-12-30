@@ -37,8 +37,8 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp7.0</TargetFramework>
-        <ConsoleProjectTargetFramework>netcoreapp7.0</ConsoleProjectTargetFramework>
+        <TargetFramework>net8</TargetFramework>
+        <ConsoleProjectTargetFramework>net8</ConsoleProjectTargetFramework>
         <TestProjectTargetFramework>$(ConsoleProjectTargetFramework)</TestProjectTargetFramework>
     </PropertyGroup>
 
