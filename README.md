@@ -129,13 +129,13 @@ Write("$$esc$$");                   //  will simply print $esc$ (no env variable
 Cmd($"docker build -f {spec} .");   //        you can use Shell.Cmd to execute 
 Cmd($"echo {title}");               //         commands via shell interpreter ...
 
-await $"docker rm {cid} .";         //      or simply await the cli string to get it executed
-                                    //    this is the the most convenient way to execute commands
-
 r = await Run($"docker images");    //      and you can get the result of the execution
 Write(result.StandardOutput);       //    by using functionality provided by MedallionShell
 
 Run("app") < new FileInfo("input")  //   this includes fancy composable piping and redirects
+
+await $"docker rm {cid} .";         //      or simply await the cli string to get it executed
+                                    //    this is the the most convenient way to execute commands
 
 await $@"docker logs --tail 10 \    //      backslash (\) as line continuation symbol
          {container}";              //        could be used with verbatim strings
