@@ -3,7 +3,6 @@ skip_tags: true
 version: 2.0.{build}
 
 image: 
-  - Visual Studio 2022
   - Ubuntu2004
 
 environment:
