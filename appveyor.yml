@@ -28,8 +28,8 @@ init:
       libstdc++6 \
       zlib1g \
       && rm -rf /var/lib/apt/lists/*
-  - sh sudo snap install dotnet-sdk --channel=8.0/beta --classic
-  - sh sudo snap alias dotnet-sdk.dotnet dotnet
+  - sh: sudo snap install dotnet-sdk --channel=8.0/beta --classic
+  - sh: sudo snap alias dotnet-sdk.dotnet dotnet
   
 
 build_script:
