@@ -3,7 +3,9 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Medallion.Shell;
-using NUnit.Framework;	
+using NUnit.Framework;
+using NUnit.Framework.Legacy;
+
 using static Nake.Shell;
 
 namespace Nake.Utility	
@@ -89,7 +91,7 @@ namespace Nake.Utility
             {
                 const string command = @"dotnet '''C:\Program' Files'''  pack";
                 var exception = Assert.Throws<Exception>(()=> ToCommandLineArgs(command));
-                Assert.AreEqual("The command contains unbalanced quote at position 27", exception.Message);
+                Assert.That(exception!.Message, Is.EqualTo("The command contains unbalanced quote at position 27"));
             }
         }
     }	

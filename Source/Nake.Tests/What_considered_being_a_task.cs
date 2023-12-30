@@ -20,7 +20,7 @@ namespace Nake
             
             Build(code);
 
-            Assert.AreEqual(Tasks.Count(), isTask ? 1 : 0);
+            Assert.That(Tasks.Count(), Is.EqualTo(isTask ? 1 : 0));
         }
 
         static object[][] TestCases()

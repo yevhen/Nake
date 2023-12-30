@@ -47,31 +47,31 @@
 
 		<!-- Infrastructure packages -->
         <MedallionShellVersion>1.6.2</MedallionShellVersion>
-		<DotnetScriptDependencyModelVersion>1.4.0</DotnetScriptDependencyModelVersion>
-		<DotnetScriptDependencyModelNugetVersion>1.4.0</DotnetScriptDependencyModelNugetVersion>
+		<DotnetScriptDependencyModelVersion>1.5.0</DotnetScriptDependencyModelVersion>
+		<DotnetScriptDependencyModelNugetVersion>1.5.0</DotnetScriptDependencyModelNugetVersion>
 
         <!-- MSBuild packages -->
-        <MicrosoftBuildVersion>17.6.3</MicrosoftBuildVersion>
-        <MicrosoftBuildTasksCoreVersion>17.6.3</MicrosoftBuildTasksCoreVersion>
-        <MicrosoftBuildUtilitiesCoreVersion>17.6.3</MicrosoftBuildUtilitiesCoreVersion>
+        <MicrosoftBuildVersion>17.8.3</MicrosoftBuildVersion>
+        <MicrosoftBuildTasksCoreVersion>17.8.3</MicrosoftBuildTasksCoreVersion>
+        <MicrosoftBuildUtilitiesCoreVersion>17.8.3</MicrosoftBuildUtilitiesCoreVersion>
 
         <!-- Conflicted dependencies -->
         <MicrosoftWin32RegistryVersion>5.0.0</MicrosoftWin32RegistryVersion>
-        <SystemCodeDomVersion>7.0.0</SystemCodeDomVersion>
+        <SystemCodeDomVersion>8.0.0</SystemCodeDomVersion>
         <SystemSecurityPrincipalWindowsVersion>5.0.0</SystemSecurityPrincipalWindowsVersion>
-        <SystemSecurityCryptographyProtectedDataVersion>7.0.1</SystemSecurityCryptographyProtectedDataVersion>
+        <SystemSecurityCryptographyProtectedDataVersion>8.0.0</SystemSecurityCryptographyProtectedDataVersion>
 
         <!-- Roslyn packages -->
-        <MicrosoftCodeAnalysisScriptingVersion>4.6.0</MicrosoftCodeAnalysisScriptingVersion>
+        <MicrosoftCodeAnalysisScriptingVersion>4.8.0</MicrosoftCodeAnalysisScriptingVersion>
 
         <!-- Microsoft extensions -->
         <MicrosoftExtensionsLoggingVersion>2.1.1</MicrosoftExtensionsLoggingVersion>
         <MicrosoftExtensionsLoggingConsoleVersion>2.1.1</MicrosoftExtensionsLoggingConsoleVersion>
 
         <!-- Testing packages -->
-        <NUnitVersion>3.13.3</NUnitVersion>
+        <NUnitVersion>4.0.1</NUnitVersion>
         <NUnit3TestAdapterVersion>4.5.0</NUnit3TestAdapterVersion>
-        <MicrosoftNETTestSdkVersion>17.6.3</MicrosoftNETTestSdkVersion>
+        <MicrosoftNETTestSdkVersion>17.8.0</MicrosoftNETTestSdkVersion>
         <PowerAssertVersion>1.0.79</PowerAssertVersion>
 
         <!-- Tooling related packages -->

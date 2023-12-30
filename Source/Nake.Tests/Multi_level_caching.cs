@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Nake
 {
@@ -180,7 +181,7 @@ namespace Nake
                     {
                         var first = firstRunModified[i];
                         var next = nextRunModified[i];
-                        Assert.AreEqual(first.modified, next.modified, 
+                        Assert.That(first.modified, Is.EqualTo(next.modified), 
                             $"Last write time is different between first and next run for {first.name}");    
                     }
                 }
