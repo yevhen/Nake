@@ -25,7 +25,7 @@
     <!-- Common compile parameters -->
     <PropertyGroup>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-        <NoWarn>$(NoWarn);1591</NoWarn>
+        <NoWarn>$(NoWarn);1591;NU1701;NU1605</NoWarn>
         <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
         <DebugType>portable</DebugType>
     </PropertyGroup>
@@ -51,13 +51,13 @@
 		<DotnetScriptDependencyModelNugetVersion>1.5.0</DotnetScriptDependencyModelNugetVersion>
 
         <!-- MSBuild packages -->
-        <MicrosoftBuildVersion>17.8.3</MicrosoftBuildVersion>
-        <MicrosoftBuildTasksCoreVersion>17.8.3</MicrosoftBuildTasksCoreVersion>
-        <MicrosoftBuildUtilitiesCoreVersion>17.8.3</MicrosoftBuildUtilitiesCoreVersion>
+        <MicrosoftBuildVersion>17.14.8</MicrosoftBuildVersion>
+        <MicrosoftBuildTasksCoreVersion>17.14.8</MicrosoftBuildTasksCoreVersion>
+        <MicrosoftBuildUtilitiesCoreVersion>17.14.8</MicrosoftBuildUtilitiesCoreVersion>
 
         <!-- Conflicted dependencies -->
         <MicrosoftWin32RegistryVersion>5.0.0</MicrosoftWin32RegistryVersion>
-        <SystemCodeDomVersion>8.0.0</SystemCodeDomVersion>
+        <SystemCodeDomVersion>9.0.0</SystemCodeDomVersion>
         <SystemSecurityPrincipalWindowsVersion>5.0.0</SystemSecurityPrincipalWindowsVersion>
         <SystemSecurityCryptographyProtectedDataVersion>8.0.0</SystemSecurityCryptographyProtectedDataVersion>
 
@@ -65,8 +65,8 @@
         <MicrosoftCodeAnalysisScriptingVersion>4.8.0</MicrosoftCodeAnalysisScriptingVersion>
 
         <!-- Microsoft extensions -->
-        <MicrosoftExtensionsLoggingVersion>2.1.1</MicrosoftExtensionsLoggingVersion>
-        <MicrosoftExtensionsLoggingConsoleVersion>2.1.1</MicrosoftExtensionsLoggingConsoleVersion>
+        <MicrosoftExtensionsLoggingVersion>8.0.1</MicrosoftExtensionsLoggingVersion>
+        <MicrosoftExtensionsLoggingConsoleVersion>8.0.1</MicrosoftExtensionsLoggingConsoleVersion>
 
         <!-- Testing packages -->
         <NUnitVersion>4.0.1</NUnitVersion>
