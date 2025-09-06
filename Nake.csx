@@ -1,4 +1,7 @@
-﻿#r "System.Net.WebClient"
+#!/usr/bin/env bash
+//usr/bin/true; exec dotnet nake "$@"; exit
+/**/
+#r "System.Net.WebClient"
 
 #r "nuget: Nake.Meta, 3.0.0"
 #r "nuget: Nake.Utility, 3.0.0"

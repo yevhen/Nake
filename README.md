@@ -167,6 +167,21 @@ General syntax is: `Nake [options ...]  [VAR=VALUE ...]  [task ...]`
                                     //   to use Nake.csx file if present in current directory
 ```
 
+### Making scripts executable
+
+Nake scripts can be made directly executable with a polyglot shebang 
+(just make sure you've installed Nake as dotnet tool either globally or locally):
+
+```cs
+#!/usr/bin/env bash
+//usr/bin/true; exec dotnet nake "$@"; exit
+/**/
+#r "nuget: Nake.Meta, 3.0.0"
+// ... rest of your script
+```
+
+Then just `chmod +x Nake.csx` and run with `./Nake.csx [task]`
+
 Options:
 
 	   -?  --help             Display help message and exit
