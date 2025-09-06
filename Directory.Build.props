@@ -33,7 +33,8 @@
     <!-- Common project props -->
     <PropertyGroup>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-        <LangVersion>11.0</LangVersion>
+        <LangVersion>12.0</LangVersion>
+        <Nullable>annotations</Nullable>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -71,8 +72,8 @@
 
         <!-- Testing packages -->
         <NUnitVersion>4.0.1</NUnitVersion>
-        <NUnit3TestAdapterVersion>4.5.0</NUnit3TestAdapterVersion>
-        <MicrosoftNETTestSdkVersion>17.8.0</MicrosoftNETTestSdkVersion>
+        <NUnit3TestAdapterVersion>4.6.0</NUnit3TestAdapterVersion>
+        <MicrosoftNETTestSdkVersion>17.14.1</MicrosoftNETTestSdkVersion>
         <PowerAssertVersion>1.0.79</PowerAssertVersion>
 
         <!-- Tooling related packages -->
