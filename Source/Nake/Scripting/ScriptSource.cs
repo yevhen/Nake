@@ -48,7 +48,7 @@ class ScriptSource
 
     public AssemblyReference[] ComputeDependencies(AssemblyReference[]? cached = null)
     {
-        if (cached != null)
+        if (cached is { Length: > 0 })
         {
             Log.Debug($"Reusing compilation dependencies from previous build for {File?.FullName}");
             return cached;
