@@ -13,9 +13,9 @@ public static class AssemblyResolver
 
     public static void Register()
     {
-        AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
+        AppDomain.CurrentDomain.AssemblyResolve += (_, args) =>
         {
-            var reference = references.Find(new AssemblyName(args.Name!).Name);
+            var reference = references.Find(new AssemblyName(args.Name).Name!);
                 
             return reference != null 
                 ? Assembly.LoadFrom(reference.FullPath) 

@@ -6,6 +6,7 @@
     <AssemblyName>Nake.Meta</AssemblyName>
     <IsPackable>true</IsPackable>
     <PackageIcon>Logo.png</PackageIcon>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

@@ -5,9 +5,10 @@ struct EnvironmentVariable(string name, string value)
     public readonly string Name = name;
     public readonly string Value = value;
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
-        var other = (EnvironmentVariable) obj;
+        if (obj is not EnvironmentVariable other)
+            return false;
         return string.Equals(Name, other.Name);
     }
 

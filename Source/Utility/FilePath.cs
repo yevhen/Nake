@@ -4,20 +4,20 @@ namespace Nake;
 
 readonly struct FilePath
 {
-    public static FilePath From(string s) => new(s
+    public static FilePath From(string s) => new(s?
         .Replace('/', Path.DirectorySeparatorChar)
-        .Replace('\\', Path.DirectorySeparatorChar));
+        .Replace('\\', Path.DirectorySeparatorChar) ?? "");
 
     readonly string value;
 
     FilePath(string value) => 
-        this.value = value;
+        this.value = value ?? "";
 
-    public int Length => value.Length;
+    public int Length => value?.Length ?? 0;
 
-    public string CaseInsensitive() => value.ToLowerInvariant();
+    public string CaseInsensitive() => value?.ToLowerInvariant() ?? "";
 
     public FilePath Combine(FilePath p) => new(Path.Combine(this, p));
 
-    public static implicit operator string(FilePath p) => p.value;
+    public static implicit operator string(FilePath p) => p.value ?? "";
 }

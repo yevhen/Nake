@@ -52,7 +52,7 @@ public class EnvironmentScope : IEnumerable<KeyValuePair<string, string>>
     /// <value> The string value. </value>
     /// <param name="name">The variable name.</param>
     /// <returns>Value or <c>null</c> if environment variable does not exists</returns>
-    public string this[string name]
+    public string? this[string name]
     {
         get => Defined(name) ? Environment.GetEnvironmentVariable(name, target) : null;
         set => Environment.SetEnvironmentVariable(name, value, target);
@@ -76,6 +76,7 @@ public class EnvironmentScope : IEnumerable<KeyValuePair<string, string>>
     /// </summary>
     public IEnumerator<KeyValuePair<string, string>> GetEnumerator() =>
         (from DictionaryEntry entry in Environment.GetEnvironmentVariables(target)
+            where entry.Key is string && entry.Value is string
             select new KeyValuePair<string,string>((string) entry.Key, (string) entry.Value)).GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

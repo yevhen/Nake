@@ -91,7 +91,7 @@ public static class Log
         Error(exception.Message);
 
         if (TraceEnabled)
-            Info(exception.StackTrace);
+            Info(exception.StackTrace ?? "No stack trace available");
     }
 
     /// <summary>

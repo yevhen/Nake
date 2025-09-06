@@ -6,11 +6,11 @@ namespace Nake;
 
 class Options
 {
-    public string ScriptFile;
-    public string CurrentDirectory;
+    public string ScriptFile = "";
+    public string CurrentDirectory = "";
 
-    public string Framework;
-    public string RunnerName;
+    public string Framework = "";
+    public string RunnerName = "";
     public bool DebugScript;
     public bool ResetCache;
 
@@ -22,7 +22,7 @@ class Options
     public bool ShowVersion;
         
     public bool ShowTasks;
-    public string ShowTasksFilter;
+    public string ShowTasksFilter = "";
         
     public readonly List<Variable> Variables = [];
     public readonly List<Task> Tasks = [];
@@ -154,7 +154,7 @@ class Options
 
         while (position < args.Length)
         {
-            Switch.Match match = null;
+            Switch.Match? match = null;
 
             foreach (var option in switches)
             {
@@ -211,7 +211,7 @@ class Options
         readonly bool requiresValue;
 
         string shortcut = "";
-        Action<Options, string> handler;
+        Action<Options, string> handler = (_, _) => { };
 
         public Switch(string pattern, string description)
         {
@@ -277,7 +277,7 @@ class Options
             return this;
         }
 
-        public Match TryMatch(string[] args, int position)
+        public Match? TryMatch(string[] args, int position)
         {
             return Matches(args[position])
                 ? new Match(this, GetValue(args, position))
@@ -295,7 +295,7 @@ class Options
             return false;
         }
 
-        string GetValue(string[] args, int position)
+        string? GetValue(string[] args, int position)
         {
             if (!expectsValue)
                 return null;
@@ -311,9 +311,9 @@ class Options
         public class Match
         {
             readonly Switch option;
-            readonly string value;
+            readonly string? value;
 
-            public Match(Switch option, string value)
+            public Match(Switch option, string? value)
             {
                 this.option = option;
                 this.value = value;
@@ -321,7 +321,7 @@ class Options
 
             public void Apply(Options options)
             {
-                option.handler(options, value);
+                option.handler(options, value ?? "");
             }
 
             public int ArgumentsConsumed()
@@ -455,15 +455,15 @@ class Options
                     .ToArray());
             }
 
-            public Match Next()
+            public Match? Next()
             {
                 return remaining.Length != 0 ? new Match(remaining) : null;
             }
 
             class Argument
             {
-                string name;
-                string value;
+                string name = "";
+                string value = "";
 
                 public void SetValue(string arg)
                 {

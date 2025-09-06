@@ -15,7 +15,7 @@ namespace Nake;
 
 class BuildInput(ScriptSource source, IDictionary<string, string> substitutions, bool debug)
 {
-    AssemblyReference[] cached;
+    AssemblyReference[] cached = [];
 
     public readonly ScriptSource Source = source;
     public readonly IDictionary<string, string> Substitutions = substitutions;
@@ -28,8 +28,8 @@ class BuildInput(ScriptSource source, IDictionary<string, string> substitutions,
 }
 
 class BuildEngine(
-    IEnumerable<AssemblyReference> references = null,
-    IEnumerable<string> namespaces = null)
+    IEnumerable<AssemblyReference>? references = null,
+    IEnumerable<string>? namespaces = null)
 {
     readonly IEnumerable<AssemblyReference> references = references ?? [];
     readonly IEnumerable<string> namespaces = namespaces ?? [];
@@ -61,7 +61,7 @@ class PixieDust(CompiledScript script)
         var result = Rewrite(substitutions);
 
         byte[] assembly;
-        byte[] symbols = null;
+        byte[]? symbols = null;
 
         if (debug)
             EmitDebug(result.Compilation, out assembly, out symbols);
@@ -92,7 +92,7 @@ class PixieDust(CompiledScript script)
 
         var rewrittenTree = rewrittenTrees.Count == 1
             ? rewrittenTrees.First().Value
-            : rewrittenTrees[script.Source.File.FullName];
+            : rewrittenTrees[script.Source.File?.FullName ?? ""];
 
         var compilation = script.Compilation;
         if (script.Source.IsFile)
@@ -125,7 +125,7 @@ class PixieDust(CompiledScript script)
     }
 
     SourceFileResolver Resolver(Dictionary<string, CSharpSyntaxTree> rewrittenTrees) =>
-        new LoadScriptResolver(rewrittenTrees, script.Source.File.DirectoryName);
+        new LoadScriptResolver(rewrittenTrees, script.Source.File?.DirectoryName ?? "");
 
     class LoadScriptResolver(Dictionary<string, CSharpSyntaxTree> rewrittenTrees, string baseDirectory)
         : SourceFileResolver(ImmutableArray<string>.Empty, baseDirectory)
@@ -145,7 +145,7 @@ class PixieDust(CompiledScript script)
         assembly = assemblyStream.GetBuffer();
     }
 
-    void EmitDebug(Compilation compilation, out byte[] assembly, out byte[] symbols)
+    void EmitDebug(Compilation compilation, out byte[] assembly, out byte[]? symbols)
     {
         using var assemblyStream = new MemoryStream();
         using var symbolStream = new MemoryStream();
@@ -179,14 +179,14 @@ class BuildResult
     public readonly EnvironmentVariable[] Variables;
     public readonly Assembly Assembly;
     public readonly byte[] AssemblyBytes;
-    public readonly byte[] SymbolBytes;
+    public readonly byte[]? SymbolBytes;
 
     public BuildResult(
         Task[] tasks,
         AssemblyReference[] references,
         EnvironmentVariable[] variables,
         byte[] assembly,
-        byte[] symbols)
+        byte[]? symbols)
     {
         Tasks = tasks;
         References = references;

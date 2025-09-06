@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <None Include="..\..\Logo.png" Pack="true" PackagePath=""/>
+    <None Remove="Shell.Run.fix.md" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">

@@ -22,21 +22,21 @@ class Task
     readonly List<Task> dependencies = new();
     readonly HashSet<BodyInvocation> invocations = new();
 
-    readonly IMethodSymbol symbol;
+    readonly IMethodSymbol? symbol;
     readonly bool step;
-    MethodInfo reflected;
+    MethodInfo? reflected;
 
     public Task(IMethodSymbol symbol, bool step)
     {
         CheckSignature(symbol);
-        Signature = symbol.ToString();
+        Signature = symbol.ToString() ?? symbol.Name;
         this.symbol = symbol;
         this.step = step;
     }
 
     public Task(TaskDeclaration declaration)
     {
-        Signature = declaration.Signature;
+        Signature = declaration.Signature ?? "";
         step = declaration.IsStep;
     }
 
@@ -52,7 +52,7 @@ class Task
             symbol.IsGenericMethod ||
             symbol.Parameters.Any(p => p.RefKind != RefKind.None || !TypeConverter.IsSupported(p.Type)) ||
             hasDuplicateParameters)
-            throw new TaskSignatureViolationException(symbol.ToString());
+            throw new TaskSignatureViolationException(symbol.ToString() ?? symbol.Name);
     }
 
     public MethodDeclarationSyntax Replace(MethodDeclarationSyntax method)
@@ -79,7 +79,7 @@ class Task
     {
         var arguments = TaskArgument.BuildArgumentString(method.ParameterList.Parameters);
             
-        return symbol.IsAsync
+        return symbol?.IsAsync == true
             ? TaskRegistry.BuildInvokeTaskAsyncString(FullName, arguments, body)
             : TaskRegistry.BuildInvokeTaskString(FullName, arguments, body);
     }
@@ -89,6 +89,9 @@ class Task
         if (method.Body != null)
             return method.Body.ToFullString();
 
+        if (method.ExpressionBody == null)
+            throw new InvalidOperationException("Method has no body or expression body");
+            
         var body = method.ExpressionBody.ToFullString();
         return body.Substring(body.IndexOf("=>", StringComparison.Ordinal) + 2);
     }
@@ -129,14 +132,18 @@ class Task
         
     public void Reflect(Assembly assembly)
     {
-        reflected = assembly.GetType(DeclaringType)
-            .GetMethod(Name, BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-
-        Debug.Assert(reflected != null);            
+        var type = assembly.GetType(DeclaringType);
+        if (type == null)
+            throw new InvalidOperationException($"Could not find type {DeclaringType}");
+            
+        reflected = type.GetMethod(Name, BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        
+        if (reflected == null)
+            throw new InvalidOperationException($"Could not find method {Name} in type {DeclaringType}");
     }
 
     public async AsyncTask Invoke(object script, TaskArgument[] arguments) => 
-        await new TaskInvocation(script, this, reflected, arguments).Invoke();
+        await new TaskInvocation(script, this, reflected ?? throw new InvalidOperationException("Task not reflected"), arguments).Invoke();
 
     public async AsyncTask Invoke(IEnumerable<TaskArgument> arguments, Func<AsyncTask> body)
     {
@@ -167,7 +174,7 @@ class Task
         public BodyInvocation(IEnumerable<TaskArgument> arguments) => 
             values = arguments.Select(x => x.Value).ToArray();
 
-        public override bool Equals(object obj) => 
+        public override bool Equals(object? obj) => 
             !ReferenceEquals(null, obj) && (ReferenceEquals(this, obj) || Equals((BodyInvocation) obj));
 
         bool Equals(BodyInvocation other) => 

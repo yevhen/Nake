@@ -7,7 +7,7 @@ namespace Nake;
 
 public class TaskArgument
 {
-    static string FullTypeName => typeof(TaskArgument).FullName;
+    static string FullTypeName => typeof(TaskArgument).FullName ?? typeof(TaskArgument).Name;
 
     public static string BuildArgumentString(IReadOnlyList<ParameterSyntax> parameters)
     {
@@ -47,7 +47,7 @@ public class TaskArgument
 
     object ConvertEnumValue(Type enumType)
     {
-        var parts = Value.ToString().Split('.');
+        var parts = Value.ToString()?.Split('.') ?? new string[0];
 
         var value = parts.Length == 1 
             ? parts[0] 

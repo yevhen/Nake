@@ -14,7 +14,7 @@ namespace Nake;
 
 class Application
 {
-    string currentDirectory;
+    string currentDirectory = Environment.CurrentDirectory;
     readonly Options options;
         
     public Application(Options options) => 
@@ -148,7 +148,7 @@ class Application
         Console.WriteLine();
 
         var @default = tasks.SingleOrDefault(x => x.DisplayName == "default");
-        if (@default != null)
+        if (@default is not null)
             PrintTask(@default, breadth, ConsoleColor.Cyan);
 
         foreach (var task in tasks.Where(x => x.DisplayName != "default"))

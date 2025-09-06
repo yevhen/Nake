@@ -14,11 +14,11 @@ class ScriptSource
         
     public readonly Logger Log;
     public readonly string Code;
-    public readonly FileInfo File;
+    public readonly FileInfo? File;
     public readonly ScriptSource[] Imports = [];
     readonly string framework;
 
-    public ScriptSource(string code, FileInfo file = null, Logger log = null, string framework = null)
+    public ScriptSource(string code, FileInfo? file = null, Logger? log = null, string? framework = null)
     {
         Log = log ?? DotnetScript.Logger();
         this.framework = framework ?? DefaultTargetFramework;
@@ -30,10 +30,10 @@ class ScriptSource
             return;
 
         var imports = new ScriptFilesResolver().GetScriptFiles(file.FullName);
-        imports.RemoveWhere(x => x.ToLowerInvariant().Equals(File.FullName.ToLowerInvariant()));
+        imports.RemoveWhere(x => x.ToLowerInvariant().Equals(File?.FullName.ToLowerInvariant()));
 
         Imports = imports
-            .Select(x => new ScriptSource(System.IO.File.ReadAllText(x), new FileInfo(x), log, framework))
+            .Select(x => new ScriptSource(System.IO.File.ReadAllText(x), new FileInfo(x), Log, this.framework))
             .ToArray();
     }
 
@@ -46,29 +46,30 @@ class ScriptSource
             yield return each;
     }
 
-    public AssemblyReference[] ComputeDependencies(AssemblyReference[] cached = null)
+    public AssemblyReference[] ComputeDependencies(AssemblyReference[]? cached = null)
     {
         if (cached != null)
         {
-            Log.Debug($"Reusing compilation dependencies from previous build for {File.FullName}");
+            Log.Debug($"Reusing compilation dependencies from previous build for {File?.FullName}");
             return cached;
         }
 
         if (!IsFile)
             return [];
 
-        Log.Debug($"Computing compilation dependencies for {File.FullName}");
+        Log.Debug($"Computing compilation dependencies for {File?.FullName}");
 
         var loaded = AppDomain.CurrentDomain.GetAssemblies()
             .Where(a => !a.IsDynamic)
             .Select(a => a.Location)
+            .Where(location => !string.IsNullOrEmpty(location))
             .Distinct()
-            .ToDictionary(Path.GetFileName);
+            .ToDictionary(location => Path.GetFileName(location) ?? "", location => location);
 
         var dependencyResolver = new CompilationDependencyResolver(t => Log);
         var dependencies = dependencyResolver.GetDependencies(
-            File.DirectoryName, 
-            AllFiles().Select(x => x.File.ToString()), 
+            File?.DirectoryName ?? Directory.GetCurrentDirectory(), 
+            AllFiles().Select(x => x.File?.ToString() ?? ""), 
             true, framework);
 
         return dependencies
@@ -80,8 +81,8 @@ class ScriptSource
     public string ProjectFileContents()
     {
         var provider = new ScriptProjectProvider(_ => Log);
-        var scriptFiles = AllFiles().Select(x => x.File.ToString());
-        var targetDirectory = File.DirectoryName;
+        var scriptFiles = AllFiles().Select(x => x.File?.ToString() ?? "");
+        var targetDirectory = File?.DirectoryName ?? Directory.GetCurrentDirectory();
         var project = provider.CreateProject(targetDirectory, scriptFiles, framework, true);
         return System.IO.File.ReadAllText(project.Path);
     }

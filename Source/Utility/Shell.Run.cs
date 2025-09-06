@@ -69,8 +69,8 @@ public static partial class Shell
     public static Command Run(
         string command,
         bool ignoreExitCode = false,
-        string workingDirectory = null,
-        IEnumerable<KeyValuePair<string, string>> environmentVariables = null)
+        string? workingDirectory = null,
+        IEnumerable<KeyValuePair<string, string>>? environmentVariables = null)
     {
         if (string.IsNullOrWhiteSpace(command))
             throw new ArgumentException("command is null or contains whitespace only");
@@ -188,8 +188,8 @@ public static partial class Shell
             
         public ParserState(string input)
         {
-            this.input = input;
-            CurrentChar = input[0];
+            this.input = input ?? throw new ArgumentNullException(nameof(input));
+            CurrentChar = input.Length > 0 ? input[0] : EndOfLine;
         }
 
         public IEnumerable<string> Arguments => arguments;

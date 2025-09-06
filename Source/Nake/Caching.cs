@@ -13,7 +13,7 @@ namespace Nake;
 
 class CachingBuildEngine(BuildEngine engine, Task[] tasks, bool reset)
 {
-    public (BuildResult result, CacheKey cache) Build(BuildInput input)
+    public (BuildResult result, CacheKey? cache) Build(BuildInput input)
     {
         if (!input.Source.IsFile)
             return (engine.Build(input), null);
@@ -66,13 +66,13 @@ class CacheKey
         debug = input.Debug;
         substitutions = input.Substitutions;
 
-        ScriptFolder = Path.Combine(RootCacheFolder, StringHash(source.File.FullName));
+        ScriptFolder = Path.Combine(RootCacheFolder, StringHash(source.File!.FullName));
         ProjectFolder = Path.Combine(ScriptFolder, ComputeProjectHash());
         CompilationFolder = Path.Combine(ProjectFolder, ComputeCompilationHash());
     }
 
-    string AssemblyFile => Path.Combine(CompilationFolder, source.File.Name + ".dll");
-    string PdbFile => Path.Combine(CompilationFolder, source.File.Name + ".pdb");
+    string AssemblyFile => Path.Combine(CompilationFolder, source.File!.Name + ".dll");
+    string PdbFile => Path.Combine(CompilationFolder, source.File!.Name + ".pdb");
 
     string ReferencesFile => Path.Combine(ProjectFolder, "references");
     string CapturedVariablesFile => Path.Combine(CompilationFolder, "variables");
@@ -100,12 +100,12 @@ class CacheKey
         return s.Replace("/", "_").Replace("\\", "_").Replace("+", "_").Replace("=", "_");
     }
 
-    public AssemblyReference[] FindDependencies() =>
+    public AssemblyReference[]? FindDependencies() =>
         ProjectFolderExists()
             ? ReadReferences()
             : null;
 
-    public BuildResult FindCompilation(Task[] tasks, AssemblyReference[] references)
+    public BuildResult? FindCompilation(Task[] tasks, AssemblyReference[] references)
     {
         if (!CachedAssemblyExists())
             return null;
@@ -116,7 +116,7 @@ class CacheKey
         var assembly = ReadAssembly();
         var symbols = ReadSymbols();
 
-        return new BuildResult(tasks, references, null, assembly, debug ? symbols : null);
+        return new BuildResult(tasks, references, [], assembly, debug ? symbols : null);
     }
 
     bool ProjectFolderExists() => Directory.Exists(ProjectFolder);
@@ -145,7 +145,7 @@ class CacheKey
             .ToArray();
 
     byte[] ReadAssembly() => File.ReadAllBytes(AssemblyFile);
-    byte[] ReadSymbols() => debug && File.Exists(PdbFile) ? File.ReadAllBytes(PdbFile) : null;
+    byte[]? ReadSymbols() => debug && File.Exists(PdbFile) ? File.ReadAllBytes(PdbFile) : null;
 
     public void Store(BuildResult result)
     {

@@ -19,7 +19,7 @@ class FieldSubstitution(VariableDeclaratorSyntax node, IFieldSymbol symbol, stri
         return node;
     }
 
-    LiteralExpressionSyntax TryCreateLiteral()
+    LiteralExpressionSyntax? TryCreateLiteral()
     {
         if (symbol.Type.IsBoolean())
             return BooleanLiteral();
@@ -33,7 +33,7 @@ class FieldSubstitution(VariableDeclaratorSyntax node, IFieldSymbol symbol, stri
         throw new NakeException("Unsupported literal type " + symbol.Type);
     }
 
-    LiteralExpressionSyntax BooleanLiteral()
+    LiteralExpressionSyntax? BooleanLiteral()
     {
         bool value;
         if (!bool.TryParse(substitution, out value))
@@ -45,7 +45,7 @@ class FieldSubstitution(VariableDeclaratorSyntax node, IFieldSymbol symbol, stri
             .WithLeadingTrivia(SyntaxFactory.Space);
     }
 
-    LiteralExpressionSyntax IntegerLiteral()
+    LiteralExpressionSyntax? IntegerLiteral()
     {
         int value;
         if (!int.TryParse(substitution, out value))

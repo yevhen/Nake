@@ -41,12 +41,12 @@ public class TaskDeclaration : IEquatable<TaskDeclaration>
         return path == "" ? signature : path + "." + signature;
     }
 
-    public bool Equals(TaskDeclaration other) =>
+    public bool Equals(TaskDeclaration? other) =>
         !ReferenceEquals(null, other) &&
         (ReferenceEquals(this, other) ||
          FullName == other.FullName);
 
-    public override bool Equals(object obj) =>
+    public override bool Equals(object? obj) =>
         !ReferenceEquals(null, obj) &&
         (ReferenceEquals(this, obj) ||
          obj.GetType() == GetType() && Equals((TaskDeclaration) obj));

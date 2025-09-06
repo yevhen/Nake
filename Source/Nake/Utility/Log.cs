@@ -95,7 +95,7 @@ static class Log
         Error(exception.Message);
 
         if (TraceEnabled)
-            Info(exception.StackTrace);
+            Info(exception.StackTrace ?? "");
     }
 
     /// <summary>

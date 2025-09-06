@@ -12,7 +12,7 @@ class Rewriter(AnalyzerResult result, CSharpSyntaxTree tree) : CSharpSyntaxRewri
 
     public CSharpSyntaxTree Rewrite()
     {
-        var newRoot = tree.GetRoot().Accept(this);
+        var newRoot = tree.GetRoot().Accept(this)!;
         return CreateTree(newRoot);
     }
 
@@ -28,28 +28,24 @@ class Rewriter(AnalyzerResult result, CSharpSyntaxTree tree) : CSharpSyntaxRewri
     public override SyntaxNode VisitMethodDeclaration(MethodDeclarationSyntax node)
     {
         var visited = (MethodDeclarationSyntax)
-            base.VisitMethodDeclaration(node);
+            base.VisitMethodDeclaration(node)!;
 
         var task = result.Find(node);
-        return task != null
-            ? task.Replace(visited)
-            : visited;
+        return task?.Replace(visited) ?? visited;
     }
 
     public override SyntaxNode VisitVariableDeclarator(VariableDeclaratorSyntax node)
     {
         var substitution = result.Find(node);
 
-        return substitution != null
-            ? substitution.Substitute()
-            : base.VisitVariableDeclarator(node);
+        return substitution?.Substitute() ?? base.VisitVariableDeclarator(node)!;
     }
 
     public override SyntaxNode VisitLiteralExpression(LiteralExpressionSyntax node)
     {
         var interpolation = result.Find(node);
         if (interpolation == null)
-            return base.VisitLiteralExpression(node);
+            return base.VisitLiteralExpression(node)!;
 
         var (interpolated, captured) = interpolation.Interpolate();
         foreach (var variable in captured)
@@ -63,6 +59,6 @@ class Rewriter(AnalyzerResult result, CSharpSyntaxTree tree) : CSharpSyntaxRewri
         var interpolation = result.Find(node);
         return interpolation != null
             ? (interpolation.Interpolate()).interpolated
-            : base.VisitInterpolatedStringExpression(node);
+            : base.VisitInterpolatedStringExpression(node)!;
     }
 }

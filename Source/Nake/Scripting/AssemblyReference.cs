@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.IO;
 using Microsoft.CodeAnalysis;
 
@@ -10,7 +11,7 @@ public class AssemblyReference
     public readonly string Name;
 
     public AssemblyReference(MetadataReference reference)
-        : this(reference.Display)
+        : this(reference.Display ?? throw new ArgumentException("MetadataReference.Display cannot be null", nameof(reference)))
     {}
 
     public AssemblyReference(string fullPath)

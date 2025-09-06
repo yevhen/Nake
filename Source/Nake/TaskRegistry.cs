@@ -8,7 +8,7 @@ namespace Nake;
 
 public class TaskRegistry
 {
-    static string FullTypeName => typeof(TaskRegistry).FullName;
+    static string FullTypeName => typeof(TaskRegistry).FullName ?? typeof(TaskRegistry).Name;
 
     internal static string BuildInvokeTaskString(string fullName, string arguments, string body) =>
         $@"{FullTypeName}.{nameof(InvokeTask)}(""{fullName}"", {arguments}, ()=> {body})";
@@ -16,7 +16,7 @@ public class TaskRegistry
     internal static string BuildInvokeTaskAsyncString(string fullName, string arguments, string body) => 
         $@"await {FullTypeName}.{nameof(InvokeTaskAsync)}(""{fullName}"", {arguments}, async ()=> {body})";
 
-    internal static TaskRegistry Global;
+    internal static TaskRegistry Global = new TaskRegistry();
 
     public static void InvokeTask(string fullName, TaskArgument[] arguments, Action body) =>
         Task(fullName).Invoke(arguments, body);
@@ -25,10 +25,10 @@ public class TaskRegistry
         await Task(fullName).Invoke(arguments, body);
 
     public static async AsyncTask InvokeTask(string fullName, params TaskArgument[] arguments) => 
-        await Task(fullName).Invoke(Global.script, arguments);
+        await Task(fullName).Invoke(Global.script ?? throw new InvalidOperationException("Script not initialized"), arguments);
 
     readonly Dictionary<string, Task> tasks = new(new CaseInsensitiveEqualityComparer());
-    readonly object script;
+    readonly object? script;
 
     internal TaskRegistry()
     {}
@@ -44,6 +44,8 @@ public class TaskRegistry
     static object CreateScriptInstance(Assembly assembly)
     {
         var submission = assembly.GetType(Nake.Task.ScriptClass);
+        if (submission == null)
+            throw new InvalidOperationException($"Could not find type {Nake.Task.ScriptClass}");
 
         var ctor = submission.GetConstructor([typeof(object[])]);
         Debug.Assert(ctor != null);
@@ -52,8 +54,12 @@ public class TaskRegistry
         submissionStates[0] = new object();
 
         var instance = ctor.Invoke([submissionStates]);
-        // ReSharper disable once PossibleNullReferenceException
-        submission.GetMethod("<Initialize>").Invoke(instance, []);
+        
+        var initializeMethod = submission.GetMethod("<Initialize>");
+        if (initializeMethod == null)
+            throw new InvalidOperationException("Could not find <Initialize> method");
+            
+        initializeMethod.Invoke(instance, []);
 
         return instance;
     }
@@ -68,6 +74,6 @@ public class TaskRegistry
         return task;
     }
 
-    internal Task FindTask(string fullName) => tasks.Find(fullName);
+    internal Task? FindTask(string fullName) => tasks.Find(fullName);
     internal IEnumerable<Task> Tasks => tasks.Values;
 }

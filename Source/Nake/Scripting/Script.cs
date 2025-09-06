@@ -65,7 +65,7 @@ class Script
             .WithMetadataResolver(new NuGetMetadataReferenceResolver(ScriptOptions.Default.MetadataResolver));
 
         if (source.IsFile)
-            options = options.WithFilePath(source.File.FullName);
+            options = options.WithFilePath(source.File!.FullName);
 
         var script = CSharpScript.Create(source.Code, options);
         var compilation = (CSharpCompilation)script.GetCompilation();
@@ -117,7 +117,7 @@ class CompiledScript
         var result = compilation.SyntaxTrees.First();
             
         if (compilation.SyntaxTrees.Length != 1)
-            result = compilation.SyntaxTrees.Single(x => x.FilePath == source.File.FullName);
+            result = compilation.SyntaxTrees.Single(x => x.FilePath == source.File!.FullName);
 
         return (CSharpSyntaxTree) result;
     }

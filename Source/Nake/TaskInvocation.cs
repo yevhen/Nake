@@ -47,10 +47,10 @@ class TaskInvocation
         return result.Values.ToArray();
     }
 
-    ParameterInfo GetParameterByPosition(int position) => 
+    ParameterInfo? GetParameterByPosition(int position) => 
         method.GetParameters().SingleOrDefault(x => x.Position == position);
 
-    ParameterInfo GetParameterByName(string name) => 
+    ParameterInfo? GetParameterByName(string name) => 
         method.GetParameters().SingleOrDefault(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
 
     object Convert(TaskArgument arg, int position, ParameterInfo parameter)
@@ -61,19 +61,19 @@ class TaskInvocation
         }
         catch (InvalidCastException e)
         {
-            throw new TaskArgumentException(task, parameter.Name, position, e.Message);
+            throw new TaskArgumentException(task, parameter.Name ?? "", position, e.Message);
         }
         catch (FormatException e)
         {
-            throw new TaskArgumentException(task, parameter.Name, position, e.Message);
+            throw new TaskArgumentException(task, parameter.Name ?? "", position, e.Message);
         }
         catch (ArgumentException e)
         {
-            throw new TaskArgumentException(task, parameter.Name, position, e.Message);
+            throw new TaskArgumentException(task, parameter.Name ?? "", position, e.Message);
         }
         catch (OverflowException e)
         {
-            throw new TaskArgumentException(task, parameter.Name, position, e.Message);
+            throw new TaskArgumentException(task, parameter.Name ?? "", position, e.Message);
         }
     }
 
@@ -81,7 +81,7 @@ class TaskInvocation
     {
         try
         {
-            object host = null;
+            object? host = null;
 
             if (!method.IsStatic)
                 host = GetMethodHost();                    
@@ -117,6 +117,6 @@ class TaskInvocation
     object GetMethodHost()
     {
         Debug.Assert(method.DeclaringType != null);
-        return task.IsGlobal ? script : Activator.CreateInstance(method.DeclaringType);
+        return task.IsGlobal ? script : Activator.CreateInstance(method.DeclaringType) ?? throw new InvalidOperationException($"Failed to create instance of {method.DeclaringType}");
     }
 }

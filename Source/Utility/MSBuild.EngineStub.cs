@@ -23,7 +23,7 @@ class MSBuildEngineStub : IBuildEngine
     public void LogErrorEvent(BuildErrorEventArgs e)
     {
         if (string.IsNullOrEmpty(e.Code))
-            stdError.Add(e.Message);
+            stdError.Add(e.Message ?? "Unknown error");
 
         logger.ErrorHandler(this, e);
     }
@@ -63,7 +63,7 @@ class MSBuildEngineStub : IBuildEngine
         get; set;
     }
 
-    public string ProjectFileOfTaskNode
+    public string? ProjectFileOfTaskNode
     {
         get; set;
     }

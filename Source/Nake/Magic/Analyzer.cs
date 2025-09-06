@@ -12,9 +12,9 @@ class Analyzer : CSharpSyntaxWalker
     readonly SemanticModel model;
     readonly IDictionary<string, string> substitutions;
 
-    Task current;
+    Task? current;
     bool visitingConstant;
-    AnalyzerResult result;
+    AnalyzerResult result = null!; // Initialized in Analyze()
 
     public Analyzer(IDictionary<string, string> substitutions, CSharpSyntaxTree tree, SemanticModel model)
     {
@@ -23,6 +23,7 @@ class Analyzer : CSharpSyntaxWalker
 
         this.substitutions = new Dictionary<string, string>(substitutions,
             new CaseInsensitiveEqualityComparer());
+        this.current = null; // Will be set in VisitMethodDeclaration
     }
 
     public AnalyzerResult Analyze()
@@ -35,6 +36,9 @@ class Analyzer : CSharpSyntaxWalker
     public override void VisitMethodDeclaration(MethodDeclarationSyntax node)
     {
         var symbol = model.GetDeclaredSymbol(node);
+        
+        if (symbol == null)
+            return;
 
         var isTask = IsTask(symbol);
         var isStep = IsStep(symbol);
@@ -57,11 +61,11 @@ class Analyzer : CSharpSyntaxWalker
         current = null;
     }
 
-    static bool IsTask(ISymbol symbol) => HasAttribute(symbol, "NakeAttribute");
-    static bool IsStep(ISymbol symbol) => HasAttribute(symbol, "StepAttribute");
+    static bool IsTask(ISymbol? symbol) => symbol != null && HasAttribute(symbol, "NakeAttribute");
+    static bool IsStep(ISymbol? symbol) => symbol != null && HasAttribute(symbol, "StepAttribute");
 
     static bool HasAttribute(ISymbol symbol, string attribute) =>
-        symbol.GetAttributes().SingleOrDefault(x => x.AttributeClass.Name == attribute) != null;
+        symbol.GetAttributes().SingleOrDefault(x => x.AttributeClass?.Name == attribute) != null;
 
     public override void VisitInvocationExpression(InvocationExpressionSyntax node)
     {
@@ -97,10 +101,12 @@ class Analyzer : CSharpSyntaxWalker
 
         foreach (var variable in node.Declaration.Variables)
         {
-            var symbol = (IFieldSymbol) ModelExtensions.GetDeclaredSymbol(model, variable);
+            var declaredSymbol = ModelExtensions.GetDeclaredSymbol(model, variable);
+            if (declaredSymbol is not IFieldSymbol symbol)
+                continue;
 
             var fullName = symbol.ToString();
-            if (!substitutions.ContainsKey(fullName))
+            if (fullName == null || !substitutions.ContainsKey(fullName))
                 continue;
 
             if (FieldSubstitution.Qualifies(symbol))

@@ -18,7 +18,7 @@ class EnvironmentVariableInterpolation
 {
     const string NakeScriptDirectoryVariable = "NakeScriptDirectory";
 
-    public static IEnvironmentVariableInterpolation Match(SemanticModel model, LiteralExpressionSyntax node, bool constant)
+    public static IEnvironmentVariableInterpolation? Match(SemanticModel model, LiteralExpressionSyntax node, bool constant)
     {
         if (node.Kind() != SyntaxKind.StringLiteralExpression)
             return null;
@@ -33,7 +33,7 @@ class EnvironmentVariableInterpolation
             : null;
     }
 
-    public static IEnvironmentVariableInterpolation Match(SemanticModel model, InterpolatedStringExpressionSyntax node) =>
+    public static IEnvironmentVariableInterpolation? Match(SemanticModel model, InterpolatedStringExpressionSyntax node) =>
         RuntimeWithinInterpolation.Qualifies(node)
             ? new RuntimeWithinInterpolation(node, ScriptFilePath(model, node))
             : null;
@@ -41,7 +41,7 @@ class EnvironmentVariableInterpolation
     static string ScriptFilePath(SemanticModel model, SyntaxNode node)
     {
         var symbol = model.GetEnclosingSymbol(node.FullSpan.Start);
-        return (symbol.Locations.FirstOrDefault()?.GetLineSpan())?.Path ?? "NOT_A_FILE";
+        return (symbol?.Locations.FirstOrDefault()?.GetLineSpan())?.Path ?? "NOT_A_FILE";
     }
 
     static bool Qualifies(string text) =>
@@ -72,7 +72,7 @@ class EnvironmentVariableInterpolation
             {
                 var name  = match.Groups["variable"].Value;
                 if (name == NakeScriptDirectoryVariable)
-                    return Path.GetDirectoryName(filePath);
+                    return Path.GetDirectoryName(filePath) ?? "";
 
                 var value = Environment.GetEnvironmentVariable(name) ?? "";
                 captured.Add(new EnvironmentVariable(name, value));
@@ -150,7 +150,7 @@ class EnvironmentVariableInterpolation
             var name = match.Groups["variable"].Value;
             if (name == NakeScriptDirectoryVariable)
             {
-                var inline = $"@\"{Path.GetDirectoryName(filePath)}\"";
+                var inline = $"@\"{Path.GetDirectoryName(filePath) ?? ""}\"";
                 yield return SyntaxFactory.Interpolation(SyntaxFactory.ParseExpression(inline));
             }
             else

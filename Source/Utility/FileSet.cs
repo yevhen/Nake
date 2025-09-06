@@ -27,7 +27,7 @@ public class FileSet : IEnumerable<string>
     /// Initializes a new instance of the <see cref="FileSet"/> with the given base path.
     /// </summary>
     /// <param name="basePath">The base path to be used for relative paths, instead of CurrentDirectory.</param>
-    public FileSet(string basePath = null)
+    public FileSet(string? basePath = null)
     {
         this.basePath = basePath ?? Location.CurrentDirectory;
     }
@@ -318,7 +318,7 @@ public class FileSet : IEnumerable<string>
 
         public Inclusion(string pattern)
         {
-            var baseDirectory = Path.GetDirectoryName(FilePath.From(pattern));
+            var baseDirectory = Path.GetDirectoryName(FilePath.From(pattern)) ?? "";
 
             if (!string.IsNullOrEmpty(baseDirectory))
             {
@@ -411,7 +411,7 @@ public class FileSet : IEnumerable<string>
             FullPath = fullPath;
 
             RecursivePath = BasePath != FullPath 
-                ? Path.GetDirectoryName(FullPath.Remove(0, basePath.Length + 1)) 
+                ? (Path.GetDirectoryName(FullPath.Remove(0, basePath.Length + 1)) ?? "")
                 : "";
 
             FileName    = Path.GetFileName(fullPath);
