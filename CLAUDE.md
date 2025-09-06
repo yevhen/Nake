@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Build System
 
-Nake is a self-hosting task runner for .NET Core. The project uses its own build tool through `Nake.csx` scripts.
+Nake is a self-hosting task runner for .NET. The project uses its own build tool through `Nake.csx` scripts.
 
 ### Common Commands
 

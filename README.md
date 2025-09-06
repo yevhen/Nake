@@ -1,6 +1,10 @@
 ![Nake](Logo.Wide.png)
 
-Nake is a magic task runner tool for .NET Core. It's a hybrid of Shovel and Rake. The DSL for defining tasks is uniquely minimal and it's just plain (_naked_) C# code! Nake is built on top of the latest Roslyn release so you can use all of the latest C# features in you scripts and even more.
+Nake is a magic task runner tool for .NET. It's a hybrid of Shovel and Rake. The DSL for defining tasks is uniquely minimal and it's just plain (_naked_) C# code! Nake is built on top of the latest Roslyn release so you can use all of the latest C# features in your scripts and even more.
+
+**Requirements:**
+- .NET 8.0 SDK (8.0.12 or later recommended)
+- Supports C# 12 language features
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/yevhen/Nake?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build status](https://ci.appveyor.com/api/projects/status/kors8n8y4r4xklop/branch/master?svg=true)](https://ci.appveyor.com/project/yevhen/nake/branch/master)
@@ -8,9 +12,11 @@ Nake is a magic task runner tool for .NET Core. It's a hybrid of Shovel and Rake
 
 ### How to install
 
-Nake is built as dotnet tool. You can install it either globally of [locally](https://stu.dev/dotnet-core-3-local-tools/) (recommended):
+Nake is built as dotnet tool. You can install it either globally or [locally](https://stu.dev/dotnet-core-3-local-tools/) (recommended):
 
 	PM> dotnet tool install Nake
+
+**Prerequisites:** Ensure you have .NET 8.0 SDK installed. Nake leverages C# 12 language features and requires .NET 8.0 runtime.
 
 ## Syntax cheatsheet
 

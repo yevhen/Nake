@@ -11,7 +11,7 @@ namespace Nake.Scripting
 {
     class ScriptSource
     {
-        const string DefaultTargetFramework = "netcoreapp7.0";
+        const string DefaultTargetFramework = "net8.0";
         
         public readonly Logger Log;
         public readonly string Code;
