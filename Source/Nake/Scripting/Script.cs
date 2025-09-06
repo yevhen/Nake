@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
-using Dotnet.Script.DependencyModel.NuGet;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
@@ -59,15 +59,18 @@ class Script
 
     public CompiledScript Compile(ScriptSource source)
     {
+        // Remove #r "nuget:" directives from the source code since dependencies 
+        // are resolved separately and added as references
+        var processedCode = RemoveNuGetDirectives(source.Code);
+        
         var options = ScriptOptions.Default
             .AddImports(namespaces)
-            .AddReferences(references)
-            .WithMetadataResolver(new NuGetMetadataReferenceResolver(ScriptOptions.Default.MetadataResolver));
+            .AddReferences(references);
 
         if (source.IsFile)
             options = options.WithFilePath(source.File!.FullName);
 
-        var script = CSharpScript.Create(source.Code, options);
+        var script = CSharpScript.Create(processedCode, options);
         var compilation = (CSharpCompilation)script.GetCompilation();
 
         var errors = compilation.GetDiagnostics()
@@ -78,6 +81,14 @@ class Script
             throw new ScriptCompilationException(errors);
 
         return new CompiledScript(source, references.Select(x => new AssemblyReference(x)), compilation);
+    }
+    
+    static string RemoveNuGetDirectives(string code)
+    {
+        // Remove lines that contain #r "nuget:..." directives
+        // Pattern matches: #r "nuget: PackageName, Version" or #r "nuget: PackageName"
+        var nugetPattern = @"^\s*#r\s+""nuget:\s*[^""]+"".*$";
+        return Regex.Replace(code, nugetPattern, string.Empty, RegexOptions.Multiline | RegexOptions.IgnoreCase);
     }
 
     public void AddReference(AssemblyReference reference) => AddReference(reference.FullPath);

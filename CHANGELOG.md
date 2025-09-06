@@ -37,6 +37,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - DotnetScript.DependencyModel: 1.5.0 → 1.6.0
 - Various supporting packages updated to their latest stable versions
 
+### Fixed
+- NuGet package resolution compatibility with Roslyn 4.11.0+
+  - Removed dependency on NuGetMetadataReferenceResolver which became incompatible
+  - Implemented preprocessing to remove #r "nuget:" directives before compilation
+  - Fixed caching logic bug that prevented dependency resolution
+- All tests now pass with updated dotnet-script 1.6.0 dependencies
+
 ### Technical Improvements
 - Enabled nullable reference type annotations for improved null safety
 - Improved build reproducibility with enhanced MSBuild configuration
