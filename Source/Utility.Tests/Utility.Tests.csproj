@@ -65,4 +65,12 @@
     </None>
   </ItemGroup>
 
+  <!-- Ensure MSBuild assemblies with correct assembly versions are available at runtime -->
+  <Target Name="CopyMSBuildAssemblies" AfterTargets="Build">
+    <ItemGroup>
+      <MSBuildSDKAssemblies Include="$(MSBuildToolsPath)\Microsoft.Build.Framework.dll;$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll;$(MSBuildToolsPath)\Microsoft.Build.Utilities.Core.dll" />
+    </ItemGroup>
+    <Copy SourceFiles="@(MSBuildSDKAssemblies)" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
+  </Target>
+
 </Project>
