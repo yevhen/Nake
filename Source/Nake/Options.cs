@@ -462,8 +462,8 @@ class Options
 
             class Argument
             {
-                string name = "";
-                string value = "";
+                string? name;
+                string? value;
 
                 public void SetValue(string arg)
                 {
@@ -478,7 +478,7 @@ class Options
                 public void Terminate()
                 {
                     if (!IsEmpty() && !IsComplete())
-                        throw OptionParseException.IncompleteArgument(name);
+                        throw OptionParseException.IncompleteArgument(name!);
                 }
 
                 public bool IsEmpty()
@@ -493,7 +493,7 @@ class Options
 
                 public TaskArgument Build()
                 {
-                    return new TaskArgument(name ?? "", value);
+                    return new TaskArgument(name ?? "", value!);
                 }
             }
         }
