@@ -4,248 +4,214 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis.Text;
-
 using Nake.Magic;
 using Nake.Scripting;
 
-namespace Nake
+namespace Nake;
+
+class BuildInput(ScriptSource source, IDictionary<string, string> substitutions, bool debug)
 {
-    class BuildInput
+    AssemblyReference[] cached;
+
+    public readonly ScriptSource Source = source;
+    public readonly IDictionary<string, string> Substitutions = substitutions;
+    public readonly bool Debug = debug;
+
+    public BuildInput WithCached(AssemblyReference[] dependencies) => new(Source, Substitutions, Debug) {cached = dependencies};
+
+    public IEnumerable<AssemblyReference> Dependencies() =>
+        Source.ComputeDependencies(cached);
+}
+
+class BuildEngine(
+    IEnumerable<AssemblyReference> references = null,
+    IEnumerable<string> namespaces = null)
+{
+    readonly IEnumerable<AssemblyReference> references = references ?? [];
+    readonly IEnumerable<string> namespaces = namespaces ?? [];
+
+    public BuildResult Build(BuildInput input)
     {
-        AssemblyReference[] cached;
-
-        public readonly ScriptSource Source;
-        public readonly IDictionary<string, string> Substitutions;
-        public readonly bool Debug;
-
-        public BuildInput(ScriptSource source, IDictionary<string, string> substitutions, bool debug)
-        {
-            Source = source;
-            Substitutions = substitutions;
-            Debug = debug;
-        }
-
-        public BuildInput WithCached(AssemblyReference[] dependencies) =>
-            new BuildInput(Source, Substitutions, Debug) {cached = dependencies};
-
-        public IEnumerable<AssemblyReference> Dependencies() =>
-            Source.ComputeDependencies(cached);
+        var magic = new PixieDust(Compile(input.Source, input.Dependencies()));
+        return magic.Apply(input.Substitutions, input.Debug);
     }
 
-    class BuildEngine
+    CompiledScript Compile(ScriptSource source, IEnumerable<AssemblyReference> dependencies)
     {
-        readonly IEnumerable<AssemblyReference> references;
-        readonly IEnumerable<string> namespaces;
+        var script = new Script();
 
-        public BuildEngine(
-            IEnumerable<AssemblyReference> references = null,
-            IEnumerable<string> namespaces = null)
-        {
-            this.references = references ?? Enumerable.Empty<AssemblyReference>();
-            this.namespaces = namespaces ?? Enumerable.Empty<string>();
-        }
+        foreach (var each in dependencies.Concat(references))
+            script.AddReference(each);
 
-        public BuildResult Build(BuildInput input)
-        {
-            var magic = new PixieDust(Compile(input.Source, input.Dependencies()));
-            return magic.Apply(input.Substitutions, input.Debug);
-        }
+        foreach (var each in namespaces)
+            script.ImportNamespace(each);
 
-        CompiledScript Compile(ScriptSource source, IEnumerable<AssemblyReference> dependencies)
-        {
-            var script = new Script();
+        return script.Compile(source);
+    }
+}
 
-            foreach (var each in dependencies.Concat(references))
-                script.AddReference(each);
+class PixieDust(CompiledScript script)
+{
+    public BuildResult Apply(IDictionary<string, string> substitutions, bool debug)
+    {
+        var result = Rewrite(substitutions);
 
-            foreach (var each in namespaces)
-                script.ImportNamespace(each);
+        byte[] assembly;
+        byte[] symbols = null;
 
-            return script.Compile(source);
-        }
+        if (debug)
+            EmitDebug(result.Compilation, out assembly, out symbols);
+        else
+            Emit(result.Compilation, out assembly);
+
+        return new BuildResult(
+            result.Tasks,
+            script.References.ToArray(),
+            result.Captured,
+            assembly, symbols);
     }
 
-    class PixieDust
+    RewriteResult Rewrite(IDictionary<string, string> substitutions)
     {
-        readonly CompiledScript script;
+        var rewrittenTrees = new Dictionary<string, CSharpSyntaxTree>();
+        var capturedEnvironmentVariables = new HashSet<EnvironmentVariable>();
+        var tasks = new List<Task>();
 
-        public PixieDust(CompiledScript script) =>
-            this.script = script;
-
-        public BuildResult Apply(IDictionary<string, string> substitutions, bool debug)
+        foreach (CSharpSyntaxTree tree in script.Compilation.SyntaxTrees)
         {
-            var result = Rewrite(substitutions);
+            var analyzed = Analyze(substitutions, tree);
+            var captured = Rewrite(analyzed, tree, rewrittenTrees);
 
-            byte[] assembly;
-            byte[] symbols = null;
-
-            if (debug)
-                EmitDebug(result.Compilation, out assembly, out symbols);
-            else
-                Emit(result.Compilation, out assembly);
-
-            return new BuildResult(
-                result.Tasks,
-                script.References.ToArray(),
-                result.Captured,
-                assembly, symbols);
+            Array.ForEach(captured.ToArray(), x => capturedEnvironmentVariables.Add(x));
+            Array.ForEach(analyzed.Tasks.ToArray(), x => tasks.Add(x));
         }
 
-        RewriteResult Rewrite(IDictionary<string, string> substitutions)
-        {
-            var rewrittenTrees = new Dictionary<string, CSharpSyntaxTree>();
-            var capturedEnvironmentVariables = new HashSet<EnvironmentVariable>();
-            var tasks = new List<Task>();
+        var rewrittenTree = rewrittenTrees.Count == 1
+            ? rewrittenTrees.First().Value
+            : rewrittenTrees[script.Source.File.FullName];
 
-            foreach (CSharpSyntaxTree tree in script.Compilation.SyntaxTrees)
-            {
-                var analyzed = Analyze(substitutions, tree);
-                var captured = Rewrite(analyzed, tree, rewrittenTrees);
+        var compilation = script.Compilation;
+        if (script.Source.IsFile)
+            compilation = compilation.WithOptions(compilation.Options.WithSourceReferenceResolver(Resolver(rewrittenTrees)));
 
-                Array.ForEach(captured.ToArray(), x => capturedEnvironmentVariables.Add(x));
-                Array.ForEach(analyzed.Tasks.ToArray(), x => tasks.Add(x));
-            }
+        compilation = compilation.ReplaceSyntaxTree(script.SyntaxTree, rewrittenTree);
+        var rewritten = compilation;
 
-            var rewrittenTree = rewrittenTrees.Count == 1
-                ? rewrittenTrees.First().Value
-                : rewrittenTrees[script.Source.File.FullName];
-
-            var compilation = script.Compilation;
-            if (script.Source.IsFile)
-                compilation = compilation.WithOptions(compilation.Options.WithSourceReferenceResolver(Resolver(rewrittenTrees)));
-
-            compilation = compilation.ReplaceSyntaxTree(script.SyntaxTree, rewrittenTree);
-            var rewritten = compilation;
-
-            return new RewriteResult(rewritten, tasks.ToArray(), capturedEnvironmentVariables.ToArray());
-        }
-
-        class RewriteResult
-        {
-            public readonly CSharpCompilation Compilation;
-            public readonly Task[] Tasks;
-            public readonly EnvironmentVariable[] Captured;
-
-            public RewriteResult(CSharpCompilation compilation, Task[] tasks, EnvironmentVariable[] captured)
-            {
-                Compilation = compilation;
-                Tasks = tasks;
-                Captured = captured;
-            }
-        }
-
-        static HashSet<EnvironmentVariable> Rewrite(AnalyzerResult analyzed, CSharpSyntaxTree tree, Dictionary<string, CSharpSyntaxTree> rewrittenTrees)
-        {
-            var rewriter = new Rewriter(analyzed, tree);
-            rewrittenTrees.Add(tree.FilePath, rewriter.Rewrite());
-            return rewriter.Captured;
-        }
-
-        AnalyzerResult Analyze(IDictionary<string, string> substitutions, CSharpSyntaxTree tree)
-        {
-            var analyzer = new Analyzer(substitutions, tree, script.Compilation.GetSemanticModel(tree, ignoreAccessibility: false));
-            return analyzer.Analyze();
-        }
-
-        SourceFileResolver Resolver(Dictionary<string, CSharpSyntaxTree> rewrittenTrees) =>
-            new LoadScriptResolver(rewrittenTrees, script.Source.File.DirectoryName);
-
-        class LoadScriptResolver : SourceFileResolver
-        {
-            readonly Dictionary<string, CSharpSyntaxTree> rewrittenTrees;
-
-            public LoadScriptResolver(Dictionary<string, CSharpSyntaxTree> rewrittenTrees, string baseDirectory)
-                : base(ImmutableArray<string>.Empty, baseDirectory) =>
-                this.rewrittenTrees = rewrittenTrees;
-
-            public override SourceText ReadText(string resolvedPath) =>
-                rewrittenTrees.ContainsKey(resolvedPath)
-                    ? rewrittenTrees[resolvedPath].GetText()
-                    : base.ReadText(resolvedPath);
-        }
-
-        void Emit(Compilation compilation, out byte[] assembly)
-        {
-            using var assemblyStream = new MemoryStream();
-
-            Check(compilation, compilation.Emit(assemblyStream));
-
-            assembly = assemblyStream.GetBuffer();
-        }
-
-        void EmitDebug(Compilation compilation, out byte[] assembly, out byte[] symbols)
-        {
-            using var assemblyStream = new MemoryStream();
-            using var symbolStream = new MemoryStream();
-
-            Check(compilation, compilation.Emit(assemblyStream, pdbStream: symbolStream));
-
-            assembly = assemblyStream.GetBuffer();
-            symbols = symbolStream.GetBuffer();
-        }
-
-        void Check(Compilation compilation, EmitResult result)
-        {
-            if (result.Success)
-                return;
-
-            var errors = result.Diagnostics
-                .Where(x => x.Severity == DiagnosticSeverity.Error)
-                .ToArray();
-
-            if (errors.Any())
-                throw new RewrittenScriptCompilationException(SourceText(script.Compilation), SourceText(compilation), errors);
-
-            static string SourceText(Compilation arg) => arg.SyntaxTrees.First().ToString();
-        }
+        return new RewriteResult(rewritten, tasks.ToArray(), capturedEnvironmentVariables.ToArray());
     }
 
-    class BuildResult
+    class RewriteResult(CSharpCompilation compilation, Task[] tasks, EnvironmentVariable[] captured)
     {
-        public readonly Task[] Tasks;
-        public readonly AssemblyReference[] References;
-        public readonly EnvironmentVariable[] Variables;
-        public readonly Assembly Assembly;
-        public readonly byte[] AssemblyBytes;
-        public readonly byte[] SymbolBytes;
+        public readonly CSharpCompilation Compilation = compilation;
+        public readonly Task[] Tasks = tasks;
+        public readonly EnvironmentVariable[] Captured = captured;
+    }
 
-        public BuildResult(
-            Task[] tasks,
-            AssemblyReference[] references,
-            EnvironmentVariable[] variables,
-            byte[] assembly,
-            byte[] symbols)
-        {
-            Tasks = tasks;
-            References = references;
-            AssemblyBytes = assembly;
-            SymbolBytes = symbols;
-            Variables = variables;
-            Assembly = Load();
-            Reflect();
-        }
+    static HashSet<EnvironmentVariable> Rewrite(AnalyzerResult analyzed, CSharpSyntaxTree tree, Dictionary<string, CSharpSyntaxTree> rewrittenTrees)
+    {
+        var rewriter = new Rewriter(analyzed, tree);
+        rewrittenTrees.Add(tree.FilePath, rewriter.Rewrite());
+        return rewriter.Captured;
+    }
 
-        Assembly Load()
-        {
-            AssemblyResolver.Register();
+    AnalyzerResult Analyze(IDictionary<string, string> substitutions, CSharpSyntaxTree tree)
+    {
+        var analyzer = new Analyzer(substitutions, tree, script.Compilation.GetSemanticModel(tree, ignoreAccessibility: false));
+        return analyzer.Analyze();
+    }
 
-            foreach (var reference in References)
-                AssemblyResolver.Add(reference);
+    SourceFileResolver Resolver(Dictionary<string, CSharpSyntaxTree> rewrittenTrees) =>
+        new LoadScriptResolver(rewrittenTrees, script.Source.File.DirectoryName);
 
-            return SymbolBytes != null
-                ? Assembly.Load(AssemblyBytes, SymbolBytes)
-                : Assembly.Load(AssemblyBytes);
-        }
+    class LoadScriptResolver(Dictionary<string, CSharpSyntaxTree> rewrittenTrees, string baseDirectory)
+        : SourceFileResolver(ImmutableArray<string>.Empty, baseDirectory)
+    {
+        public override SourceText ReadText(string resolvedPath) =>
+            rewrittenTrees.ContainsKey(resolvedPath)
+                ? rewrittenTrees[resolvedPath].GetText()
+                : base.ReadText(resolvedPath);
+    }
 
-        void Reflect()
-        {
-            foreach (var task in Tasks)
-                task.Reflect(Assembly);
-        }
+    void Emit(Compilation compilation, out byte[] assembly)
+    {
+        using var assemblyStream = new MemoryStream();
+
+        Check(compilation, compilation.Emit(assemblyStream));
+
+        assembly = assemblyStream.GetBuffer();
+    }
+
+    void EmitDebug(Compilation compilation, out byte[] assembly, out byte[] symbols)
+    {
+        using var assemblyStream = new MemoryStream();
+        using var symbolStream = new MemoryStream();
+
+        Check(compilation, compilation.Emit(assemblyStream, pdbStream: symbolStream));
+
+        assembly = assemblyStream.GetBuffer();
+        symbols = symbolStream.GetBuffer();
+    }
+
+    void Check(Compilation compilation, EmitResult result)
+    {
+        if (result.Success)
+            return;
+
+        var errors = result.Diagnostics
+            .Where(x => x.Severity == DiagnosticSeverity.Error)
+            .ToArray();
+
+        if (errors.Any())
+            throw new RewrittenScriptCompilationException(SourceText(script.Compilation), SourceText(compilation), errors);
+
+        static string SourceText(Compilation arg) => arg.SyntaxTrees.First().ToString();
+    }
+}
+
+class BuildResult
+{
+    public readonly Task[] Tasks;
+    public readonly AssemblyReference[] References;
+    public readonly EnvironmentVariable[] Variables;
+    public readonly Assembly Assembly;
+    public readonly byte[] AssemblyBytes;
+    public readonly byte[] SymbolBytes;
+
+    public BuildResult(
+        Task[] tasks,
+        AssemblyReference[] references,
+        EnvironmentVariable[] variables,
+        byte[] assembly,
+        byte[] symbols)
+    {
+        Tasks = tasks;
+        References = references;
+        AssemblyBytes = assembly;
+        SymbolBytes = symbols;
+        Variables = variables;
+        Assembly = Load();
+        Reflect();
+    }
+
+    Assembly Load()
+    {
+        AssemblyResolver.Register();
+
+        foreach (var reference in References)
+            AssemblyResolver.Add(reference);
+
+        return SymbolBytes != null
+            ? Assembly.Load(AssemblyBytes, SymbolBytes)
+            : Assembly.Load(AssemblyBytes);
+    }
+
+    void Reflect()
+    {
+        foreach (var task in Tasks)
+            task.Reflect(Assembly);
     }
 }

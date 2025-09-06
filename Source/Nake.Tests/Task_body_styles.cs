@@ -1,14 +1,14 @@
 using NUnit.Framework;
 
-namespace Nake
+namespace Nake;
+
+[TestFixture]
+class Task_body_styles : CodeFixture
 {
-    [TestFixture]
-    class Task_body_styles : CodeFixture
+    [Test]
+    public void Expression_body_vs_block_body()
     {
-        [Test]
-        public void Expression_body_vs_block_body()
-        {
-            Build(@"
+        Build(@"
             
                 [Nake] void ExpTask() => System.Console.WriteLine(""Expression"");
 
@@ -26,12 +26,11 @@ namespace Nake
                 }
             ");
 
-            Invoke("ExpTask");
-            Invoke("ExpTriviaTask");
-            Invoke("BodyTask");
-            Invoke("BodyBSDFormattedTask");
+        Invoke("ExpTask");
+        Invoke("ExpTriviaTask");
+        Invoke("BodyTask");
+        Invoke("BodyBSDFormattedTask");
 
-            Assert.Pass();
-        }
+        Assert.Pass();
     }
 }

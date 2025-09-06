@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.CodeAnalysis;
+using Nake.Magic;
 using static System.Environment;
 
-using Microsoft.CodeAnalysis;
-
 namespace Nake;
-
-using Magic;
 
 class NakeException : Exception
 {
@@ -14,7 +12,7 @@ class NakeException : Exception
         : base(message)
     {}
 
-    public NakeException(string message, Exception inner)
+    protected NakeException(string message, Exception inner)
         : base(message, inner)
     {}
 
@@ -23,13 +21,9 @@ class NakeException : Exception
     {}
 }
 
-class ScriptCompilationException : NakeException
-{
-    public ScriptCompilationException(IEnumerable<Diagnostic> diagnostics)
-        : base($"Script compilation failure! See diagnostics below.{NewLine}" +
-               $"{string.Join(NewLine, diagnostics)}")
-    {}
-}
+class ScriptCompilationException(IEnumerable<Diagnostic> diagnostics) : NakeException(
+    $"Script compilation failure! See diagnostics below.{NewLine}" +
+    $"{string.Join(NewLine, diagnostics)}");
 
 class RewrittenScriptCompilationException : NakeException
 {

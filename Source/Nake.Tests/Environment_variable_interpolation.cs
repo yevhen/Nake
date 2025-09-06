@@ -1,86 +1,83 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-
+﻿using System.Collections.Generic;
 using NUnit.Framework;
 
-namespace Nake
+namespace Nake;
+
+[TestFixture]
+class Environment_variable_interpolation : CodeFixture
 {
-    [TestFixture]
-    class Environment_variable_interpolation : CodeFixture
+    static IEnumerable<TestCaseData> InliningSurroundingTestCases()
     {
-        static IEnumerable<TestCaseData> InliningSurroundingTestCases()
-        {
-            yield return new TestCaseData(@"""foo%var%""", "bar", "foobar").SetName("Text before");
-            yield return new TestCaseData(@"""%var%bar""", "foo", "foobar").SetName("Text after");
-            yield return new TestCaseData(@"""foo%var%baz""", "bar", "foobarbaz").SetName("In the middle of text");
-            yield return new TestCaseData(@"""foo%var%baz%var%qrux""", "bar", "foobarbazbarqrux").SetName("In the middle of text, multiple times");
-            yield return new TestCaseData(@"""%var%""", @"C:\Work\OSS", @"C:\Work\OSS").SetName("No surrounding");
-            yield return new TestCaseData(@"""%var%""", @"C:\\Work\\OSS", @"C:\\Work\\OSS").SetName("No surrounding, double slash value");
-            yield return new TestCaseData(@"@""%var%""", @"C:\Work\OSS", @"C:\Work\OSS").SetName("Verbatim empty surrounding");
-            yield return new TestCaseData(@"@""%var%""", @"C:\\Work\\OSS", @"C:\\Work\\OSS").SetName("Verbatim empty surrounding, double slash value");
-            yield return new TestCaseData("\"\\\"%var%\\\"\"", @"""C:\Work\OSS""", @"""""C:\Work\OSS""""").SetName("Double quotes surrounding, doubly quoted value");
-            yield return new TestCaseData(@"@""""""%var%""""""", @"""C:\Work\OSS""", @"""""C:\Work\OSS""""").SetName("Verbatim double quotes surrounding, doubly quoted value");
-        }
+        yield return new TestCaseData(@"""foo%var%""", "bar", "foobar").SetName("Text before");
+        yield return new TestCaseData(@"""%var%bar""", "foo", "foobar").SetName("Text after");
+        yield return new TestCaseData(@"""foo%var%baz""", "bar", "foobarbaz").SetName("In the middle of text");
+        yield return new TestCaseData(@"""foo%var%baz%var%qrux""", "bar", "foobarbazbarqrux").SetName("In the middle of text, multiple times");
+        yield return new TestCaseData(@"""%var%""", @"C:\Work\OSS", @"C:\Work\OSS").SetName("No surrounding");
+        yield return new TestCaseData(@"""%var%""", @"C:\\Work\\OSS", @"C:\\Work\\OSS").SetName("No surrounding, double slash value");
+        yield return new TestCaseData(@"@""%var%""", @"C:\Work\OSS", @"C:\Work\OSS").SetName("Verbatim empty surrounding");
+        yield return new TestCaseData(@"@""%var%""", @"C:\\Work\\OSS", @"C:\\Work\\OSS").SetName("Verbatim empty surrounding, double slash value");
+        yield return new TestCaseData("\"\\\"%var%\\\"\"", @"""C:\Work\OSS""", @"""""C:\Work\OSS""""").SetName("Double quotes surrounding, doubly quoted value");
+        yield return new TestCaseData(@"@""""""%var%""""""", @"""C:\Work\OSS""", @"""""C:\Work\OSS""""").SetName("Verbatim double quotes surrounding, doubly quoted value");
+    }
 
-        class Constant
+    class Constant
+    {
+        [Test]
+        public void Evaluated_at_compile_time()
         {
-            [Test]
-            public void Evaluated_at_compile_time()
-            {
-                Env.Var["var"] = @"C:\Work\OSS";
+            Env.Var["var"] = @"C:\Work\OSS";
 
-                Build(@"                
+            Build(@"                
                     const string inlined = ""%var%"";                    
 
                     [Nake] void Interpolate() => Env.Var[""Inlined""] = inlined;                    
                 ");
 
-                Env.Var["var"] = "changed";
+            Env.Var["var"] = "changed";
 
-                Invoke("Interpolate");
+            Invoke("Interpolate");
 
-                Assert.That(Env.Var["Inlined"], Is.EqualTo(@"C:\Work\OSS"));
-            }
+            Assert.That(Env.Var["Inlined"], Is.EqualTo(@"C:\Work\OSS"));
+        }
 
-            [Test]
-            [Category("Slow")]
-            public void NakeScriptDirectory_inlined_at_compile_time()
-            {
-                var path = BuildFile(@"                
+        [Test]
+        [Category("Slow")]
+        public void NakeScriptDirectory_inlined_at_compile_time()
+        {
+            var path = BuildFile(@"                
                     const string inlined = ""%NakeScriptDirectory%"";
 
                     [Nake] void Interpolate() => Env.Var[""Constant_NakeScriptDirectory""] = inlined;                    
                 ");
 
-                Invoke("Interpolate");
+            Invoke("Interpolate");
 
-                Assert.That(Env.Var["Constant_NakeScriptDirectory"], Is.EqualTo(path.DirectoryName));
-            }
+            Assert.That(Env.Var["Constant_NakeScriptDirectory"], Is.EqualTo(path.DirectoryName));
+        }
 
-            [Test]
-            [TestCaseSource(typeof(Environment_variable_interpolation), nameof(InliningSurroundingTestCases))]
-            public void Inlined_respectively_to_surroundings(string surrounding, string value, string result)
-            {
-                Env.Var["var"] = value;
+        [Test]
+        [TestCaseSource(typeof(Environment_variable_interpolation), nameof(InliningSurroundingTestCases))]
+        public void Inlined_respectively_to_surroundings(string surrounding, string value, string result)
+        {
+            Env.Var["var"] = value;
 
-                Build($@"                
+            Build($@"                
                     const string inlined = {surrounding};                    
 
                     [Nake] void Interpolate() => Env.Var[""Inlined""] = inlined;                    
                 ");
 
-                Invoke("Interpolate");
+            Invoke("Interpolate");
 
-                Assert.That(Env.Var["Inlined"], Is.EqualTo(result));
-            }
+            Assert.That(Env.Var["Inlined"], Is.EqualTo(result));
+        }
 
-            [Test]
-            public void Works_for_all_kinds_of_constant_literals()
-            {
-                Env.Var["var"] = "foo";
+        [Test]
+        public void Works_for_all_kinds_of_constant_literals()
+        {
+            Env.Var["var"] = "foo";
 
-                Build(@"
+            Build(@"
 
                     const string fieldConst = ""%var%"";
                         
@@ -97,20 +94,20 @@ namespace Nake
                                  
                 ");
 
-                Invoke("Interpolate");
+            Invoke("Interpolate");
 
-                Assert.That(Env.Var["LocalConst"], Is.EqualTo("foo"));
-                Assert.That(Env.Var["FieldConst"], Is.EqualTo("foo"));
-                Assert.That(Env.Var["OptionalParameterDefaultValue"], Is.EqualTo("foo"));
-                Assert.That(Env.Var["AnyLiteral"], Is.EqualTo("foo"));
-            }
+            Assert.That(Env.Var["LocalConst"], Is.EqualTo("foo"));
+            Assert.That(Env.Var["FieldConst"], Is.EqualTo("foo"));
+            Assert.That(Env.Var["OptionalParameterDefaultValue"], Is.EqualTo("foo"));
+            Assert.That(Env.Var["AnyLiteral"], Is.EqualTo("foo"));
+        }
 
-            [Test]
-            public void Should_unescape_doubled_interpolation_markers()
-            {
-                Env.Var["whatever"] = "sigh!";
+        [Test]
+        public void Should_unescape_doubled_interpolation_markers()
+        {
+            Env.Var["whatever"] = "sigh!";
 
-                Build(@"
+            Build(@"
 
                     const string esc = ""%%whatever%%"";
                     const string esc_inline = ""%%whatever%%_%whatever%_%%whatever%%"";
@@ -123,16 +120,16 @@ namespace Nake
                         
                 ");
 
-                Invoke("Interpolate");
+            Invoke("Interpolate");
 
-                Assert.That(Env.Var["Const_DoubledDollarSign"], Is.EqualTo("%whatever%"));
-                Assert.That(Env.Var["Const_DoubledDollarSignWithInline"], Is.EqualTo("%whatever%_sigh!_%whatever%"));
-            }
+            Assert.That(Env.Var["Const_DoubledDollarSign"], Is.EqualTo("%whatever%"));
+            Assert.That(Env.Var["Const_DoubledDollarSignWithInline"], Is.EqualTo("%whatever%_sigh!_%whatever%"));
+        }
 
-            [Test]
-            public void Do_not_replace_doubled_escapes_for_incomplete_surroundings()
-            {
-                Build(@"
+        [Test]
+        public void Do_not_replace_doubled_escapes_for_incomplete_surroundings()
+        {
+            Build(@"
                     
                     [Nake] public static void Interpolate()
                     {
@@ -142,21 +139,21 @@ namespace Nake
                     
                 ");
 
-                Invoke("Interpolate");
+            Invoke("Interpolate");
 
-                Assert.That(Env.Var["Const_StartsFromDoubledDollarSign"], Is.EqualTo("%%1"));
-                Assert.That(Env.Var["Const_EndsWithDoubledDollarSign"], Is.EqualTo("1%%"));
-            }
+            Assert.That(Env.Var["Const_StartsFromDoubledDollarSign"], Is.EqualTo("%%1"));
+            Assert.That(Env.Var["Const_EndsWithDoubledDollarSign"], Is.EqualTo("1%%"));
         }
+    }
 
-        class Runtime
+    class Runtime
+    {
+        [Test]
+        public void Evaluated_at_run_time()
         {
-            [Test]
-            public void Evaluated_at_run_time()
-            {
-                Env.Var["var"] = "foo";
+            Env.Var["var"] = "foo";
 
-                Build(@"                
+            Build(@"                
                 
                     [Nake] void Interpolate() 
                     { 
@@ -165,18 +162,18 @@ namespace Nake
                     }
                 ");
 
-                Env.Var["var"] = @"C:\Work\OSS";
+            Env.Var["var"] = @"C:\Work\OSS";
 
-                Invoke("Interpolate");
+            Invoke("Interpolate");
 
-                Assert.That(Env.Var["Inlined"], Is.EqualTo(@"C:\Work\OSS"));
-            }
+            Assert.That(Env.Var["Inlined"], Is.EqualTo(@"C:\Work\OSS"));
+        }
 
-            [Test]
-            [Category("Slow")]
-            public void NakeScriptDirectory_inlined_at_compile_time()
-            {
-                var path = BuildFile(@"                
+        [Test]
+        [Category("Slow")]
+        public void NakeScriptDirectory_inlined_at_compile_time()
+        {
+            var path = BuildFile(@"                
 
                     [Nake] void Interpolate() 
                     { 
@@ -185,17 +182,17 @@ namespace Nake
                     }
                 ");
 
-                Invoke("Interpolate");
+            Invoke("Interpolate");
 
-                Assert.That(Env.Var["Runtime_NakeScriptDirectory"], Is.EqualTo(path.DirectoryName));
-            }
+            Assert.That(Env.Var["Runtime_NakeScriptDirectory"], Is.EqualTo(path.DirectoryName));
+        }
             
-            [Test]
-            [TestCaseSource(typeof(Environment_variable_interpolation), nameof(InliningSurroundingTestCases))]
-            [TestCaseSource(typeof(Runtime), nameof(InterpolatedSurroundingTestCases))]
-            public void Inlined_respectively_to_surroundings(string surrounding, string value, string result)
-            {
-                Build($@"                
+        [Test]
+        [TestCaseSource(typeof(Environment_variable_interpolation), nameof(InliningSurroundingTestCases))]
+        [TestCaseSource(typeof(Runtime), nameof(InterpolatedSurroundingTestCases))]
+        public void Inlined_respectively_to_surroundings(string surrounding, string value, string result)
+        {
+            Build($@"                
                 
                     [Nake] void Interpolate() 
                     {{ 
@@ -204,31 +201,31 @@ namespace Nake
                     }}
                 ");
 
-                Env.Var["var"] = value;
+            Env.Var["var"] = value;
 
-                Invoke("Interpolate");
+            Invoke("Interpolate");
 
-                Assert.That(Env.Var["Inlined"], Is.EqualTo(result));
-            }
+            Assert.That(Env.Var["Inlined"], Is.EqualTo(result));
+        }
 
-            static IEnumerable<TestCaseData> InterpolatedSurroundingTestCases()
-            {
-                yield return new TestCaseData(@"$""foo%var%{true}""", "bar", "foobarTrue").SetName("Text before");
-                yield return new TestCaseData(@"$""{true}%var%bar""", "foo", "Truefoobar").SetName("Text after");
-                yield return new TestCaseData(@"$""{true}foo%var%baz{false}""", "bar", "TruefoobarbazFalse").SetName("In the middle of text");
-                yield return new TestCaseData(@"$""foo{true}%var%baz%var%{false}qrux""", "bar", "fooTruebarbazbarFalseqrux").SetName("In the middle of text, multiple times");
-                yield return new TestCaseData(@"$""%var%""", "bar", "bar").SetName("No surrounding");
-                yield return new TestCaseData(@"$@""%var%""", "bar", "bar").SetName("Verbatim empty surrounding");
-                yield return new TestCaseData("\"\\\"%var%\\\"\"", "bar", "\"bar\"").SetName("Double quotes surrounding");
-                yield return new TestCaseData(@"$@""""""%var%""""""", "bar", "\"bar\"").SetName("Verbatim double quotes surrounding");
-            }
+        static IEnumerable<TestCaseData> InterpolatedSurroundingTestCases()
+        {
+            yield return new TestCaseData(@"$""foo%var%{true}""", "bar", "foobarTrue").SetName("Text before");
+            yield return new TestCaseData(@"$""{true}%var%bar""", "foo", "Truefoobar").SetName("Text after");
+            yield return new TestCaseData(@"$""{true}foo%var%baz{false}""", "bar", "TruefoobarbazFalse").SetName("In the middle of text");
+            yield return new TestCaseData(@"$""foo{true}%var%baz%var%{false}qrux""", "bar", "fooTruebarbazbarFalseqrux").SetName("In the middle of text, multiple times");
+            yield return new TestCaseData(@"$""%var%""", "bar", "bar").SetName("No surrounding");
+            yield return new TestCaseData(@"$@""%var%""", "bar", "bar").SetName("Verbatim empty surrounding");
+            yield return new TestCaseData("\"\\\"%var%\\\"\"", "bar", "\"bar\"").SetName("Double quotes surrounding");
+            yield return new TestCaseData(@"$@""""""%var%""""""", "bar", "\"bar\"").SetName("Verbatim double quotes surrounding");
+        }
 
-            [Test]
-            public void Should_unescape_doubled_interpolation_markers()
-            {
-                Env.Var["whatever"] = "sigh!";
+        [Test]
+        public void Should_unescape_doubled_interpolation_markers()
+        {
+            Env.Var["whatever"] = "sigh!";
 
-                Build(@"
+            Build(@"
                     
                     [Nake] public static void Interpolate()
                     {
@@ -238,16 +235,16 @@ namespace Nake
                         
                 ");
 
-                Invoke("Interpolate");
+            Invoke("Interpolate");
 
-                Assert.That(Env.Var["Soft_DoubledDollarSign"], Is.EqualTo("%whatever%"));
-                Assert.That(Env.Var["Soft_DoubledDollarSignWithInline"], Is.EqualTo("%whatever%_sigh!_%whatever%"));
-            }
+            Assert.That(Env.Var["Soft_DoubledDollarSign"], Is.EqualTo("%whatever%"));
+            Assert.That(Env.Var["Soft_DoubledDollarSignWithInline"], Is.EqualTo("%whatever%_sigh!_%whatever%"));
+        }
 
-            [Test]
-            public void Do_not_replace_doubled_escapes_for_incomplete_surroundings()
-            {
-                Build(@"
+        [Test]
+        public void Do_not_replace_doubled_escapes_for_incomplete_surroundings()
+        {
+            Build(@"
                     
                     [Nake] public static void Interpolate()
                     {
@@ -257,17 +254,17 @@ namespace Nake
                     
                 ");
 
-                Invoke("Interpolate");
+            Invoke("Interpolate");
 
-                Assert.That(Env.Var["Soft_StartsFromDoubledDollarSign"], Is.EqualTo("%%1"));
-                Assert.That(Env.Var["Soft_EndsWithDoubledDollarSign"], Is.EqualTo("1%%"));
-            }
+            Assert.That(Env.Var["Soft_StartsFromDoubledDollarSign"], Is.EqualTo("%%1"));
+            Assert.That(Env.Var["Soft_EndsWithDoubledDollarSign"], Is.EqualTo("1%%"));
         }
+    }
 
-        [Test]
-        public void Should_inline_empty_value_if_inlined_environment_variable_is_undefined()
-        {
-            Build(@"
+    [Test]
+    public void Should_inline_empty_value_if_inlined_environment_variable_is_undefined()
+    {
+        Build(@"
                 
                 [Nake] public static void Interpolate()
                 {
@@ -276,9 +273,8 @@ namespace Nake
                     
             ");
             
-            Invoke("Interpolate");
+        Invoke("Interpolate");
             
-            Assert.That(Env.Var["Result"], Is.Null);
-        } 
-    }
+        Assert.That(Env.Var["Result"], Is.Null);
+    } 
 }

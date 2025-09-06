@@ -1,13 +1,12 @@
 ﻿using System;
 
-namespace TestEcho
+namespace TestEcho;
+
+public class Program
 {
-    public class Program
+    static void Main(string[] args)
     {
-        static void Main(string[] args)
-        {
-            Console.WriteLine(args.Length);
-            Array.ForEach(args, Console.WriteLine);
-        }
+        Console.WriteLine(args.Length);
+        Array.ForEach(args, Console.WriteLine);
     }
 }

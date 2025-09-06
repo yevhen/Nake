@@ -1,26 +1,23 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
-
 using Microsoft.CodeAnalysis;
 
-namespace Nake.Scripting
+namespace Nake.Scripting;
+
+public class AssemblyReference
 {
-    public class AssemblyReference
+    public readonly string FullPath;
+    public readonly string Name;
+
+    public AssemblyReference(MetadataReference reference)
+        : this(reference.Display)
+    {}
+
+    public AssemblyReference(string fullPath)
     {
-        public readonly string FullPath;
-        public readonly string Name;
+        Debug.Assert(!string.IsNullOrEmpty(fullPath));
 
-        public AssemblyReference(MetadataReference reference)
-            : this(reference.Display)
-        {}
-
-        public AssemblyReference(string fullPath)
-        {
-            Debug.Assert(!string.IsNullOrEmpty(fullPath));
-
-            FullPath = fullPath;
-            Name = Path.GetFileNameWithoutExtension(fullPath);
-        }
+        FullPath = fullPath;
+        Name = Path.GetFileNameWithoutExtension(fullPath);
     }
 }

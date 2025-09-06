@@ -1,23 +1,21 @@
 using System;
-using System.Linq;
 
-namespace Nake
+namespace Nake;
+
+/// <summary>
+/// Helps printing console messages with given color
+/// </summary>
+public static class Color
 {
     /// <summary>
-    /// Helps printing console messages with given color
+    /// Temporarily switches console color to the given one, while executing specified action
     /// </summary>
-    public static class Color
+    /// <param name="color">The color to switch to.</param>
+    /// <param name="action">The action to execute.</param>
+    public static void With(ConsoleColor color, Action action)
     {
-        /// <summary>
-        /// Temporarily switches console color to the given one, while executing specified action
-        /// </summary>
-        /// <param name="color">The color to switch to.</param>
-        /// <param name="action">The action to execute.</param>
-        public static void With(ConsoleColor color, Action action)
-        {
-            Console.ForegroundColor = color;
-            action();
-            Console.ResetColor();
-        }
+        Console.ForegroundColor = color;
+        action();
+        Console.ResetColor();
     }
 }

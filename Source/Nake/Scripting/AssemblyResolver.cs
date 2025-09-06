@@ -1,28 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 
-namespace Nake.Scripting
+namespace Nake.Scripting;
+
+public static class AssemblyResolver
 {
-    public static class AssemblyResolver
+    static readonly Dictionary<string, AssemblyReference> references = new();
+
+    public static void Add(AssemblyReference reference) => 
+        references[reference.Name] = reference;
+
+    public static void Register()
     {
-        static readonly Dictionary<string, AssemblyReference> references =
-                    new Dictionary<string, AssemblyReference>();
-
-        public static void Add(AssemblyReference reference) => 
-            references[reference.Name] = reference;
-
-        public static void Register()
+        AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
         {
-            AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
-            {
-                var reference = references.Find(new AssemblyName(args.Name!).Name);
+            var reference = references.Find(new AssemblyName(args.Name!).Name);
                 
-                return reference != null 
-                        ? Assembly.LoadFrom(reference.FullPath) 
-                        : null;
-            };
-        }
+            return reference != null 
+                ? Assembly.LoadFrom(reference.FullPath) 
+                : null;
+        };
     }
 }

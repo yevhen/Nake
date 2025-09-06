@@ -1,69 +1,66 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
 using Nake.Magic;
-
 using NUnit.Framework;
 
-namespace Nake
+namespace Nake;
+
+[TestFixture]
+class Describing_tasks : CodeFixture
 {
-    [TestFixture]
-    class Describing_tasks : CodeFixture
+    [Test]
+    [TestCaseSource("TestCases")]
+    public void Verify(string code, string summary, Type exceptionType)
     {
-        [Test]
-        [TestCaseSource("TestCases")]
-        public void Verify(string code, string summary, Type exceptionType)
+        if (exceptionType != null)
         {
-            if (exceptionType != null)
-            {
-                Assert.Throws(exceptionType, () => FindTaskDeclarations(code));
-                return;
-            }
-
-            var tasks = FindTaskDeclarations(code);
-            Assert.That(tasks.Single().Summary, Is.EqualTo(summary));
+            Assert.Throws(exceptionType, () => FindTaskDeclarations(code));
+            return;
         }
 
-        static IEnumerable<TaskDeclaration> FindTaskDeclarations(string code)
-        {
-            return new TaskDeclarationScanner().Scan(code);
-        }
+        var tasks = FindTaskDeclarations(code);
+        Assert.That(tasks.Single().Summary, Is.EqualTo(summary));
+    }
 
-        static object[][] TestCases()
-        {
-            return new[]
-            {
-                TaskDeclaration(
-                    @"[Nake] public static void NotDescribed() {}", ""
-                ),
+    static IEnumerable<TaskDeclaration> FindTaskDeclarations(string code)
+    {
+        return new TaskDeclarationScanner().Scan(code);
+    }
 
-                TaskDeclaration(
-                    @"
+    static object[][] TestCases()
+    {
+        return
+        [
+            TaskDeclaration(
+                @"[Nake] public static void NotDescribed() {}", ""
+            ),
+
+            TaskDeclaration(
+                @"
                     /// 
                     [Nake] public static void WhitespaceOnlyInSummary() {}", ""
-                ),
+            ),
 
-                TaskDeclaration(
-                    @"
+            TaskDeclaration(
+                @"
                     /// described in F#-style summary doc
                     [Nake] public static void ProperlyDescribed() {}", "described in F#-style summary doc"
-                ),
+            ),
 
-                TaskDeclaration(
-                    @"
+            TaskDeclaration(
+                @"
                     // described in simple comment style
                     [Nake] public static void InvalidXmlDoc() {}", ""
-                )
-            };
-        }
+            )
+        ];
+    }
 
-        static object[] TaskDeclaration(string code, string summary)
-        {
-            return new object[]
-            {
-                code, summary, null
-            };
-        }
+    static object[] TaskDeclaration(string code, string summary)
+    {
+        return
+        [
+            code, summary, null
+        ];
     }
 }

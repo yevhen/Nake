@@ -1,87 +1,83 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-
 using NUnit.Framework;
 
-namespace Nake.Utility
+namespace Nake.Utility;
+
+[TestFixture]
+public class FileSetExtensionsFixture
 {
-    [TestFixture]
-    public class FileSetExtensionsFixture
+    FileSet files;
+
+    [SetUp]
+    public void SetUp()
     {
-        FileSet files;
+        Location.CurrentDirectory = BaseDirectory();
 
-        [SetUp]
-        public void SetUp()
+        files = new FileSet();
+    }
+
+    [Test]
+    public void Mirroring()
+    {
+        files.Include(@"A");
+        files.Include(@"B");
+
+        var destination = Path.Combine(BaseDirectory(), @"R");
+        var result = files.Mirror(destination);
+
+        var expected = new List<string>
         {
-            Location.CurrentDirectory = BaseDirectory();
+            Path.Combine(destination, @"A"),
+            Path.Combine(destination, @"B"),
+        };
 
-            files = new FileSet();
-        }
+        Assert.That(result, Is.EquivalentTo(expected));
+    }
 
-        [Test]
-        public void Mirroring()
+    [Test] public void Flattening()
+    {
+        files.Include(@"A\**\*.lg");
+
+        var destination = Path.Combine(BaseDirectory(), @"R");
+        var result = files.Flatten(destination);
+
+        var expected = new List<string>
         {
-            files.Include(@"A");
-            files.Include(@"B");
+            Path.Combine(destination, @"A3.lg"),
+            Path.Combine(destination, @"AC3.lg"),
+        };
 
-            var destination = Path.Combine(BaseDirectory(), @"R");
-            var result = files.Mirror(destination);
+        Assert.That(result, Is.EquivalentTo(expected));
+    }
 
-            var expected = new List<string>
-            {
-                Path.Combine(destination, @"A"),
-                Path.Combine(destination, @"B"),
-            };
-
-            Assert.That(result, Is.EquivalentTo(expected));
-        }
-
-        [Test] public void Flattening()
-        {
-            files.Include(@"A\**\*.lg");
-
-            var destination = Path.Combine(BaseDirectory(), @"R");
-            var result = files.Flatten(destination);
-
-            var expected = new List<string>
-            {
-                Path.Combine(destination, @"A3.lg"),
-                Path.Combine(destination, @"AC3.lg"),
-            };
-
-            Assert.That(result, Is.EquivalentTo(expected));
-        }
-
-        [Test] public void Transforming()
-        {
-            files.Include(@"**\*.lg");
+    [Test] public void Transforming()
+    {
+        files.Include(@"**\*.lg");
             
-            var destination = Path.Combine(BaseDirectory(), @"R");
+        var destination = Path.Combine(BaseDirectory(), @"R");
 
-            var result = files.Transform( 
-                x => Path.Combine(destination, x.RecursivePath, x.Name + ".tmp"));
+        var result = files.Transform( 
+            x => Path.Combine(destination, x.RecursivePath, x.Name + ".tmp"));
 
-            var expected = new List<string>
-            {
-                Path.Combine(destination, "A", "A3.tmp"),
-                Path.Combine(destination, "A", "C", "AC3.tmp"),
-                Path.Combine(destination, "B", "B3.tmp"),
-                Path.Combine(destination, "B", "C", "BC3.tmp"),
-            };
-
-            Assert.That(result, Is.EquivalentTo(expected));
-        }
-
-        static string BaseDirectory()
+        var expected = new List<string>
         {
-            var assemblyLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            Debug.Assert(assemblyLocation != null);
+            Path.Combine(destination, "A", "A3.tmp"),
+            Path.Combine(destination, "A", "C", "AC3.tmp"),
+            Path.Combine(destination, "B", "B3.tmp"),
+            Path.Combine(destination, "B", "C", "BC3.tmp"),
+        };
 
-            return Path.Combine(assemblyLocation, "Testing", "FileList");
-        }
+        Assert.That(result, Is.EquivalentTo(expected));
+    }
+
+    static string BaseDirectory()
+    {
+        var assemblyLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        Debug.Assert(assemblyLocation != null);
+
+        return Path.Combine(assemblyLocation, "Testing", "FileList");
     }
 }

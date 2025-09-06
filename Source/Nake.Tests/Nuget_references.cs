@@ -1,15 +1,15 @@
 ﻿using NUnit.Framework;
 
-namespace Nake
+namespace Nake;
+
+[TestFixture]
+class Nuget_references : CodeFixture
 {
-    [TestFixture]
-    class Nuget_references : CodeFixture
+    [Test]
+    [Category("Slow")]
+    public void Nuget_references_are_resolved_via_dotnet_script()
     {
-        [Test]
-        [Category("Slow")]
-        public void Nuget_references_are_resolved_via_dotnet_script()
-        {
-            BuildFile(@"
+        BuildFile(@"
                 
                 #r ""nuget: Streamstone, 2.3.0""
 
@@ -21,9 +21,8 @@ namespace Nake
                 }
             ");
 
-            Invoke("Test");
+        Invoke("Test");
 
-            Assert.That(Env.Var["ResolvedShard"], Is.EqualTo("5"));
-        }
+        Assert.That(Env.Var["ResolvedShard"], Is.EqualTo("5"));
     }
 }

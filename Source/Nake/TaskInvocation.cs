@@ -4,121 +4,119 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-
 using AsyncTask = System.Threading.Tasks.Task;
 
-namespace Nake
+namespace Nake;
+
+class TaskInvocation
 {
-    class TaskInvocation
+    readonly object script;
+    readonly Task task;
+    readonly MethodInfo method;
+    readonly object[] values;
+
+    public TaskInvocation(object script, Task task, MethodInfo method, IList<TaskArgument> arguments)
     {
-        readonly object script;
-        readonly Task task;
-        readonly MethodInfo method;
-        readonly object[] values;
+        this.script = script;
+        this.task = task;
+        this.method = method;
 
-        public TaskInvocation(object script, Task task, MethodInfo method, IList<TaskArgument> arguments)
+        values = Bind(arguments);
+    }
+
+    object[] Bind(IList<TaskArgument> arguments)
+    {
+        var result = method.GetParameters()
+            .ToDictionary(parameter => parameter, parameter => Type.Missing);
+
+        for (var i = 0; i < arguments.Count; i++)
         {
-            this.script = script;
-            this.task = task;
-            this.method = method;
+            var argument = arguments[i];
 
-            values = Bind(arguments);
+            var parameter = argument.IsPositional()
+                ? GetParameterByPosition(i)
+                : GetParameterByName(argument.Name);
+
+            if (parameter == null)
+                throw new TaskArgumentException(task, 
+                    $"Cannot bind argument ({i + 1}) -> {(argument.IsNamed() ? argument.Name + ":" : "")}{argument.Value}");
+
+            result[parameter] = Convert(argument, i, parameter);
         }
 
-        object[] Bind(IList<TaskArgument> arguments)
+        return result.Values.ToArray();
+    }
+
+    ParameterInfo GetParameterByPosition(int position) => 
+        method.GetParameters().SingleOrDefault(x => x.Position == position);
+
+    ParameterInfo GetParameterByName(string name) => 
+        method.GetParameters().SingleOrDefault(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
+
+    object Convert(TaskArgument arg, int position, ParameterInfo parameter)
+    {
+        try
         {
-            var result = method.GetParameters()
-                .ToDictionary(parameter => parameter, parameter => Type.Missing);
-
-            for (var i = 0; i < arguments.Count; i++)
-            {
-                var argument = arguments[i];
-
-                var parameter = argument.IsPositional()
-                    ? GetParameterByPosition(i)
-                    : GetParameterByName(argument.Name);
-
-                if (parameter == null)
-                    throw new TaskArgumentException(task, 
-                        $"Cannot bind argument ({i + 1}) -> {(argument.IsNamed() ? argument.Name + ":" : "")}{argument.Value}");
-
-                result[parameter] = Convert(argument, i, parameter);
-            }
-
-            return result.Values.ToArray();
+            return arg.Convert(parameter.ParameterType);
         }
-
-        ParameterInfo GetParameterByPosition(int position) => 
-            method.GetParameters().SingleOrDefault(x => x.Position == position);
-
-        ParameterInfo GetParameterByName(string name) => 
-            method.GetParameters().SingleOrDefault(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
-
-        object Convert(TaskArgument arg, int position, ParameterInfo parameter)
+        catch (InvalidCastException e)
         {
-            try
-            {
-                return arg.Convert(parameter.ParameterType);
-            }
-            catch (InvalidCastException e)
-            {
-                throw new TaskArgumentException(task, parameter.Name, position, e.Message);
-            }
-            catch (FormatException e)
-            {
-                throw new TaskArgumentException(task, parameter.Name, position, e.Message);
-            }
-            catch (ArgumentException e)
-            {
-                throw new TaskArgumentException(task, parameter.Name, position, e.Message);
-            }
-            catch (OverflowException e)
-            {
-                throw new TaskArgumentException(task, parameter.Name, position, e.Message);
-            }
+            throw new TaskArgumentException(task, parameter.Name, position, e.Message);
         }
-
-        public async AsyncTask Invoke()
+        catch (FormatException e)
         {
-            try
-            {
-                object host = null;
+            throw new TaskArgumentException(task, parameter.Name, position, e.Message);
+        }
+        catch (ArgumentException e)
+        {
+            throw new TaskArgumentException(task, parameter.Name, position, e.Message);
+        }
+        catch (OverflowException e)
+        {
+            throw new TaskArgumentException(task, parameter.Name, position, e.Message);
+        }
+    }
 
-                if (!method.IsStatic)
-                    host = GetMethodHost();                    
+    public async AsyncTask Invoke()
+    {
+        try
+        {
+            object host = null;
 
-                var result = method.Invoke(
-                    host, BindingFlags.OptionalParamBinding, null,
-                    values, CultureInfo.InvariantCulture);
+            if (!method.IsStatic)
+                host = GetMethodHost();                    
 
-                switch (result)
-                {
-                    case AsyncTask t:
-                        await t;
-                        break;
-                    default:
-                        await AsyncTask.CompletedTask;
-                        break;
-                }
-            }
-            catch (ArgumentException)
+            var result = method.Invoke(
+                host, BindingFlags.OptionalParamBinding, null,
+                values, CultureInfo.InvariantCulture);
+
+            switch (result)
             {
-                throw new TaskArgumentException(task, "Missing parameter does not have a default value.");
-            }
-            catch (TargetParameterCountException)
-            {
-                throw new TaskArgumentException(task, "Parameter count mismatch");
-            }
-            catch (TargetInvocationException ex)
-            {
-                throw new TaskInvocationException(task, ex.GetBaseException());
+                case AsyncTask t:
+                    await t;
+                    break;
+                default:
+                    await AsyncTask.CompletedTask;
+                    break;
             }
         }
-
-        object GetMethodHost()
+        catch (ArgumentException)
         {
-            Debug.Assert(method.DeclaringType != null);
-            return task.IsGlobal ? script : Activator.CreateInstance(method.DeclaringType);
+            throw new TaskArgumentException(task, "Missing parameter does not have a default value.");
         }
+        catch (TargetParameterCountException)
+        {
+            throw new TaskArgumentException(task, "Parameter count mismatch");
+        }
+        catch (TargetInvocationException ex)
+        {
+            throw new TaskInvocationException(task, ex.GetBaseException());
+        }
+    }
+
+    object GetMethodHost()
+    {
+        Debug.Assert(method.DeclaringType != null);
+        return task.IsGlobal ? script : Activator.CreateInstance(method.DeclaringType);
     }
 }

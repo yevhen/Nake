@@ -6,199 +6,186 @@ using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
+using Nake.Scripting;
 using static System.Environment;
 
-namespace Nake
+namespace Nake;
+
+class CachingBuildEngine(BuildEngine engine, Task[] tasks, bool reset)
 {
-    using Scripting;
-
-    class CachingBuildEngine
+    public (BuildResult result, CacheKey cache) Build(BuildInput input)
     {
-        readonly BuildEngine engine;
-        readonly Task[] tasks;
-        readonly bool reset;
+        if (!input.Source.IsFile)
+            return (engine.Build(input), null);
 
-        public CachingBuildEngine(BuildEngine engine, Task[] tasks, bool reset)
+        var cache = new CacheKey(input);
+        if (reset)
+            cache.Reset();
+
+        var dependencies = cache.FindDependencies();
+        if (dependencies != null)
         {
-            this.engine = engine;
-            this.tasks = tasks;
-            this.reset = reset;
+            input = input.WithCached(dependencies);
+
+            var compilation = cache.FindCompilation(tasks, dependencies);
+            if (compilation != null)
+                return (compilation, cache);
         }
 
-        public (BuildResult result, CacheKey cache) Build(BuildInput input)
-        {
-            if (!input.Source.IsFile)
-                return (engine.Build(input), null);
+        var output = engine.Build(input);
+        cache.Store(output);
 
-            var cache = new CacheKey(input);
-            if (reset)
-                cache.Reset();
+        return (output, cache);
+    }
+}
 
-            var dependencies = cache.FindDependencies();
-            if (dependencies != null)
-            {
-                input = input.WithCached(dependencies);
+class CacheKey
+{
+    public static readonly string RootCacheFolder;
 
-                var compilation = cache.FindCompilation(tasks, dependencies);
-                if (compilation != null)
-                    return (compilation, cache);
-            }
-
-            var output = engine.Build(input);
-            cache.Store(output);
-
-            return (output, cache);
-        }
+    static CacheKey()
+    {
+        var version = Assembly.GetExecutingAssembly().GetName().Version;
+        RootCacheFolder = Path.Combine(Path.GetTempPath(), "Nake." + version);
     }
 
-    class CacheKey
+    public readonly string ScriptFolder;
+    public readonly string ProjectFolder;
+    public readonly string CompilationFolder;
+
+    readonly SHA1 sha1 = SHA1.Create();
+    readonly bool debug;
+    readonly ScriptSource source;
+    readonly IEnumerable<KeyValuePair<string, string>> substitutions;
+
+    public CacheKey(BuildInput input)
     {
-        public static readonly string RootCacheFolder;
+        Debug.Assert(input.Source.IsFile);
 
-        static CacheKey()
-        {
-            var version = Assembly.GetExecutingAssembly().GetName().Version;
-            RootCacheFolder = Path.Combine(Path.GetTempPath(), "Nake." + version);
-        }
+        source = input.Source;
+        debug = input.Debug;
+        substitutions = input.Substitutions;
 
-        public readonly string ScriptFolder;
-        public readonly string ProjectFolder;
-        public readonly string CompilationFolder;
+        ScriptFolder = Path.Combine(RootCacheFolder, StringHash(source.File.FullName));
+        ProjectFolder = Path.Combine(ScriptFolder, ComputeProjectHash());
+        CompilationFolder = Path.Combine(ProjectFolder, ComputeCompilationHash());
+    }
 
-        readonly SHA1 sha1 = SHA1.Create();
-        readonly bool debug;
-        readonly ScriptSource source;
-        readonly IEnumerable<KeyValuePair<string, string>> substitutions;
-        
-        public CacheKey(BuildInput input)
-        {
-            Debug.Assert(input.Source.IsFile);
+    string AssemblyFile => Path.Combine(CompilationFolder, source.File.Name + ".dll");
+    string PdbFile => Path.Combine(CompilationFolder, source.File.Name + ".pdb");
 
-            source = input.Source;
-            debug = input.Debug;
-            substitutions = input.Substitutions;
+    string ReferencesFile => Path.Combine(ProjectFolder, "references");
+    string CapturedVariablesFile => Path.Combine(CompilationFolder, "variables");
 
-            ScriptFolder = Path.Combine(RootCacheFolder, StringHash(source.File.FullName));
-            ProjectFolder = Path.Combine(ScriptFolder, ComputeProjectHash());
-            CompilationFolder = Path.Combine(ProjectFolder, ComputeCompilationHash());
-        }
+    string ComputeCompilationHash() => StringHash(source.Code + ToDeterministicString(substitutions) + debug);
+    string ComputeProjectHash() => StringHash(source.ProjectFileContents());
 
-        string AssemblyFile => Path.Combine(CompilationFolder, source.File.Name + ".dll");
-        string PdbFile => Path.Combine(CompilationFolder, source.File.Name + ".pdb");
-        
-        string ReferencesFile => Path.Combine(ProjectFolder, "references");
-        string CapturedVariablesFile => Path.Combine(CompilationFolder, "variables");
-        
-        string ComputeCompilationHash() => StringHash(source.Code + ToDeterministicString(substitutions) + debug);
-        string ComputeProjectHash() => StringHash(source.ProjectFileContents());
+    static string ToDeterministicString(IEnumerable<KeyValuePair<string, string>> substitutions) =>
+        string.Join("", substitutions
+            .OrderBy(x => x.Key.ToLower())
+            .Select(x => x.Key.ToLower() + x.Value.ToLower()));
 
-        static string ToDeterministicString(IEnumerable<KeyValuePair<string, string>> substitutions) =>
-            string.Join("", substitutions
-                .OrderBy(x => x.Key.ToLower())
-                .Select(x => x.Key.ToLower() + x.Value.ToLower()));
+    string StringHash(string s) => EnsureSafePath(Convert.ToBase64String(sha1.ComputeHash(Encoding.UTF8.GetBytes(s))));
 
-        string StringHash(string s) => EnsureSafePath(Convert.ToBase64String(sha1.ComputeHash(Encoding.UTF8.GetBytes(s))));
+    string EnsureSafePath(string s)
+    {
+        // Hashed value is used as a directory name.
+        // According to http://en.wikipedia.org/wiki/Base64 Base64 could contain '/' symbol.
+        // It breaks Path.Combine(temp, hash) sematics.
+        // E.g Path.Combine("c:\temp\nake", "/somebase64string") would produce '/somebase64string'
+        // which is not quite expected.
+        // Workaround it by replacing dangerous character with '_' symbol.
+        // It's used in some alternative Base64 implementations:
+        // http://en.wikipedia.org/wiki/Base64#Variants_summary_table
+        return s.Replace("/", "_").Replace("\\", "_").Replace("+", "_").Replace("=", "_");
+    }
 
-        string EnsureSafePath(string s)
-        {
-            // Hashed value is used as a directory name.
-            // According to http://en.wikipedia.org/wiki/Base64 Base64 could contain '/' symbol.
-            // It breaks Path.Combine(temp, hash) sematics. 
-            // E.g Path.Combine("c:\temp\nake", "/somebase64string") would produce '/somebase64string'
-            // which is not quite expected.
-            // Workaround it by replacing dangerous character with '_' symbol.
-            // It's used in some alternative Base64 implementations:
-            // http://en.wikipedia.org/wiki/Base64#Variants_summary_table
-            return s.Replace("/", "_").Replace("\\", "_").Replace("+", "_").Replace("=", "_");
-        }
+    public AssemblyReference[] FindDependencies() =>
+        ProjectFolderExists()
+            ? ReadReferences()
+            : null;
 
-        public AssemblyReference[] FindDependencies() =>
-            ProjectFolderExists()
-                ? ReadReferences()
-                : null;
+    public BuildResult FindCompilation(Task[] tasks, AssemblyReference[] references)
+    {
+        if (!CachedAssemblyExists())
+            return null;
 
-        public BuildResult FindCompilation(Task[] tasks, AssemblyReference[] references)
-        {
-            if (!CachedAssemblyExists())
-                return null;
+        if (CapturedVariablesMismatch())
+            return null;
 
-            if (CapturedVariablesMismatch())
-                return null;
+        var assembly = ReadAssembly();
+        var symbols = ReadSymbols();
 
-            var assembly = ReadAssembly();
-            var symbols = ReadSymbols();
+        return new BuildResult(tasks, references, null, assembly, debug ? symbols : null);
+    }
 
-            return new BuildResult(tasks, references, null, assembly, debug ? symbols : null);
-        }
+    bool ProjectFolderExists() => Directory.Exists(ProjectFolder);
+    bool CachedAssemblyExists() => File.Exists(AssemblyFile);
 
-        bool ProjectFolderExists() => Directory.Exists(ProjectFolder);
-        bool CachedAssemblyExists() => File.Exists(AssemblyFile);
+    bool CapturedVariablesMismatch()
+    {
+        var lines = File.ReadAllLines(CapturedVariablesFile);
 
-        bool CapturedVariablesMismatch()
-        {
-            var lines = File.ReadAllLines(CapturedVariablesFile);
+        var names = lines[0].Split(["!#!"], StringSplitOptions.RemoveEmptyEntries);
+        var captured = lines[1];
 
-            var names = lines[0].Split(["!#!"], StringSplitOptions.RemoveEmptyEntries);
-            var captured = lines[1];
+        if (names.Length == 0)
+            return false;
 
-            if (names.Length == 0)
-                return false;
+        var current = new StringBuilder();
+        foreach (var name in names)
+            current.Append(GetEnvironmentVariable(name));
 
-            var current = new StringBuilder();
-            foreach (var name in names)
-                current.Append(GetEnvironmentVariable(name));
+        return StringHash(current.ToString()) != captured;
+    }
 
-            return StringHash(current.ToString()) != captured;
-        }
+    AssemblyReference[] ReadReferences() =>
+        File.ReadAllLines(ReferencesFile)
+            .Select(line => new AssemblyReference(line))
+            .ToArray();
 
-        AssemblyReference[] ReadReferences() =>
-            File.ReadAllLines(ReferencesFile)
-                .Select(line => new AssemblyReference(line))
-                .ToArray();
+    byte[] ReadAssembly() => File.ReadAllBytes(AssemblyFile);
+    byte[] ReadSymbols() => debug && File.Exists(PdbFile) ? File.ReadAllBytes(PdbFile) : null;
 
-        byte[] ReadAssembly() => File.ReadAllBytes(AssemblyFile);
-        byte[] ReadSymbols() => debug && File.Exists(PdbFile) ? File.ReadAllBytes(PdbFile) : null;
+    public void Store(BuildResult result)
+    {
+        CreateCacheFolders();
 
-        public void Store(BuildResult result)
-        {
-            CreateCacheFolders();
+        WriteReferences(result);
+        WriteVariables(result);
+        WriteAssembly(result);
+        WriteSymbols(result);
+    }
 
-            WriteReferences(result);
-            WriteVariables(result);
-            WriteAssembly(result);
-            WriteSymbols(result);
-        }
+    void CreateCacheFolders() => Directory.CreateDirectory(CompilationFolder);
+    void WriteReferences(BuildResult result) => File.WriteAllLines(ReferencesFile, result.References.Select(x => x.FullPath));
 
-        void CreateCacheFolders() => Directory.CreateDirectory(CompilationFolder);
-        void WriteReferences(BuildResult result) => File.WriteAllLines(ReferencesFile, result.References.Select(x => x.FullPath));
+    void WriteVariables(BuildResult result)
+    {
+        var variables = result.Variables
+            .OrderBy(x => x.Name)
+            .ToArray();
 
-        void WriteVariables(BuildResult result)
-        {
-            var variables = result.Variables
-                .OrderBy(x => x.Name)
-                .ToArray();
+        var names  = string.Join("!#!", variables.Select(x => x.Name));
+        var values = StringHash(string.Join("", variables.Select(x => x.Value)));
 
-            var names  = string.Join("!#!", variables.Select(x => x.Name));
-            var values = StringHash(string.Join("", variables.Select(x => x.Value)));
+        File.WriteAllLines(CapturedVariablesFile, [names, values]);
+    }
 
-            File.WriteAllLines(CapturedVariablesFile, [names, values]);
-        }
+    void WriteAssembly(BuildResult result)
+    {
+        File.WriteAllBytes(AssemblyFile, result.AssemblyBytes);
+    }
 
-        void WriteAssembly(BuildResult result)
-        {
-            File.WriteAllBytes(AssemblyFile, result.AssemblyBytes);
-        }
+    void WriteSymbols(BuildResult result)
+    {
+        if (result.SymbolBytes != null)
+            File.WriteAllBytes(PdbFile, result.SymbolBytes);
+    }
 
-        void WriteSymbols(BuildResult result)
-        {
-            if (result.SymbolBytes != null)
-                File.WriteAllBytes(PdbFile, result.SymbolBytes);
-        }
-
-        public void Reset()
-        {
-            if (Directory.Exists(ScriptFolder))
-                Directory.Delete(ScriptFolder, recursive: true);
-        }
+    public void Reset()
+    {
+        if (Directory.Exists(ScriptFolder))
+            Directory.Delete(ScriptFolder, recursive: true);
     }
 }
