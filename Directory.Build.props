@@ -48,8 +48,8 @@
 
 		<!-- Infrastructure packages -->
         <MedallionShellVersion>1.6.2</MedallionShellVersion>
-		<DotnetScriptDependencyModelVersion>1.5.0</DotnetScriptDependencyModelVersion>
-		<DotnetScriptDependencyModelNugetVersion>1.5.0</DotnetScriptDependencyModelNugetVersion>
+		<DotnetScriptDependencyModelVersion>1.6.0</DotnetScriptDependencyModelVersion>
+		<DotnetScriptDependencyModelNugetVersion>1.6.0</DotnetScriptDependencyModelNugetVersion>
 
         <!-- MSBuild packages -->
         <MicrosoftBuildVersion>17.14.8</MicrosoftBuildVersion>
@@ -59,19 +59,19 @@
 
         <!-- Conflicted dependencies -->
         <MicrosoftWin32RegistryVersion>5.0.0</MicrosoftWin32RegistryVersion>
-        <SystemCodeDomVersion>9.0.0</SystemCodeDomVersion>
+        <SystemCodeDomVersion>9.0.8</SystemCodeDomVersion>
         <SystemSecurityPrincipalWindowsVersion>5.0.0</SystemSecurityPrincipalWindowsVersion>
-        <SystemSecurityCryptographyProtectedDataVersion>8.0.0</SystemSecurityCryptographyProtectedDataVersion>
+        <SystemSecurityCryptographyProtectedDataVersion>9.0.8</SystemSecurityCryptographyProtectedDataVersion>
 
         <!-- Roslyn packages -->
-        <MicrosoftCodeAnalysisScriptingVersion>4.8.0</MicrosoftCodeAnalysisScriptingVersion>
+        <MicrosoftCodeAnalysisScriptingVersion>4.14.0</MicrosoftCodeAnalysisScriptingVersion>
 
         <!-- Microsoft extensions -->
         <MicrosoftExtensionsLoggingVersion>8.0.1</MicrosoftExtensionsLoggingVersion>
         <MicrosoftExtensionsLoggingConsoleVersion>8.0.1</MicrosoftExtensionsLoggingConsoleVersion>
 
         <!-- Testing packages -->
-        <NUnitVersion>4.0.1</NUnitVersion>
+        <NUnitVersion>4.2.2</NUnitVersion>
         <NUnit3TestAdapterVersion>4.6.0</NUnit3TestAdapterVersion>
         <MicrosoftNETTestSdkVersion>17.14.1</MicrosoftNETTestSdkVersion>
         <PowerAssertVersion>1.0.79</PowerAssertVersion>
