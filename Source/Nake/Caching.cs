@@ -138,7 +138,7 @@ namespace Nake
         {
             var lines = File.ReadAllLines(CapturedVariablesFile);
 
-            var names = lines[0].Split(new[]{"!#!"}, StringSplitOptions.RemoveEmptyEntries);
+            var names = lines[0].Split(["!#!"], StringSplitOptions.RemoveEmptyEntries);
             var captured = lines[1];
 
             if (names.Length == 0)
@@ -181,7 +181,7 @@ namespace Nake
             var names  = string.Join("!#!", variables.Select(x => x.Name));
             var values = StringHash(string.Join("", variables.Select(x => x.Value)));
 
-            File.WriteAllLines(CapturedVariablesFile, new[]{names, values});
+            File.WriteAllLines(CapturedVariablesFile, [names, values]);
         }
 
         void WriteAssembly(BuildResult result)

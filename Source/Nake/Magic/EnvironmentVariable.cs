@@ -1,25 +1,18 @@
-﻿namespace Nake.Magic
+﻿namespace Nake.Magic;
+
+struct EnvironmentVariable(string name, string value)
 {
-    struct EnvironmentVariable
+    public readonly string Name = name;
+    public readonly string Value = value;
+
+    public override bool Equals(object obj)
     {
-        public readonly string Name;
-        public readonly string Value;
+        var other = (EnvironmentVariable) obj;
+        return string.Equals(Name, other.Name);
+    }
 
-        public EnvironmentVariable(string name, string value)
-        {
-            Name = name;
-            Value = value;
-        }
-
-        public override bool Equals(object obj)
-        {
-            var other = (EnvironmentVariable) obj;
-            return string.Equals(Name, other.Name);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked { return (Name.GetHashCode() * 397); }
-        }
+    public override int GetHashCode()
+    {
+        unchecked { return (Name.GetHashCode() * 397); }
     }
 }

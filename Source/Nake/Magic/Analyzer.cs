@@ -49,7 +49,7 @@ namespace Nake.Magic
 
             current = result.Find(symbol);
 
-            if (current == null)
+            if (current is null)
             {
                 current = new Task(symbol, isStep);
                 result.Add(symbol, current);

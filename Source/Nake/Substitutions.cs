@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace Nake
+namespace Nake;
+
+public static class Substitutions
 {
-    public static class Substitutions
-    {
-        public static string EnvironmentVariable(string name) => Environment.GetEnvironmentVariable(name) ?? "";
-    }
+    public static string EnvironmentVariable(string name) => Environment.GetEnvironmentVariable(name) ?? "";
 }

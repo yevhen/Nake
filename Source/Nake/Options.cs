@@ -86,8 +86,7 @@ namespace Nake
 
         public static void PrintUsage()
         {
-            var banner = string.Format(
-                "Usage: {0} [options ...] [VAR=VALUE ...] [task ...]", Runner.Label());
+            var banner = $"Usage: {Runner.Label()} [options ...] [VAR=VALUE ...] [task ...]";
 
             Console.WriteLine(Environment.NewLine + banner);
             Console.WriteLine(Environment.NewLine + "Options:");

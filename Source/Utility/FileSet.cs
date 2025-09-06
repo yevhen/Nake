@@ -179,7 +179,7 @@ namespace Nake
         /// <returns>A sequence of file items with additional information</returns>
         public IEnumerable<Item> Resolve()
         {
-            if (resolved != null)
+            if (resolved is not null)
                 return resolved;
 
             resolved = new HashSet<Item>();

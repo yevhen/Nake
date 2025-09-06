@@ -180,7 +180,7 @@ namespace GlobDir
                         if (ungrouper.Level < 1)
                         {
                             // Unbalanced closing bracket matches nothing
-                            return new string[] {};
+                            return [];
                         }
                         ungrouper.FinishLevel();
                         break;
@@ -374,7 +374,7 @@ namespace GlobDir
             {
                 if (pattern.Length == 0)
                 {
-                    return new string[] {};
+                    return [];
                 }
 
                 var pos = 0;
@@ -509,7 +509,7 @@ namespace GlobDir
             {
                 if (level != 0)
                 {
-                    return new string[] {};
+                    return [];
                 }
                 var list = rootNode.Flatten();
                 var result = new string[list.Count];
