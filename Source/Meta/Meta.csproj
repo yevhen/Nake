@@ -6,11 +6,13 @@
     <AssemblyName>Nake.Meta</AssemblyName>
     <IsPackable>true</IsPackable>
     <PackageIcon>Logo.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
     <None Include="..\..\Logo.png" Pack="true" PackagePath=""/>
+    <None Include="..\..\README.md" Pack="true" PackagePath=""/>
   </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">

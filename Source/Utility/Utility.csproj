@@ -6,11 +6,12 @@
     <AssemblyName>Nake.Utility</AssemblyName>
     <IsPackable>true</IsPackable>
     <PackageIcon>Logo.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
     <None Include="..\..\Logo.png" Pack="true" PackagePath=""/>
-    <None Remove="Shell.Run.fix.md" />
+    <None Include="..\..\README.md" Pack="true" PackagePath=""/>
   </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
