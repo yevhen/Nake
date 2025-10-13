@@ -3,8 +3,8 @@
 /**/
 #r "System.Net.WebClient"
 
-#r "nuget: Nake.Meta, 3.0.0"
-#r "nuget: Nake.Utility, 3.0.0"
+#r "nuget: Nake.Meta, 4.0.0"
+#r "nuget: Nake.Utility, 4.0.0"
 
 using System.IO;
 using System.Text;
